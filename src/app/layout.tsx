@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { FloatingNav } from "@/components/navigation/floating-nav";
+import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/toaster";
 import { Providers } from "@/components/providers";
+import { Geist, Geist_Mono } from "next/font/google";
+import { FloatingNav } from "@/components/navigation/floating-nav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,12 +17,22 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Connect Foundation - Bridging Orphanages and Donors Worldwide",
-  description: "Connect Foundation helps orphanages sign up, connect, and share issues they are facing. Join our community of donors making a real difference in children's lives.",
-  keywords: ["orphanage", "donation", "charity", "foundation", "children", "help", "transparency"],
+  description:
+    "Connect Foundation helps orphanages sign up, connect, and share issues they are facing. Join our community of donors making a real difference in children's lives.",
+  keywords: [
+    "orphanage",
+    "donation",
+    "charity",
+    "foundation",
+    "children",
+    "help",
+    "transparency",
+  ],
   authors: [{ name: "Connect Foundation" }],
   openGraph: {
     title: "Connect Foundation - Bridging Orphanages and Donors Worldwide",
-    description: "Join our community of donors making a real difference in children's lives.",
+    description:
+      "Join our community of donors making a real difference in children's lives.",
     type: "website",
     locale: "en_US",
   },

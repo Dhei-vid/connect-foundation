@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint"
@@ -21,9 +21,10 @@
     "clsx": "^2.1.1",
     "firebase": "^12.1.0",
     "framer-motion": "^11.0.0",
+    "geist": "^1.4.2",
     "jotai": "^2.6.0",
     "lucide-react": "^0.400.0",
-    "next": "15.5.2",
+    "next": "^15.5.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.48.2",

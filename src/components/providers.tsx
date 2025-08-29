@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React, { useEffect } from 'react';
-import { Provider } from 'jotai';
-import { useAtom } from 'jotai';
-import { userAtom, isLoadingAtom } from '@/store/auth';
-import { onAuthStateChange } from '@/firebase/auth';
+import React, { useEffect } from "react";
+import { Provider } from "jotai";
+import { useAtom } from "jotai";
+import { userAtom, isLoadingAtom } from "@/store/auth";
+import { onAuthStateChange } from "@/firebase/auth";
 
 function AppProviders({ children }: { children: React.ReactNode }) {
   const [, setUser] = useAtom(userAtom);
@@ -25,9 +25,7 @@ function AppProviders({ children }: { children: React.ReactNode }) {
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <Provider>
-      <AppProviders>
-        {children}
-      </AppProviders>
+      <AppProviders>{children}</AppProviders>
     </Provider>
   );
 }
