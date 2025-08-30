@@ -60,6 +60,7 @@ export function FloatingNav() {
         description: "You have been signed out of your account.",
       });
     } catch (error) {
+      console.log(error);
       toast({
         title: "Error signing out",
         description: "There was an error signing you out. Please try again.",
@@ -175,7 +176,6 @@ export function FloatingNav() {
                   >
                     <Link href={item.href}>
                       <Button
-                        variant="glass"
                         size="icon"
                         className={`h-12 w-12 rounded-full ${
                           pathname === item.href
@@ -210,7 +210,6 @@ export function FloatingNav() {
         >
           <div className="relative">
             <Button
-              variant="glass"
               size="icon"
               className="h-12 w-12 rounded-full"
               onClick={() => setIsExpanded(!isExpanded)}

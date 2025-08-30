@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Sun, Moon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAtom } from 'jotai';
-import { toggleThemeAtom, isDarkModeAtom } from '@/store/theme';
+import React from "react";
+import { motion } from "framer-motion";
+import { Sun, Moon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAtom } from "jotai";
+import { toggleThemeAtom, isDarkModeAtom } from "@/store/theme";
 
 export function ThemeToggle() {
   const [isDarkMode] = useAtom(isDarkModeAtom);
@@ -18,7 +18,6 @@ export function ThemeToggle() {
       transition={{ delay: 0.6, type: "spring", stiffness: 260, damping: 20 }}
     >
       <Button
-        variant="glass"
         size="icon"
         className="h-12 w-12 rounded-full"
         onClick={toggleTheme}

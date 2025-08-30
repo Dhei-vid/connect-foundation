@@ -2,7 +2,7 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Card } from "../ui/card";
 import { Heart } from "lucide-react";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 import { headerStyle } from "@/common/style";
 import { cn } from "@/lib/utils";
 import Image from "next/image";

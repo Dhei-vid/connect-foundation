@@ -1,7 +1,15 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Heart, DollarSign, Gift, Users, Target, Shield, TrendingUp } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import {
+  Heart,
+  DollarSign,
+  Gift,
+  Users,
+  Target,
+  Shield,
+  TrendingUp,
+} from "lucide-react";
 
 export default function Page() {
   return (
@@ -13,8 +21,9 @@ export default function Page() {
             Make a <span className="text-primary">Difference</span>
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
-            Your donation can change a child's life forever. Every dollar counts and goes directly to 
-            providing food, shelter, education, and care for children in need.
+            Your donation can change a child&apos;s life forever. Every dollar
+            counts and goes directly to providing food, shelter, education, and
+            care for children in need.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="text-lg px-8 py-3">
@@ -37,7 +46,9 @@ export default function Page() {
               <p className="text-gray-600 dark:text-gray-300">Total Raised</p>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-secondary mb-2">15,000+</div>
+              <div className="text-4xl font-bold text-secondary mb-2">
+                15,000+
+              </div>
               <p className="text-gray-600 dark:text-gray-300">Donors</p>
             </div>
             <div className="text-center">
@@ -46,7 +57,9 @@ export default function Page() {
             </div>
             <div className="text-center">
               <div className="text-4xl font-bold text-green-500 mb-2">95%</div>
-              <p className="text-gray-600 dark:text-gray-300">Efficiency Rate</p>
+              <p className="text-gray-600 dark:text-gray-300">
+                Efficiency Rate
+              </p>
             </div>
           </div>
         </div>
@@ -63,9 +76,12 @@ export default function Page() {
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Heart className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">General Fund</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                General Fund
+              </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Support our overall mission and help us reach more orphanages in need.
+                Support our overall mission and help us reach more orphanages in
+                need.
               </p>
               <Button className="w-full">Donate to General Fund</Button>
             </Card>
@@ -74,7 +90,9 @@ export default function Page() {
               <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Target className="w-8 h-8 text-secondary" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Specific Issue</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                Specific Issue
+              </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
                 Choose a specific need or project to support directly.
               </p>
@@ -85,7 +103,9 @@ export default function Page() {
               <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-blue-500" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Orphanage</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                Orphanage
+              </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
                 Support a specific orphanage and see your impact directly.
               </p>
@@ -120,7 +140,9 @@ export default function Page() {
                   ))}
                 </div>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                    $
+                  </span>
                   <Input
                     type="number"
                     placeholder="Enter custom amount"
@@ -131,7 +153,10 @@ export default function Page() {
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label
+                    htmlFor="firstName"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
                     First Name
                   </label>
                   <Input
@@ -142,7 +167,10 @@ export default function Page() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label
+                    htmlFor="lastName"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
                     Last Name
                   </label>
                   <Input
@@ -155,7 +183,10 @@ export default function Page() {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Email Address
                 </label>
                 <Input
@@ -207,8 +238,9 @@ export default function Page() {
                     New School Building
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    Thanks to donor contributions, we built a new school building for 200 children 
-                    in rural Kenya. The children now have access to quality education.
+                    Thanks to donor contributions, we built a new school
+                    building for 200 children in rural Kenya. The children now
+                    have access to quality education.
                   </p>
                 </div>
               </div>
@@ -222,8 +254,9 @@ export default function Page() {
                     Medical Care Program
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    Your donations funded a comprehensive medical care program for 150 children, 
-                    providing regular check-ups and emergency care.
+                    Your donations funded a comprehensive medical care program
+                    for 150 children, providing regular check-ups and emergency
+                    care.
                   </p>
                 </div>
               </div>
@@ -233,9 +266,13 @@ export default function Page() {
               <div className="w-full h-80 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-2xl flex items-center justify-center">
                 <div className="text-center text-gray-500 dark:text-gray-400">
                   <Users className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg">Image: Children in new school building</p>
+                  <p className="text-lg">
+                    Image: Children in new school building
+                  </p>
                   <p className="text-sm">Placeholder for success story photo</p>
-                  <p className="text-sm">Children learning in their new classroom</p>
+                  <p className="text-sm">
+                    Children learning in their new classroom
+                  </p>
                 </div>
               </div>
             </div>
@@ -254,27 +291,36 @@ export default function Page() {
               <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="w-8 h-8 text-green-500" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Secure Donations</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                Secure Donations
+              </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                All donations are processed securely with bank-level encryption and fraud protection.
+                All donations are processed securely with bank-level encryption
+                and fraud protection.
               </p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Target className="w-8 h-8 text-blue-500" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Transparent Tracking</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                Transparent Tracking
+              </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                See exactly how your donation is used with detailed reports and updates.
+                See exactly how your donation is used with detailed reports and
+                updates.
               </p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Heart className="w-8 h-8 text-purple-500" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Maximum Impact</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                Maximum Impact
+              </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                95% of your donation goes directly to programs and services for children.
+                95% of your donation goes directly to programs and services for
+                children.
               </p>
             </div>
           </div>
@@ -288,8 +334,9 @@ export default function Page() {
             Every Donation Makes a Difference
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-            Join thousands of donors who are already making a positive impact in children's lives. 
-            Your generosity can change the world, one child at a time.
+            Join thousands of donors who are already making a positive impact in
+            children&apos;s lives. Your generosity can change the world, one
+            child at a time.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="text-lg px-8 py-3">
