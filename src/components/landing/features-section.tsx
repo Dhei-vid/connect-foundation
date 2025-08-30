@@ -2,173 +2,115 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Heart,
-  Shield,
-  Globe,
-  Users,
-  BarChart3,
-  MessageCircle,
-  Eye,
-  HandHeart,
-} from "lucide-react";
-
-const features = [
-  {
-    icon: Heart,
-    title: "Direct Impact",
-    description:
-      "See exactly how your donations help children in need with real-time updates and progress tracking.",
-    color: "from-pink-500 to-rose-500",
-  },
-  {
-    icon: Shield,
-    title: "Transparency",
-    description:
-      "Complete financial transparency with detailed breakdowns of how every dollar is spent.",
-    color: "from-blue-500 to-cyan-500",
-  },
-  {
-    icon: Globe,
-    title: "Global Reach",
-    description:
-      "Connect with orphanages worldwide and make a difference across different cultures and communities.",
-    color: "from-green-500 to-emerald-500",
-  },
-  {
-    icon: Users,
-    title: "Community Building",
-    description:
-      "Join a network of donors and volunteers working together to create lasting change.",
-    color: "from-purple-500 to-violet-500",
-  },
-  {
-    icon: BarChart3,
-    title: "Real-time Analytics",
-    description:
-      "Track the impact of your contributions with comprehensive reporting and success metrics.",
-    color: "from-orange-500 to-amber-500",
-  },
-  {
-    icon: MessageCircle,
-    title: "Direct Communication",
-    description:
-      "Connect directly with orphanages to understand their needs and see your impact firsthand.",
-    color: "from-indigo-500 to-blue-500",
-  },
-  {
-    icon: Eye,
-    title: "Accountability",
-    description:
-      "Every donation is tracked and verified, ensuring your money goes exactly where it's needed.",
-    color: "from-teal-500 to-green-500",
-  },
-  {
-    icon: HandHeart,
-    title: "Sustainable Support",
-    description:
-      "Long-term partnerships that create lasting change rather than temporary relief.",
-    color: "from-red-500 to-pink-500",
-  },
-];
+import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
+import { Heart, HeartHandshake } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 export function FeaturesSection() {
+  const router = useRouter();
   return (
-    <section className="py-20 px-4 relative overflow-hidden">
+    <section className="py-30 2xl:py-40 px-4">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background" />
 
-      <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Why Choose <span className="gradient-text">Connect Foundation</span>
-            ?
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            We&apos;re revolutionizing how orphanages and donors connect,
-            ensuring transparency, accountability, and maximum impact for every
-            contribution.
-          </p>
-        </motion.div>
+      <div className="z-10 max-w-7xl mx-auto">
+        {/* About US Grid */}
+        <div className="grid grid-cols-2">
+          {/* Images */}
+          <div className="relative">
+            <Image
+              className={"rounded-[2rem] object-cover object-center h-full"}
+              src={
+                "https://images.pexels.com/photos/31095001/pexels-photo-31095001.jpeg"
+              }
+              alt={"image 1"}
+              width={500}
+              height={700}
+            />
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -5 }}
-            >
-              <Card className="h-full glass hover:shadow-2xl transition-all duration-300 group">
-                <CardHeader className="text-center pb-4">
-                  <div
-                    className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} p-4 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}
-                  >
-                    <feature.icon className="w-full h-full text-white" />
-                  </div>
-                  <CardTitle className="text-xl font-semibold">
-                    {feature.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <CardDescription className="text-base leading-relaxed">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
+            <div className="top-[-20%] right-20 absolute bg-white rounded-[2rem] p-2">
+              <Image
+                className={
+                  "rounded-[2rem] object-cover object-center w-52 h-52"
+                }
+                src={
+                  "https://images.pexels.com/photos/9823013/pexels-photo-9823013.jpeg"
+                }
+                alt={"image 1"}
+                width={500}
+                height={600}
+              />
+            </div>
 
-        {/* Bottom CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          viewport={{ once: true }}
-          className="text-center mt-16"
-        >
-          <div className="glass rounded-3xl p-8 max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold mb-4">
-              Ready to Make a Difference?
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              Join thousands of donors who are already changing lives through
-              transparent, accountable giving.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/donate"
-                className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300 hover:scale-105"
-              >
-                Start Donating Today
-              </a>
-              <a
-                href="/impact"
-                className="inline-flex items-center justify-center px-6 py-3 border-2 border-primary text-primary rounded-lg font-medium hover:bg-primary hover:text-white transition-all duration-300"
-              >
-                See Our Impact
-              </a>
+            <div className="absolute right-0 top-[50%] bg-white p-2 rounded-[2rem]">
+              <div className="space-y-3 bg-main-red rounded-[2rem] p-4 py-6 w-[20rem]">
+                <p className="text-grey font-bold text-2xl 2xl:text-3xl">
+                  150 Grants Awarded Across 5 Countries
+                </p>
+                <Link
+                  className="underline italic text-gold/70 hover:text-gold/90"
+                  href={"/about"}
+                >
+                  Become a donor
+                </Link>
+              </div>
             </div>
           </div>
-        </motion.div>
+
+          {/* About Us Text */}
+          <div className="space-y-3">
+            <div>
+              <div className="flex flex-row items-center gap-1">
+                <Heart size={18} className="text-main-red" />
+                <p className={"font-semibold italic text-main-red"}>About Us</p>
+              </div>
+              <p className="font-bold text-2xl 2xl:text-5xl">
+                Give Time, Change Lives Volunteer Opportunities
+              </p>
+            </div>
+
+            <div>
+              <p>
+                Loads of text here about our mission, vision, and the impact we
+                aim to create in the lives of children in need. Loads of text
+                here about our mission, vision, and the impact we aim to create
+                in the lives of children in need.
+              </p>
+            </div>
+
+            <div className="space-y-6 ml-15">
+              <p>
+                Loads of text here about our mission, vision, and the impact we
+                aim to create in the lives of children in need. Loads of text
+                here about our mission, vision, and the impact we aim to create
+                in the lives of children in need.
+              </p>
+              <div>
+                <div>
+                  <div className="flex flex-row items-center gap-1">
+                    <HeartHandshake size={20} className="text-main-red" />
+                    <p className={"font-bold text-xl 2xl:text-2xl"}>
+                      A legacy of Indigenous Environment
+                    </p>
+                  </div>
+                  <p className={""}>
+                    Supporting culture, healing, and education across
+                    generations.
+                  </p>
+                </div>
+              </div>
+              <div>
+                <Button
+                  onClick={() => router.push("/about-us")}
+                  className="rounded-full bg-main-red"
+                >
+                  Learn More
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -1,47 +1,47 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Home, 
-  Users, 
-  Heart, 
-  MessageCircle, 
-  DollarSign, 
-  BarChart3, 
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Home,
+  Users,
+  Heart,
+  MessageCircle,
+  DollarSign,
+  BarChart3,
   Menu,
   X,
   User,
-  LogOut
-} from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { useAtom } from 'jotai';
-import { userAtom, isAuthenticatedAtom } from '@/store/auth';
-import { signOutUser } from '@/firebase/auth';
-import { useToast } from '@/hooks/use-toast';
-import { ThemeToggle } from '@/components/theme-toggle';
+  LogOut,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { useAtom } from "jotai";
+import { userAtom, isAuthenticatedAtom } from "@/store/auth";
+import { signOutUser } from "@/firebase/auth";
+import { useToast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const navItems = [
-  { icon: Home, label: 'Home', href: '/' },
-  { icon: Users, label: 'About Us', href: '/about-us' },
-  { icon: Heart, label: 'Impact', href: '/impact' },
-  { icon: MessageCircle, label: 'Contact', href: '/contact' },
-  { icon: DollarSign, label: 'Donate', href: '/donate' },
-  { icon: BarChart3, label: 'Transparency', href: '/transparency' },
+  { icon: Home, label: "Home", href: "/" },
+  { icon: Users, label: "About Us", href: "/about-us" },
+  { icon: Heart, label: "Impact", href: "/impact" },
+  { icon: MessageCircle, label: "Contact", href: "/contact" },
+  { icon: DollarSign, label: "Donate", href: "/donate" },
+  { icon: BarChart3, label: "Transparency", href: "/transparency" },
 ];
 
 const adminItems = [
-  { icon: Users, label: 'Orphanages', href: '/admin/orphanages' },
-  { icon: Heart, label: 'Issues', href: '/admin/issues' },
-  { icon: BarChart3, label: 'Dashboard', href: '/admin/dashboard' },
+  { icon: Users, label: "Orphanages", href: "/admin/orphanages" },
+  { icon: Heart, label: "Issues", href: "/admin/issues" },
+  { icon: BarChart3, label: "Dashboard", href: "/admin/dashboard" },
 ];
 
 const orphanageItems = [
-  { icon: Heart, label: 'My Issues', href: '/orphanage/issues' },
-  { icon: Users, label: 'Profile', href: '/orphanage/profile' },
-  { icon: BarChart3, label: 'Analytics', href: '/orphanage/analytics' },
+  { icon: Heart, label: "My Issues", href: "/orphanage/issues" },
+  { icon: Users, label: "Profile", href: "/orphanage/profile" },
+  { icon: BarChart3, label: "Analytics", href: "/orphanage/analytics" },
 ];
 
 export function FloatingNav() {
@@ -69,9 +69,9 @@ export function FloatingNav() {
   };
 
   const getNavItems = () => {
-    if (user?.role === 'admin') {
+    if (user?.role === "admin") {
       return [...navItems, ...adminItems];
-    } else if (user?.role === 'orphanage') {
+    } else if (user?.role === "orphanage") {
       return [...navItems, ...orphanageItems];
     }
     return navItems;
@@ -141,7 +141,7 @@ export function FloatingNav() {
           >
             {/* Backdrop */}
             <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
-            
+
             {/* Menu Items */}
             <div className="relative">
               {currentItems.map((item, index) => {
@@ -149,7 +149,7 @@ export function FloatingNav() {
                 const radius = 120;
                 const x = Math.cos((angle - 90) * (Math.PI / 180)) * radius;
                 const y = Math.sin((angle - 90) * (Math.PI / 180)) * radius;
-                
+
                 return (
                   <motion.div
                     key={item.href}
@@ -159,18 +159,18 @@ export function FloatingNav() {
                       top: y + 120,
                     }}
                     initial={{ scale: 0, opacity: 0 }}
-                    animate={{ 
-                      scale: 1, 
+                    animate={{
+                      scale: 1,
                       opacity: 1,
                       x: x,
                       y: y,
                     }}
                     exit={{ scale: 0, opacity: 0 }}
-                    transition={{ 
+                    transition={{
                       delay: index * 0.1,
                       type: "spring",
                       stiffness: 260,
-                      damping: 20
+                      damping: 20,
                     }}
                   >
                     <Link href={item.href}>
@@ -178,9 +178,9 @@ export function FloatingNav() {
                         variant="glass"
                         size="icon"
                         className={`h-12 w-12 rounded-full ${
-                          pathname === item.href 
-                            ? 'ring-2 ring-white ring-offset-2 ring-offset-background' 
-                            : ''
+                          pathname === item.href
+                            ? "ring-2 ring-white ring-offset-2 ring-offset-background"
+                            : ""
                         }`}
                         onClick={() => setIsOpen(false)}
                       >
@@ -201,7 +201,12 @@ export function FloatingNav() {
           className="fixed top-6 right-6 z-50"
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.5, type: "spring", stiffness: 260, damping: 20 }}
+          transition={{
+            delay: 0.5,
+            type: "spring",
+            stiffness: 260,
+            damping: 20,
+          }}
         >
           <div className="relative">
             <Button
