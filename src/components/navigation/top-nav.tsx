@@ -1,30 +1,10 @@
 "use client";
 
-import React from "react";
-// import { motion, AnimatePresence } from "framer-motion";
-// import {
-//   Home,
-//   Users,
-//   Heart,
-//   MessageCircle,
-//   DollarSign,
-//   BarChart3,
-//   Menu,
-//   X,
-//   User,
-//   LogOut,
-//   Building2,
-// } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-// import { usePathname } from "next/navigation";
-// import { Button } from "@/components/ui/button";
-// import { useAtom } from "jotai";
-// import { userAtom, isAuthenticatedAtom } from "@/store/auth";
-// import { signOutUser } from "@/firebase/auth";
-
-// import { toast } from "sonner";
-
 import Image from "next/image";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -35,78 +15,175 @@ const navItems = [
   { label: "Contact", href: "/contact" },
 ];
 
-// const adminItems = [
-//   { icon: Building2, label: "Orphanages", href: "/admin/orphanages" },
-//   { icon: Heart, label: "Issues", href: "/admin/issues" },
-//   { icon: BarChart3, label: "Dashboard", href: "/admin/dashboard" },
-// ];
-
-// const orphanageItems = [
-//   { icon: Heart, label: "My Issues", href: "/orphanage/issues" },
-//   { icon: Users, label: "Profile", href: "/orphanage/profile" },
-//   { icon: BarChart3, label: "Analytics", href: "/orphanage/analytics" },
-// ];
-
 export function TopNav() {
-  // const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  // const pathname = usePathname();
-  // const [user] = useAtom(userAtom);
-  // const [isAuthenticated] = useAtom(isAuthenticatedAtom);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-  // const handleSignOut = async () => {
-  //   try {
-  //     await signOutUser();
-  //     setIsUserMenuOpen(false);
-  //     toast.success("Signed out successfully", {
-  //       description: "You have been signed out of your account.",
-  //     });
-  //   } catch (error) {
-  //     toast.error("Error signing out", {
-  //       description: "There was an error signing you out. Please try again.",
-  //     });
-  //   }
-  // };
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
 
-  // const getNavItems = () => {
-  //   if (user?.role === "admin") {
-  //     return [...navItems, ...adminItems];
-  //   } else if (user?.role === "orphanage") {
-  //     return [...navItems, ...orphanageItems];
-  //   }
-  //   return navItems;
-  // };
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
-  // const currentItems = getNavItems();
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        closeMobileMenu();
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
+  // Close menu on escape key
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeMobileMenu();
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isMobileMenuOpen]);
 
   return (
-    <nav className="mx-auto p-5 mx-auto w-full 2xl:w-[70%] 3xl:w-[50%] ">
-      {/* Web Navigation */}
-      <div className="grid grid-cols-4 items-center justify-center">
+    <nav className="mx-auto p-3 sm:p-4 md:p-5 w-full 2xl:w-[70%] 3xl:w-[50%]">
+      {/* Desktop Navigation - Hidden on mobile and tablet */}
+      <div className="hidden xl:grid grid-cols-4 items-center justify-center">
         <Image src="/logo.png" alt="Logo" width={60} height={60} />
 
-        <div
-          className={
-            "col-span-2 flex flex-row items-center justify-between rounded-full bg-main-red/70 backdrop-blur-lg py-4 px-12"
-          }
-        >
-          {navItems.map((item) => {
-            return (
-              <Link key={item.label} href={item.href}>
-                <div className="text-white/90 hover:text-white/50 flex flex-col items-center">
-                  <span className="text-sm">{item.label}</span>
-                </div>
-              </Link>
-            );
-          })}
+        <div className="col-span-2 flex flex-row items-center justify-between rounded-full bg-main-red/70 backdrop-blur-lg py-4 px-12">
+          {navItems.map((item) => (
+            <Link key={item.label} href={item.href}>
+              <div className="text-white/90 hover:text-white/50 flex flex-col items-center transition-colors duration-200">
+                <span className="text-sm">{item.label}</span>
+              </div>
+            </Link>
+          ))}
         </div>
 
         <div className="ml-auto">
-          <button className="cursor-pointer rounded-full bg-main-red py-3 px-8 text-white hover:bg-main-red/80">
+          <button className="cursor-pointer rounded-full bg-main-red py-3 px-8 text-white hover:bg-main-red/80 transition-colors duration-200">
             Donate
           </button>
         </div>
       </div>
+
+      {/* Tablet Navigation - Hidden on mobile and desktop */}
+      <div className="hidden md:block xl:hidden">
+        <div className="flex items-center justify-between">
+          <Image src="/logo.png" alt="Logo" width={55} height={55} />
+          
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 rounded-full bg-main-red/70 backdrop-blur-lg py-3 px-6">
+              {navItems.slice(0, 4).map((item) => (
+                <Link key={item.label} href={item.href}>
+                  <div className="text-white/90 hover:text-white/50 transition-colors duration-200">
+                    <span className="text-xs font-medium">{item.label}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            
+            <Button className="rounded-full bg-main-red text-white hover:bg-main-red/80 px-6 py-2 transition-colors duration-200">
+              Donate
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Navigation - Hidden on tablet and desktop */}
+      <div className="md:hidden flex items-center justify-between">
+        <Image src="/logo.png" alt="Logo" width={40} height={40} className="sm:w-[45px] sm:h-[45px]" />
+        
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="rounded-full bg-main-red text-white hover:bg-main-red/80 px-2 py-2 text-xs sm:px-3 sm:py-2 transition-colors duration-200"
+          >
+            <span className="hidden sm:inline">Donate</span>
+            <span className="sm:hidden">$</span>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white hover:bg-white/10 h-9 w-9 sm:h-10 sm:w-10 transition-colors duration-200"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
+            ) : (
+              <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm">
+          <div 
+            ref={mobileMenuRef}
+            className="absolute top-0 left-0 right-0 bg-white/95 backdrop-blur-lg shadow-lg"
+          >
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200">
+              <Image src="/logo.png" alt="Logo" width={40} height={40} className="sm:w-[45px] sm:h-[45px]" />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={closeMobileMenu}
+                className="text-gray-600 hover:bg-gray-100 h-9 w-9 sm:h-10 sm:w-10 transition-colors duration-200"
+                aria-label="Close mobile menu"
+              >
+                <X className="h-4 w-4 sm:h-5 sm:w-5" />
+              </Button>
+            </div>
+            
+            <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+              {navItems.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={closeMobileMenu}
+                  className="block py-2 sm:py-3 px-3 sm:px-4 text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200 active:bg-gray-200"
+                >
+                  <span className="text-sm sm:text-base font-medium">{item.label}</span>
+                </Link>
+              ))}
+              
+              <div className="pt-2 sm:pt-3 border-t border-gray-200">
+                <Button 
+                  className="w-full rounded-full bg-main-red text-white hover:bg-main-red/80 py-2 sm:py-3 transition-colors duration-200"
+                  onClick={closeMobileMenu}
+                >
+                  Donate Now
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
+

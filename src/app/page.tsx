@@ -23,7 +23,7 @@ export default function Home() {
       <StoriesSection />
       <VolunteerSection />
 
-      <div className="px-20 pb-20 lg:px-32">
+      <div className="px-5 pb-20 lg:px-32">
         <OrphanageBanner />
       </div>
       {/* <HowItWorks /> */}

@@ -13,9 +13,9 @@ export function FeaturesSection() {
     <section className="py-30 2xl:py-40 px-4">
       {/* Background */}
 
-      <div className="z-10 max-w-7xl mx-auto">
+      <div className="z-10 w-full lg:max-w-7xl mx-auto">
         {/* About US Grid */}
-        <div className="grid grid-cols-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 md:gap-0">
           {/* Images */}
           <div className="relative">
             <Image
@@ -28,7 +28,7 @@ export function FeaturesSection() {
               height={700}
             />
 
-            <div className="top-[-20%] right-20 absolute bg-white rounded-[2rem] p-2">
+            <div className="top-[-20%] right-0 md:right-20 absolute bg-white rounded-[2rem] p-2">
               <Image
                 className={
                   "rounded-[2rem] object-cover object-center w-52 h-52"
@@ -42,7 +42,7 @@ export function FeaturesSection() {
               />
             </div>
 
-            <div className="absolute right-0 top-[50%] bg-white p-2 rounded-[2rem]">
+            <div className="absolute right-0 top-[80%] md:top-[50%] bg-white p-2 rounded-[2rem]">
               <div className="space-y-3 bg-main-red rounded-[2rem] p-4 py-6 w-[20rem]">
                 <p className="text-grey font-bold text-2xl 2xl:text-3xl">
                   150 Grants Awarded Across 5 Countries
@@ -78,7 +78,7 @@ export function FeaturesSection() {
               </p>
             </div>
 
-            <div className="space-y-6 ml-15">
+            <div className="space-y-6 lg:ml-15">
               <p>
                 Loads of text here about our mission, vision, and the impact we
                 aim to create in the lives of children in need. Loads of text
