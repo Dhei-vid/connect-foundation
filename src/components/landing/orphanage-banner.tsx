@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 const OrphanageBanner = () => {
   return (
-    <div className={"rounded-lg bg-main-blue p-8 text-center my-12"}>
+    <div className={"rounded-lg bg-main-blue p-8 2xl:py-12 text-center my-12"}>
       <div className="flex flex-col items-center justify-center space-y-5">
         <h2 className={cn(headerStyle, "text-white")}>
           Join Our Support Network

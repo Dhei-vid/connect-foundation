@@ -28,10 +28,10 @@ export function FeaturesSection() {
               height={700}
             />
 
-            <div className="top-[-20%] right-0 md:right-20 absolute bg-white rounded-[2rem] p-2">
+            <div className="top-[-20%] right-0 md:right-20 absolute bg-white rounded-[2rem] p-1">
               <Image
                 className={
-                  "rounded-[2rem] object-cover object-center w-52 h-52"
+                  "rounded-[2rem] object-cover object-center w-32 h-32 lg:w-52 lg:h-52"
                 }
                 src={
                   "https://images.pexels.com/photos/9823013/pexels-photo-9823013.jpeg"
@@ -42,13 +42,13 @@ export function FeaturesSection() {
               />
             </div>
 
-            <div className="absolute right-0 top-[80%] md:top-[50%] bg-white p-2 rounded-[2rem]">
-              <div className="space-y-3 bg-main-red rounded-[2rem] p-4 py-6 w-[20rem]">
-                <p className="text-grey font-bold text-2xl 2xl:text-3xl">
+            <div className="absolute right-0 top-[80%] md:top-[50%] bg-white p-1 rounded-[2rem]">
+              <div className="space-y-3 bg-main-red rounded-[2rem] px-4 py-4 lg:py-6 w-[15rem] lg:w-[20rem]">
+                <p className="text-grey font-bold text-lg 2xl:text-3xl">
                   150 Grants Awarded Across 5 Countries
                 </p>
                 <Link
-                  className="underline italic text-gold/70 hover:text-gold/90"
+                  className="underline italic font-semibold text-main-blue/90 hover:text-main-blue/70"
                   href={"/about"}
                 >
                   Become a donor

@@ -20,10 +20,12 @@ export default function Home() {
       </HeroLayout>
 
       <FeaturesSection />
+
       <StoriesSection />
+
       <VolunteerSection />
 
-      <div className="px-5 pb-20 lg:px-32">
+      <div className="px-5 pb-20 lg:px-32 2xl:px-54">
         <OrphanageBanner />
       </div>
       {/* <HowItWorks /> */}

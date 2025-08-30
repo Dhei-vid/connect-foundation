@@ -6,10 +6,11 @@ import { Heart } from "lucide-react";
 import { headerStyle } from "@/common/style";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { paddingStyle } from "@/common/style";
 
 export const StoriesSection = () => {
   return (
-    <div className="space-y-8 bg-gray-50 py-20 px-5 lg:px-8 2xl:px-12">
+    <div className={cn(paddingStyle, "space-y-8 bg-gray-50")}>
       {/* Header */}
       <div className="w-full items-center justify-center flex flex-col gap-3">
         <div className={"flex flex-row items-center gap-2"}>
@@ -78,36 +79,40 @@ export const StoriesSection = () => {
                 />
 
                 {/* Content */}
-                <div className="p-4">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
-                    {story.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
-                    {story.description}
-                  </p>
-
-                  {/* Progress Bar */}
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-main-blue font-semibold dark:text-gray-400">
-                        {story.progressLabel}
-                      </span>
-                      <span className="text-main-blue dark:text-grey font-medium">
-                        {story.progress}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                      <div
-                        className="bg-main-blue h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${story.progress}%` }}
-                      ></div>
-                    </div>
+                <div className="flex flex-col justify-between p-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
+                      {story.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
+                      {story.description}
+                    </p>
                   </div>
 
-                  {/* Donate Button */}
-                  <Button className="w-full bg-main-blue hover:bg-main-blue/90 text-white">
-                    Donate Now &gt;
-                  </Button>
+                  <div>
+                    {/* Progress Bar */}
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-main-blue font-semibold dark:text-gray-400">
+                          {story.progressLabel}
+                        </span>
+                        <span className="text-main-blue dark:text-grey font-medium">
+                          {story.progress}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div
+                          className="bg-main-blue h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${story.progress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    {/* Donate Button */}
+                    <Button className="w-full bg-main-blue hover:bg-main-blue/90 text-white">
+                      Donate Now &gt;
+                    </Button>
+                  </div>
                 </div>
               </div>
             </Card>

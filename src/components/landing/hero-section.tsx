@@ -8,7 +8,7 @@ import Link from "next/link";
 
 export function HeroSection() {
   return (
-    <section className="relative flex items-center justify-center overflow-hidden pt-15">
+    <section className="relative flex items-center justify-center overflow-hidden pt-15 2xl:pt-35">
       {/* Content */}
       <div className="z-10 text-center px-4 max-w-6xl mx-auto">
         <motion.div
@@ -17,7 +17,7 @@ export function HeroSection() {
           transition={{ duration: 0.8 }}
           className="mb-8"
         >
-          <h1 className="text-5xl md:text-7xl font-bold mb-6">
+          <h1 className="text-5xl md:text-7xl 2xl:text-8xl font-bold mb-6">
             <span className="text-grey">Connect</span>
             <br />
             <span className="text-grey">Orphanage Foundation</span>

@@ -30,36 +30,39 @@ export function TopNav() {
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node)
+      ) {
         closeMobileMenu();
       }
     };
 
     if (isMobileMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "unset";
     };
   }, [isMobileMenuOpen]);
 
   // Close menu on escape key
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         closeMobileMenu();
       }
     };
 
     if (isMobileMenuOpen) {
-      document.addEventListener('keydown', handleEscape);
+      document.addEventListener("keydown", handleEscape);
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [isMobileMenuOpen]);
 
@@ -90,7 +93,7 @@ export function TopNav() {
       <div className="hidden md:block xl:hidden">
         <div className="flex items-center justify-between">
           <Image src="/logo.png" alt="Logo" width={55} height={55} />
-          
+
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 rounded-full bg-main-red/70 backdrop-blur-lg py-3 px-6">
               {navItems.slice(0, 4).map((item) => (
@@ -101,7 +104,7 @@ export function TopNav() {
                 </Link>
               ))}
             </div>
-            
+
             <Button className="rounded-full bg-main-red text-white hover:bg-main-red/80 px-6 py-2 transition-colors duration-200">
               Donate
             </Button>
@@ -111,18 +114,23 @@ export function TopNav() {
 
       {/* Mobile Navigation - Hidden on tablet and desktop */}
       <div className="md:hidden flex items-center justify-between">
-        <Image src="/logo.png" alt="Logo" width={40} height={40} className="sm:w-[45px] sm:h-[45px]" />
-        
+        <Image
+          src="/logo.png"
+          alt="Logo"
+          width={40}
+          height={40}
+          className="sm:w-[45px] sm:h-[45px]"
+        />
+
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="sm"
             className="rounded-full bg-main-red text-white hover:bg-main-red/80 px-2 py-2 text-xs sm:px-3 sm:py-2 transition-colors duration-200"
           >
-            <span className="hidden sm:inline">Donate</span>
-            <span className="sm:hidden">$</span>
+            Donate
           </Button>
-          
+
           <Button
             variant="ghost"
             size="icon"
@@ -133,7 +141,7 @@ export function TopNav() {
             {isMobileMenuOpen ? (
               <X className="h-4 w-4 sm:h-5 sm:w-5" />
             ) : (
-              <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
+              <Menu className="h-4 w-8 sm:h-5 sm:w-10" />
             )}
           </Button>
         </div>
@@ -142,12 +150,18 @@ export function TopNav() {
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="md:hidden fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm">
-          <div 
+          <div
             ref={mobileMenuRef}
             className="absolute top-0 left-0 right-0 bg-white/95 backdrop-blur-lg shadow-lg"
           >
             <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200">
-              <Image src="/logo.png" alt="Logo" width={40} height={40} className="sm:w-[45px] sm:h-[45px]" />
+              <Image
+                src="/logo.png"
+                alt="Logo"
+                width={40}
+                height={40}
+                className="sm:w-[45px] sm:h-[45px]"
+              />
               <Button
                 variant="ghost"
                 size="icon"
@@ -158,7 +172,7 @@ export function TopNav() {
                 <X className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </div>
-            
+
             <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
               {navItems.map((item) => (
                 <Link
@@ -167,12 +181,14 @@ export function TopNav() {
                   onClick={closeMobileMenu}
                   className="block py-2 sm:py-3 px-3 sm:px-4 text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200 active:bg-gray-200"
                 >
-                  <span className="text-sm sm:text-base font-medium">{item.label}</span>
+                  <span className="text-sm sm:text-base font-medium">
+                    {item.label}
+                  </span>
                 </Link>
               ))}
-              
+
               <div className="pt-2 sm:pt-3 border-t border-gray-200">
-                <Button 
+                <Button
                   className="w-full rounded-full bg-main-red text-white hover:bg-main-red/80 py-2 sm:py-3 transition-colors duration-200"
                   onClick={closeMobileMenu}
                 >
@@ -186,4 +202,3 @@ export function TopNav() {
     </nav>
   );
 }
-
