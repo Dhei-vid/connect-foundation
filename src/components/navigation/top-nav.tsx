@@ -125,8 +125,8 @@ export function TopNav() {
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
-            size="sm"
-            className="rounded-full bg-main-red text-white hover:bg-main-red/80 px-2 py-2 text-xs sm:px-3 sm:py-2 transition-colors duration-200"
+            size="default"
+            className="rounded-full bg-main-red text-white hover:bg-main-red/80 px-5 py-2 text-xs sm:px-3 sm:py-2 transition-colors duration-200"
           >
             Donate
           </Button>
@@ -141,7 +141,7 @@ export function TopNav() {
             {isMobileMenuOpen ? (
               <X className="h-4 w-4 sm:h-5 sm:w-5" />
             ) : (
-              <Menu className="h-4 w-8 sm:h-5 sm:w-10" />
+              <Menu className="h-6 w-20 sm:h-9 sm:w-15" />
             )}
           </Button>
         </div>

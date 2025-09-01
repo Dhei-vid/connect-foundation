@@ -2,7 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Clock, MessageCircle, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { heroLayoutStyle } from "@/common/style";
 
 import { TopNav } from "@/components/navigation/top-nav";
 import HeroLayout from "@/components/general/hero-layout";
@@ -16,12 +18,17 @@ export default function Page() {
         }
       >
         <TopNav />
-        <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+        <section
+          className={cn(
+            heroLayoutStyle,
+            "flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8"
+          )}
+        >
           <div className="max-w-7xl mx-auto text-center">
-            <h1 className="text-4xl md:text-7xl font-bold text-grey dark:text-white mb-6">
+            <h1 className="text-6xl md:text-7xl font-bold text-grey dark:text-white mb-6">
               Get in Touch
             </h1>
-            <p className="text-xl text-grey dark:text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl lg:text-2xl text-grey dark:text-gray-300 max-w-3xl mx-auto">
               Have questions about our work? Want to learn how you can help?
               We&apos;d love to hear from you and answer any questions you might
               have.
@@ -31,7 +38,7 @@ export default function Page() {
       </HeroLayout>
 
       {/* Contact Form & Info */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 px-5 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Form */}
@@ -117,7 +124,11 @@ export default function Page() {
                     />
                   </div>
 
-                  <Button type="submit" className="w-full" size="lg">
+                  <Button
+                    type="submit"
+                    className="w-full bg-main-red hover:bg-main-red/90"
+                    size="lg"
+                  >
                     <Send className="w-4 h-4 mr-2" />
                     Send Message
                   </Button>
@@ -126,7 +137,7 @@ export default function Page() {
             </div>
 
             {/* Contact Information */}
-            <div className="space-y-8">
+            <div className="px-5 space-y-8">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                   Contact Information
@@ -139,7 +150,7 @@ export default function Page() {
 
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Mail className="w-6 h-6 text-primary" />
                   </div>
                   <div>
@@ -156,8 +167,8 @@ export default function Page() {
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-6 h-6 text-secondary" />
+                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-6 h-6" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -170,8 +181,8 @@ export default function Page() {
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-6 h-6 text-blue-500" />
+                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-6 h-6" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -188,8 +199,8 @@ export default function Page() {
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-6 h-6 text-green-500" />
+                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-6 h-6" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -273,28 +284,6 @@ export default function Page() {
                 <p className="text-gray-600 dark:text-gray-300">{faq.answer}</p>
               </Card>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-            Ready to Make a Difference?
-          </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-            Don&apos;t wait to start helping children in need. Every moment
-            counts in a child&apos;s life.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8 py-3">
-              <MessageCircle className="w-5 h-5 mr-2" />
-              Start a Conversation
-            </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-3">
-              Learn More About Us
-            </Button>
           </div>
         </div>
       </section>
