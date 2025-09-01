@@ -3,5 +3,4 @@ export const headerStyle =
 
 export const paddingStyle = "px-5 py-20 lg:px-8 2xl:px-54";
 
-export const heroLayoutStyle =
-  "h-[30rem] md:h-[25rem] 2xl:h-[50rem] 3xl:h-[55rem]";
+export const heroLayoutStyle = "h-[30rem] md:h-[25rem] 2xl:h-[40rem]";

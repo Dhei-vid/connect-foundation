@@ -30,15 +30,15 @@ export default function Page() {
         <section
           className={cn(
             heroLayoutStyle,
-            "flex flex-col items-center justify-center"
+            "flex flex-col items-center justify-center border border-red-500 max-w-6xl mx-auto"
           )}
         >
           <div className="max-w-7xl space-y-5 mx-auto text-center">
             <div className={"space-y-2"}>
-              <h1 className="text-6xl md:text-7xl font-bold text-white/90">
+              <h1 className="text-5xl md:text-7xl 2xl:text-9xl font-bold text-white/90">
                 Our <span className="text-main-red/90">Impact</span>
               </h1>
-              <p className="text-xl text-white max-w-3xl mx-auto mb-8">
+              <p className="text-xl 2xl:text-2xl text-white max-w-3xl mx-auto mb-8">
                 See the real difference your support makes in children&apos;s
                 lives. From education to healthcare, every donation creates
                 lasting positive change.
