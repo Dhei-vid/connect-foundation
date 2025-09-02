@@ -32,7 +32,9 @@ const AccordionComp: FC<IAccordionComp> = ({ item }) => {
           <AccordionTrigger>
             <div className="flex flex-row items-center gap-2">
               <item.trigger.Icon size={25} className="text-main-red/50" />
-              <p className="text-lg text-main-red/80">{item.trigger.label}</p>
+              <p className="font-bold lg:text-xl 2xl:text-3xl text-main-red/80">
+                {item.trigger.label}
+              </p>
             </div>
           </AccordionTrigger>
           <AccordionContent className={"flex flex-col gap-4"}>

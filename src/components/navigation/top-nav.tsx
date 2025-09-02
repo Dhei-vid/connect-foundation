@@ -11,7 +11,7 @@ const navItems = [
   { label: "About Us", href: "/about-us" },
   { label: "Impact", href: "/impact" },
   { label: "Report", href: "/donate" },
-  { label: "Volunteer", href: "/transparency" },
+  { label: "Volunteer", href: "/volunteer" },
   { label: "Contact", href: "/contact" },
 ];
 
