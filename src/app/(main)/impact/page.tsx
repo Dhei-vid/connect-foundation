@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Awards from "@/components/impact/awards";
+import AccordionComp from "@/components/general/accordion-component";
 
 import StoriesCard from "@/components/stories/stories-card";
 import { TopNav } from "@/components/navigation/top-nav";
@@ -30,15 +31,15 @@ export default function Page() {
         <section
           className={cn(
             heroLayoutStyle,
-            "flex flex-col items-center justify-center border border-red-500 max-w-6xl mx-auto"
+            "flex flex-col items-center justify-center max-w-6xl mx-auto"
           )}
         >
           <div className="max-w-7xl space-y-5 mx-auto text-center">
             <div className={"space-y-2"}>
-              <h1 className="text-5xl md:text-7xl 2xl:text-9xl font-bold text-white/90">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl 2xl:text-[10rem] font-bold text-white/90">
                 Our <span className="text-main-red/90">Impact</span>
               </h1>
-              <p className="text-xl 2xl:text-2xl text-white max-w-3xl mx-auto mb-8">
+              <p className="text-xl lg:text-2xl 2xl:text-3xl text-white max-w-3xl mx-auto mb-8">
                 See the real difference your support makes in children&apos;s
                 lives. From education to healthcare, every donation creates
                 lasting positive change.
@@ -133,46 +134,43 @@ export default function Page() {
             Impact by the Numbers
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="p-3 text-center border border-main-blue/20 rounded-2xl">
-              <div className="text-5xl font-bold text-main-blue mb-2">50+</div>
-              <p className="text-gray-600 dark:text-gray-300 text-lg">
-                Orphanages Supported
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                Across 15 countries
-              </p>
-            </div>
-            <div className="p-3 text-center border border-main-blue/20 rounded-2xl">
-              <div className="text-5xl font-bold text-main-blue mb-2">
-                1,500+
+            {[
+              {
+                number: "50+",
+                support: "Orphanages Supported",
+                medium: "Across 15 countries",
+              },
+              {
+                number: "1,500+",
+                support: "Children Helped",
+                medium: "Direct beneficiaries",
+              },
+              {
+                number: "$2.5M+",
+                support: "Funds Raised",
+                medium: "Through our platform",
+              },
+              {
+                number: "95%",
+                support: "Efficiency Rate",
+                medium: "Funds to programs",
+              },
+            ].map((items, index) => (
+              <div
+                key={index}
+                className="p-3 text-center border border-main-blue/20 rounded-2xl"
+              >
+                <div className="text-5xl font-bold text-main-blue mb-2">
+                  {items.number}
+                </div>
+                <p className="text-main-red dark:text-gray-300 text-lg">
+                  {items.support}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  {items.medium}
+                </p>
               </div>
-              <p className="text-gray-600 dark:text-gray-300 text-lg">
-                Children Helped
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                Direct beneficiaries
-              </p>
-            </div>
-            <div className="p-3 text-center border border-main-blue/20 rounded-2xl">
-              <div className="text-5xl font-bold text-main-blue mb-2">
-                $2.5M+
-              </div>
-              <p className="text-gray-600 dark:text-gray-300 text-lg">
-                Funds Raised
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                Through our platform
-              </p>
-            </div>
-            <div className="p-3 text-center border border-main-blue/20 rounded-2xl">
-              <div className="text-5xl font-bold text-main-blue mb-2">95%</div>
-              <p className="text-gray-600 dark:text-gray-300 text-lg">
-                Efficiency Rate
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                Funds to programs
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -223,57 +221,71 @@ export default function Page() {
       </section>
 
       {/* Program Areas */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-            Areas of Impact
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: Target,
-                title: "Education",
-                description:
-                  "Building schools, providing supplies, and supporting teachers to ensure every child has access to quality education.",
-                impact: "500+ children enrolled in school",
-              },
-              {
-                icon: Heart,
-                title: "Healthcare",
-                description:
-                  "Establishing medical clinics, providing vaccinations, and ensuring children receive proper medical care.",
-                impact: "300+ children receiving healthcare",
-              },
-              {
-                icon: Users,
-                title: "Shelter",
-                description:
-                  "Improving living conditions, building safe housing, and creating comfortable environments for children.",
-                impact: "200+ children in improved housing",
-              },
-              {
-                icon: Star,
-                title: "Nutrition",
-                description:
-                  "Providing balanced meals, clean water, and nutritional support to ensure children grow up healthy.",
-                impact: "400+ children with improved nutrition",
-              },
-            ].map((area, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <area.icon className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                  {area.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  {area.description}
-                </p>
-                <div className="text-sm font-medium text-primary">
-                  {area.impact}
-                </div>
-              </div>
-            ))}
+
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-main-blue dark:bg-gray-900">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center max-w-7xl mx-auto">
+          <div>
+            <Image
+              className="rounded-xl bg-cover bg-contain w-full h-[90%]"
+              src={
+                "https://images.pexels.com/photos/8432478/pexels-photo-8432478.jpeg"
+              }
+              alt={""}
+              width={400}
+              height={500}
+            />
+          </div>
+          <div className="space-y-6">
+            <h2 className="text-5xl font-bold text-gray-100 dark:text-main-blue">
+              Areas of Impact
+            </h2>
+
+            <div>
+              <AccordionComp
+                item={[
+                  {
+                    trigger: {
+                      label: "Education",
+                      Icon: Target,
+                    },
+                    content: [
+                      "Building schools, providing supplies, and supporting teachers to ensure every child has access to quality education.",
+                      "500+ children enrolled in school",
+                    ],
+                  },
+                  {
+                    trigger: {
+                      label: "Healthcare",
+                      Icon: Heart,
+                    },
+                    content: [
+                      "Establishing medical clinics, providing vaccinations, and ensuring children receive proper medical care.",
+                      "200+ children in improved housing",
+                    ],
+                  },
+                  {
+                    trigger: {
+                      label: "Shelter",
+                      Icon: Users,
+                    },
+                    content: [
+                      "Establishing medical clinics, providing vaccinations, and ensuring children receive proper medical care.",
+                      "200+ children in improved housing",
+                    ],
+                  },
+                  {
+                    trigger: {
+                      label: "Nutrition",
+                      Icon: Star,
+                    },
+                    content: [
+                      "Providing balanced meals, clean water, and nutritional support to ensure children grow up healthy.",
+                      "400+ children with improved nutrition",
+                    ],
+                  },
+                ]}
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -350,12 +362,17 @@ export default function Page() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/donate">
-              <Button size="lg" className="text-lg px-8 py-3">
-                <Heart className="w-5 h-5 mr-2" />
+              <Button size="lg" className="bg-main-red text-lg w-[20rem]">
+                <Heart size={20} className="mr-2" />
                 Start Donating
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-3">
+            <Button
+              onClick={() => router.push("/about-us")}
+              variant="outline"
+              size="lg"
+              className="text-lg w-[20rem]"
+            >
               Learn More About Our Work
             </Button>
           </div>
