@@ -280,8 +280,34 @@ export default function Page() {
         </div>
       </section>
 
+      <div className="footer1-curves border border-red-500">
+        <svg
+          viewBox="0 0 1440 122"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="none"
+          className="rotate-180 top-0 left-0 w-full h-full"
+        >
+          <path
+            d="M0,40 C480,160 960,-80 1440,50 L1440,122 L0,122 Z"
+            fill="#007a4850"
+          />
+        </svg>
+
+        <svg
+          viewBox="0 0 1440 122"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="none"
+          className="rotate-180 top-0 left-0 w-full h-full"
+        >
+          <path
+            d="M0,70 C480,170 960,-30 1440,70 L1440,122 L0,122 Z"
+            fill="#007a48"
+          />
+        </svg>
+      </div>
+
       {/* Trust & Security */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
+      {/* <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
             Your Trust is Our Priority
@@ -325,30 +351,7 @@ export default function Page() {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-            Every Donation Makes a Difference
-          </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-            Join thousands of donors who are already making a positive impact in
-            children&apos;s lives. Your generosity can change the world, one
-            child at a time.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8 py-3">
-              <Heart className="w-5 h-5 mr-2" />
-              Donate Now
-            </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-3">
-              Learn More About Our Work
-            </Button>
-          </div>
-        </div>
-      </section>
+      </section> */}
     </div>
   );
 }

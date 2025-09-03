@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -18,6 +20,7 @@ const navItems = [
 export function TopNav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -75,7 +78,14 @@ export function TopNav() {
         <div className="col-span-2 flex flex-row items-center justify-between rounded-full bg-main-red/70 backdrop-blur-lg py-4 px-12">
           {navItems.map((item) => (
             <Link key={item.label} href={item.href}>
-              <div className="text-white/90 hover:text-white/50 flex flex-col items-center transition-colors duration-200">
+              <div
+                className={cn(
+                  pathname === item.href
+                    ? "text-main-blue font-semibold"
+                    : "text-white/90",
+                  "hover:text-white/50 flex flex-col items-center transition-colors duration-200 transition-all ease-in-out"
+                )}
+              >
                 <span className="text-sm">{item.label}</span>
               </div>
             </Link>
