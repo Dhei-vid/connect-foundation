@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Heart, Lock, Mail, User, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/hooks/use-auth";
+import Image from "next/image";
+import { extractErrorMessage } from "@/common/helpers";
+import { toast } from "sonner";
 
 export default function AdminSignUpPage() {
   const [formData, setFormData] = useState({
@@ -14,61 +18,92 @@ export default function AdminSignUpPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    adminCode: ""
+    adminCode: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
+  const { isAuthenticated, signIn } = useAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/admin");
+    }
+  }, [isAuthenticated, router]);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setError("");
+
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match");
       return;
     }
 
     if (formData.adminCode !== "ADMIN2024") {
-      alert("Invalid admin code");
+      setError("Invalid admin code");
       return;
     }
 
     setIsLoading(true);
-    
-    // TODO: Implement actual registration logic
-    // For now, redirect to admin dashboard
-    setTimeout(() => {
-      router.push("/admin");
+
+    try {
+      // For demo purposes, we'll just sign in with the provided credentials
+      // In a real app, you'd create the account first, then sign in
+      const success = signIn(formData.email, formData.password);
+      if (success) {
+        router.push("/admin");
+      } else {
+        setError("Failed to create account");
+      }
+    } catch (err) {
+      setError("An error occurred during registration");
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-lg p-5">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
-              <Heart className="w-8 h-8 text-white" />
-            </div>
+            <Image
+              className={"rounded-2xl"}
+              src="/logo.png"
+              alt="Logo"
+              width={60}
+              height={60}
+            />
           </div>
-          <CardTitle className="text-2xl font-bold">Admin Registration</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            Admin Registration
+          </CardTitle>
           <p className="text-gray-600 dark:text-gray-400">
             Create an admin account
           </p>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Full Name</label>
+              <label className="block text-sm font-medium mb-2">
+                Full Name
+              </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
@@ -96,7 +131,7 @@ export default function AdminSignUpPage() {
                 />
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium mb-2">Password</label>
               <div className="relative">
@@ -104,7 +139,9 @@ export default function AdminSignUpPage() {
                 <Input
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
-                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("password", e.target.value)
+                  }
                   placeholder="Enter your password"
                   className="pl-10 pr-10"
                   required
@@ -114,19 +151,27 @@ export default function AdminSignUpPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Confirm Password</label>
+              <label className="block text-sm font-medium mb-2">
+                Confirm Password
+              </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   type={showConfirmPassword ? "text" : "password"}
                   value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("confirmPassword", e.target.value)
+                  }
                   placeholder="Confirm your password"
                   className="pl-10 pr-10"
                   required
@@ -136,19 +181,27 @@ export default function AdminSignUpPage() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Admin Code</label>
+              <label className="block text-sm font-medium mb-2">
+                Admin Code
+              </label>
               <div className="relative">
                 <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   type="text"
                   value={formData.adminCode}
-                  onChange={(e) => handleInputChange("adminCode", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("adminCode", e.target.value)
+                  }
                   placeholder="Enter admin code"
                   className="pl-10"
                   required
@@ -159,11 +212,7 @@ export default function AdminSignUpPage() {
               </p>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Creating account..." : "Create Admin Account"}
             </Button>
           </form>
@@ -171,7 +220,10 @@ export default function AdminSignUpPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Already have an admin account?{" "}
-              <Link href="/admin/signin" className="text-blue-600 hover:underline">
+              <Link
+                href="/admin/signin"
+                className="text-blue-600 hover:underline"
+              >
                 Sign in here
               </Link>
             </p>

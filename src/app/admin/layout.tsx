@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Building2,
@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 const adminNavItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -39,14 +40,42 @@ export default function AdminLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { isAuthenticated, isLoading, signOut, user } = useAuth();
+
+  // Pages that don't need the admin layout (sign-in, sign-up)
+  const authPages = ["/admin/signin", "/admin/signup"];
+  const isAuthPage = authPages.includes(pathname);
 
   const handleSignOut = () => {
-    // TODO: Implement sign out logic
-    console.log("Sign out");
+    signOut();
   };
 
+  // If it's an auth page, render children without the admin layout
+  if (isAuthPage) {
+    return <>{children}</>;
+  }
+
+  // If loading, show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not authenticated and not on auth page, redirect to sign-in
+  if (!isAuthenticated) {
+    router.push("/admin/signin");
+    return null;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 border border-red-500">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -135,7 +164,7 @@ export default function AdminLayout({
 
             <div className="flex items-center space-x-4">
               <div className="text-sm text-gray-500 dark:text-gray-400">
-                Welcome back, Admin
+                Welcome back, {user?.name || "Admin"}
               </div>
             </div>
           </div>

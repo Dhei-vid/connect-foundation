@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
@@ -12,7 +13,7 @@ const navItems = [
   { label: "Home", href: "/" },
   { label: "About Us", href: "/about-us" },
   { label: "Impact", href: "/impact" },
-  { label: "Report", href: "/donate" },
+  { label: "Report", href: "/report" },
   { label: "Volunteer", href: "/volunteer" },
   { label: "Contact", href: "/contact" },
 ];
@@ -21,6 +22,7 @@ export function TopNav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const router = useRouter();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -73,7 +75,13 @@ export function TopNav() {
     <nav className="mx-auto p-3 sm:p-4 md:p-5 w-full 2xl:w-[70%] 3xl:w-[50%]">
       {/* Desktop Navigation - Hidden on mobile and tablet */}
       <div className="hidden xl:grid grid-cols-4 items-center justify-center">
-        <Image src="/logo.png" alt="Logo" width={60} height={60} />
+        <Image
+          className={"rounded-2xl"}
+          src="/logo.png"
+          alt="Logo"
+          width={60}
+          height={60}
+        />
 
         <div className="col-span-2 flex flex-row items-center justify-between rounded-full bg-main-red/70 backdrop-blur-lg py-4 px-12">
           {navItems.map((item) => (
@@ -93,7 +101,10 @@ export function TopNav() {
         </div>
 
         <div className="ml-auto">
-          <button className="cursor-pointer rounded-full bg-main-red py-3 px-8 text-white hover:bg-main-red/80 transition-colors duration-200">
+          <button
+            onClick={() => router.push("/donate")}
+            className="cursor-pointer rounded-full bg-main-red py-3 px-8 text-white hover:bg-main-red/80 transition-colors duration-200"
+          >
             Donate
           </button>
         </div>

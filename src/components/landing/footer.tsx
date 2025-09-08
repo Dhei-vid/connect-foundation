@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import Image from "next/image";
 
 const footerLinks = {
   company: [
@@ -70,9 +71,13 @@ export function Footer() {
                 className="mb-6 w-full lg:w-96 2xl:w-[12rem]"
               >
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center">
-                    <Heart className="w-6 h-6 text-white" />
-                  </div>
+                  <Image
+                    className={"rounded-lg"}
+                    src="/logo.png"
+                    alt="Logo"
+                    width={40}
+                    height={40}
+                  />
                   <span className="text-2xl font-bold text-grey/90">
                     Connect Foundation
                   </span>
