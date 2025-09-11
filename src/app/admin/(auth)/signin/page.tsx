@@ -3,23 +3,22 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/hooks/use-auth";
-import Image from "next/image";
+import { useAuthContext } from "@/components/providers";
 import { extractErrorMessage } from "@/common/helpers";
 import { toast } from "sonner";
 
 export default function AdminSignInPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const router = useRouter();
-  const { isAuthenticated, signIn } = useAuth();
+  const { isAuthenticated, signIn } = useAuthContext();
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -34,7 +33,7 @@ export default function AdminSignInPage() {
     setIsLoading(true);
 
     try {
-      const success = signIn(email, password);
+      const success = await signIn(email, password);
       if (success) {
         toast.success("Signed in successfully");
         router.push("/admin");
@@ -116,7 +115,7 @@ export default function AdminSignInPage() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don&apos;t have an admin account?{" "}
+              Can&apos;t login?{" "}
               <Link
                 href="/admin/signup"
                 className="text-blue-600 hover:underline"
@@ -126,9 +125,13 @@ export default function AdminSignInPage() {
             </p>
           </div>
 
-          <div className="mt-4 text-center">
-            <Link href="/" className="text-sm text-gray-500 hover:underline">
-              ← Back to main site
+          <div className="mt-4 justify-self-center">
+            <Link
+              href="/"
+              className="flex space-x-2 items-center text-sm text-gray-500 hover:underline"
+            >
+              <ArrowLeft size={18} />
+              <p>Back to main site</p>
             </Link>
           </div>
         </CardContent>

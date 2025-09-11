@@ -2,21 +2,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Users, 
-  Search, 
-  Filter, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  Shield, 
-  User, 
-  Mail, 
-  Calendar,
-  MoreVertical,
+import {
+  Users,
+  Search,
+  Eye,
+  Edit,
+  Trash2,
+  Shield,
+  User,
   Plus,
-  CheckCircle,
-  XCircle
+  XCircle,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,7 +27,7 @@ const mockUsers = [
     photoURL: "/api/placeholder/100/100",
     role: "admin" as const,
     createdAt: new Date("2023-01-01"),
-    lastLoginAt: new Date("2024-01-21")
+    lastLoginAt: new Date("2024-01-21"),
   },
   {
     uid: "user_2",
@@ -41,7 +36,7 @@ const mockUsers = [
     photoURL: "/api/placeholder/100/100",
     role: "orphanage" as const,
     createdAt: new Date("2023-02-15"),
-    lastLoginAt: new Date("2024-01-20")
+    lastLoginAt: new Date("2024-01-20"),
   },
   {
     uid: "user_3",
@@ -50,7 +45,7 @@ const mockUsers = [
     photoURL: "/api/placeholder/100/100",
     role: "donor" as const,
     createdAt: new Date("2023-03-10"),
-    lastLoginAt: new Date("2024-01-19")
+    lastLoginAt: new Date("2024-01-19"),
   },
   {
     uid: "user_4",
@@ -59,7 +54,7 @@ const mockUsers = [
     photoURL: "/api/placeholder/100/100",
     role: "orphanage" as const,
     createdAt: new Date("2023-04-05"),
-    lastLoginAt: new Date("2024-01-18")
+    lastLoginAt: new Date("2024-01-18"),
   },
   {
     uid: "user_5",
@@ -68,7 +63,7 @@ const mockUsers = [
     photoURL: "/api/placeholder/100/100",
     role: "donor" as const,
     createdAt: new Date("2023-05-20"),
-    lastLoginAt: new Date("2024-01-17")
+    lastLoginAt: new Date("2024-01-17"),
   },
   {
     uid: "user_6",
@@ -77,28 +72,31 @@ const mockUsers = [
     photoURL: "/api/placeholder/100/100",
     role: "orphanage" as const,
     createdAt: new Date("2023-06-12"),
-    lastLoginAt: new Date("2024-01-16")
-  }
+    lastLoginAt: new Date("2024-01-16"),
+  },
 ];
 
 const roleColors = {
   admin: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
   orphanage: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  donor: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+  donor: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
 };
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterRole, setFilterRole] = useState<"all" | "admin" | "orphanage" | "donor">("all");
+  const [filterRole, setFilterRole] = useState<
+    "all" | "admin" | "orphanage" | "donor"
+  >("all");
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  const filteredUsers = mockUsers.filter(user => {
-    const matchesSearch = user.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
+  const filteredUsers = mockUsers.filter((user) => {
+    const matchesSearch =
+      user.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesRole = filterRole === "all" || user.role === filterRole;
-    
+
     return matchesSearch && matchesRole;
   });
 
@@ -125,12 +123,12 @@ export default function UsersPage() {
 
   // Calculate statistics
   const totalUsers = mockUsers.length;
-  const adminUsers = mockUsers.filter(u => u.role === "admin").length;
-  const orphanageUsers = mockUsers.filter(u => u.role === "orphanage").length;
-  const donorUsers = mockUsers.filter(u => u.role === "donor").length;
+  const adminUsers = mockUsers.filter((u) => u.role === "admin").length;
+  const orphanageUsers = mockUsers.filter((u) => u.role === "orphanage").length;
+  const donorUsers = mockUsers.filter((u) => u.role === "donor").length;
 
   // Recent users (last 30 days)
-  const recentUsers = mockUsers.filter(user => {
+  const recentUsers = mockUsers.filter((user) => {
     const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     return user.createdAt >= monthAgo;
   });
@@ -184,7 +182,9 @@ export default function UsersPage() {
             <User className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{orphanageUsers}</div>
+            <div className="text-2xl font-bold text-blue-600">
+              {orphanageUsers}
+            </div>
           </CardContent>
         </Card>
 
@@ -194,7 +194,9 @@ export default function UsersPage() {
             <User className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{donorUsers}</div>
+            <div className="text-2xl font-bold text-green-600">
+              {donorUsers}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -207,7 +209,10 @@ export default function UsersPage() {
         <CardContent>
           <div className="space-y-3">
             {recentUsers.slice(0, 5).map((user) => (
-              <div key={user.uid} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <div
+                key={user.uid}
+                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+              >
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
                     <User className="w-5 h-5 text-gray-500" />
@@ -218,9 +223,7 @@ export default function UsersPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <Badge className={roleColors[user.role]}>
-                    {user.role}
-                  </Badge>
+                  <Badge className={roleColors[user.role]}>{user.role}</Badge>
                   <p className="text-sm text-gray-500 mt-1">
                     {user.createdAt.toLocaleDateString()}
                   </p>
@@ -282,7 +285,10 @@ export default function UsersPage() {
               </thead>
               <tbody>
                 {filteredUsers.map((user) => (
-                  <tr key={user.uid} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <tr
+                    key={user.uid}
+                    className="border-b hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
                     <td className="py-3 px-4">
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
@@ -290,13 +296,13 @@ export default function UsersPage() {
                         </div>
                         <div>
                           <div className="font-medium">{user.displayName}</div>
-                          <div className="text-sm text-gray-500">ID: {user.uid}</div>
+                          <div className="text-sm text-gray-500">
+                            ID: {user.uid}
+                          </div>
                         </div>
                       </div>
                     </td>
-                    <td className="py-3 px-4">
-                      {user.email}
-                    </td>
+                    <td className="py-3 px-4">{user.email}</td>
                     <td className="py-3 px-4">
                       <Badge className={roleColors[user.role]}>
                         {user.role}
@@ -363,9 +369,17 @@ export default function UsersPage() {
                   <User className="w-10 h-10 text-gray-500" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold">{selectedUser.displayName}</h3>
-                  <p className="text-gray-600 dark:text-gray-400">{selectedUser.email}</p>
-                  <Badge className={roleColors[selectedUser.role as keyof typeof roleColors]}>
+                  <h3 className="text-xl font-semibold">
+                    {selectedUser.displayName}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {selectedUser.email}
+                  </p>
+                  <Badge
+                    className={
+                      roleColors[selectedUser.role as keyof typeof roleColors]
+                    }
+                  >
                     {selectedUser.role}
                   </Badge>
                 </div>
@@ -385,7 +399,13 @@ export default function UsersPage() {
                     </div>
                     <div className="flex justify-between">
                       <span>Role:</span>
-                      <Badge className={roleColors[selectedUser.role as keyof typeof roleColors]}>
+                      <Badge
+                        className={
+                          roleColors[
+                            selectedUser.role as keyof typeof roleColors
+                          ]
+                        }
+                      >
                         {selectedUser.role}
                       </Badge>
                     </div>
@@ -415,21 +435,29 @@ export default function UsersPage() {
                 <h3 className="font-semibold mb-2">Change Role</h3>
                 <div className="flex gap-2">
                   <Button
-                    variant={selectedUser.role === "admin" ? "default" : "outline"}
+                    variant={
+                      selectedUser.role === "admin" ? "default" : "outline"
+                    }
                     size="sm"
                     onClick={() => handleRoleChange(selectedUser.uid, "admin")}
                   >
                     Admin
                   </Button>
                   <Button
-                    variant={selectedUser.role === "orphanage" ? "default" : "outline"}
+                    variant={
+                      selectedUser.role === "orphanage" ? "default" : "outline"
+                    }
                     size="sm"
-                    onClick={() => handleRoleChange(selectedUser.uid, "orphanage")}
+                    onClick={() =>
+                      handleRoleChange(selectedUser.uid, "orphanage")
+                    }
                   >
                     Orphanage
                   </Button>
                   <Button
-                    variant={selectedUser.role === "donor" ? "default" : "outline"}
+                    variant={
+                      selectedUser.role === "donor" ? "default" : "outline"
+                    }
                     size="sm"
                     onClick={() => handleRoleChange(selectedUser.uid, "donor")}
                   >
@@ -482,7 +510,9 @@ export default function UsersPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Display Name</label>
+                <label className="block text-sm font-medium mb-2">
+                  Display Name
+                </label>
                 <Input placeholder="Enter display name" />
               </div>
               <div>
@@ -498,7 +528,9 @@ export default function UsersPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Password</label>
+                <label className="block text-sm font-medium mb-2">
+                  Password
+                </label>
                 <Input type="password" placeholder="Enter password" />
               </div>
               <div className="flex gap-2 pt-4">

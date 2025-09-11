@@ -1,9 +1,16 @@
+import { Gender } from "./enums";
+
 export interface User {
   uid: string;
   email: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+  country?: string;
+  gender?: Gender;
   displayName?: string;
   photoURL?: string;
-  role: 'admin' | 'orphanage' | 'donor';
+  role: "ADMIN" | "ORPHANAGE";
   createdAt: Date;
   lastLoginAt: Date;
 }
@@ -12,9 +19,12 @@ export interface Orphanage {
   id: string;
   name: string;
   location: string;
+  address: string;
+  state: string;
+  city: string;
   description: string;
   contactEmail: string;
-  contactPhone?: string;
+  contactPhone: string;
   website?: string;
   logoURL?: string;
   coverImageURL?: string;
@@ -22,6 +32,18 @@ export interface Orphanage {
   staffCount: number;
   foundedYear: number;
   verified: boolean;
+  // Contact person details
+  contactPersonFirstName: string;
+  contactPersonLastName: string;
+  contactPersonEmail: string;
+  contactPersonPhone: string;
+  contactPersonPosition: string;
+  // Additional details
+  registrationNumber?: string;
+  licenseNumber?: string;
+  bankAccountNumber?: string;
+  bankName?: string;
+  accountName?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,9 +54,9 @@ export interface Issue {
   orphanageName: string;
   title: string;
   description: string;
-  category: 'medical' | 'education' | 'food' | 'shelter' | 'clothing' | 'other';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  status: 'open' | 'in-progress' | 'resolved' | 'closed';
+  category: "medical" | "education" | "food" | "shelter" | "clothing" | "other";
+  priority: "low" | "medium" | "high" | "urgent";
+  status: "open" | "in-progress" | "resolved" | "closed";
   images: string[];
   estimatedCost: number;
   raisedAmount: number;
@@ -68,13 +90,13 @@ export interface Donation {
   message?: string;
   anonymous: boolean;
   targetIssueId?: string;
-  status: 'pending' | 'completed' | 'failed';
+  status: "pending" | "completed" | "failed";
   createdAt: Date;
 }
 
 export interface FinancialRecord {
   id: string;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
   category: string;
   description: string;
   amount: number;
@@ -89,13 +111,13 @@ export interface ContactInquiry {
   email: string;
   subject: string;
   message: string;
-  status: 'new' | 'read' | 'replied' | 'closed';
+  status: "new" | "read" | "replied" | "closed";
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface Theme {
-  mode: 'light' | 'dark';
+  mode: "light" | "dark";
   primary: string;
   secondary: string;
   accent: string;

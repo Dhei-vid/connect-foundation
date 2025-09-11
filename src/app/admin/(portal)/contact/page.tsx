@@ -5,7 +5,6 @@ import React, { useState } from "react";
 import {
   MessageSquare,
   Search,
-  Filter,
   Eye,
   Mail,
   Reply,
@@ -13,8 +12,6 @@ import {
   Clock,
   User,
   Calendar,
-  Phone,
-  MoreVertical,
   Archive,
   XCircle,
 } from "lucide-react";
@@ -171,7 +168,7 @@ export default function ContactPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total</CardTitle>
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
@@ -184,7 +181,7 @@ export default function ContactPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">New</CardTitle>
             <Clock className="h-4 w-4 text-blue-600" />
@@ -196,7 +193,7 @@ export default function ContactPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Read</CardTitle>
             <Eye className="h-4 w-4 text-yellow-600" />
@@ -208,7 +205,7 @@ export default function ContactPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Replied</CardTitle>
             <Reply className="h-4 w-4 text-green-600" />
@@ -220,7 +217,7 @@ export default function ContactPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Closed</CardTitle>
             <CheckCircle className="h-4 w-4 text-gray-600" />
@@ -234,7 +231,7 @@ export default function ContactPage() {
       </div>
 
       {/* Recent Inquiries */}
-      <Card>
+      <Card className="py-4">
         <CardHeader>
           <CardTitle>Recent Inquiries</CardTitle>
         </CardHeader>
@@ -270,7 +267,7 @@ export default function ContactPage() {
 
       {/* Filters */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="p-6">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
@@ -301,10 +298,10 @@ export default function ContactPage() {
       </Card>
 
       {/* Inquiries List */}
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {filteredInquiries.map((inquiry) => (
           <Card key={inquiry.id} className="hover:shadow-lg transition-shadow">
-            <CardContent className="pt-6">
+            <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">

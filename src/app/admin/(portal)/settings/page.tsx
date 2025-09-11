@@ -2,20 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Settings, 
-  Save, 
-  User, 
-  Shield, 
-  Bell, 
-  Globe, 
-  Database,
-  Key,
-  Mail,
-  Phone,
-  MapPin,
-  Building2
-} from "lucide-react";
+import { Save, User, Shield, Bell, Database, Building2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,29 +15,29 @@ export default function SettingsPage() {
     organizationPhone: "+234-800-123-4567",
     organizationAddress: "123 Charity Street, Lagos, Nigeria",
     organizationWebsite: "www.connectfoundation.org",
-    
+
     // Admin Settings
     adminEmail: "admin@connectfoundation.org",
     adminName: "Admin User",
-    
+
     // Notification Settings
     emailNotifications: true,
     smsNotifications: false,
     donationAlerts: true,
     issueAlerts: true,
     userRegistrationAlerts: true,
-    
+
     // System Settings
     autoApproveDonations: false,
     requireOrphanageVerification: true,
     maxFileUploadSize: "10MB",
     backupFrequency: "daily",
-    
+
     // Security Settings
     twoFactorAuth: true,
     sessionTimeout: "8 hours",
     passwordPolicy: "strong",
-    ipWhitelist: false
+    ipWhitelist: false,
   });
 
   const handleSave = () => {
@@ -59,9 +46,9 @@ export default function SettingsPage() {
   };
 
   const handleInputChange = (field: string, value: any) => {
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -88,27 +75,39 @@ export default function SettingsPage() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Organization Name</label>
+              <label className="block text-sm font-medium mb-2">
+                Organization Name
+              </label>
               <Input
                 value={settings.organizationName}
-                onChange={(e) => handleInputChange("organizationName", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("organizationName", e.target.value)
+                }
                 placeholder="Enter organization name"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Organization Email</label>
+              <label className="block text-sm font-medium mb-2">
+                Organization Email
+              </label>
               <Input
                 type="email"
                 value={settings.organizationEmail}
-                onChange={(e) => handleInputChange("organizationEmail", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("organizationEmail", e.target.value)
+                }
                 placeholder="Enter organization email"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Phone Number</label>
+              <label className="block text-sm font-medium mb-2">
+                Phone Number
+              </label>
               <Input
                 value={settings.organizationPhone}
-                onChange={(e) => handleInputChange("organizationPhone", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("organizationPhone", e.target.value)
+                }
                 placeholder="Enter phone number"
               />
             </div>
@@ -116,7 +115,9 @@ export default function SettingsPage() {
               <label className="block text-sm font-medium mb-2">Website</label>
               <Input
                 value={settings.organizationWebsite}
-                onChange={(e) => handleInputChange("organizationWebsite", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("organizationWebsite", e.target.value)
+                }
                 placeholder="Enter website URL"
               />
             </div>
@@ -125,7 +126,9 @@ export default function SettingsPage() {
             <label className="block text-sm font-medium mb-2">Address</label>
             <Input
               value={settings.organizationAddress}
-              onChange={(e) => handleInputChange("organizationAddress", e.target.value)}
+              onChange={(e) =>
+                handleInputChange("organizationAddress", e.target.value)
+              }
               placeholder="Enter organization address"
             />
           </div>
@@ -143,7 +146,9 @@ export default function SettingsPage() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Admin Name</label>
+              <label className="block text-sm font-medium mb-2">
+                Admin Name
+              </label>
               <Input
                 value={settings.adminName}
                 onChange={(e) => handleInputChange("adminName", e.target.value)}
@@ -151,11 +156,15 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Admin Email</label>
+              <label className="block text-sm font-medium mb-2">
+                Admin Email
+              </label>
               <Input
                 type="email"
                 value={settings.adminEmail}
-                onChange={(e) => handleInputChange("adminEmail", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("adminEmail", e.target.value)
+                }
                 placeholder="Enter admin email"
               />
             </div>
@@ -175,61 +184,85 @@ export default function SettingsPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm font-medium">Email Notifications</label>
-                <p className="text-xs text-gray-500">Receive notifications via email</p>
+                <label className="text-sm font-medium">
+                  Email Notifications
+                </label>
+                <p className="text-xs text-gray-500">
+                  Receive notifications via email
+                </p>
               </div>
               <input
                 type="checkbox"
                 checked={settings.emailNotifications}
-                onChange={(e) => handleInputChange("emailNotifications", e.target.checked)}
+                onChange={(e) =>
+                  handleInputChange("emailNotifications", e.target.checked)
+                }
                 className="w-4 h-4"
               />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <label className="text-sm font-medium">SMS Notifications</label>
-                <p className="text-xs text-gray-500">Receive notifications via SMS</p>
+                <p className="text-xs text-gray-500">
+                  Receive notifications via SMS
+                </p>
               </div>
               <input
                 type="checkbox"
                 checked={settings.smsNotifications}
-                onChange={(e) => handleInputChange("smsNotifications", e.target.checked)}
+                onChange={(e) =>
+                  handleInputChange("smsNotifications", e.target.checked)
+                }
                 className="w-4 h-4"
               />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <label className="text-sm font-medium">Donation Alerts</label>
-                <p className="text-xs text-gray-500">Get notified of new donations</p>
+                <p className="text-xs text-gray-500">
+                  Get notified of new donations
+                </p>
               </div>
               <input
                 type="checkbox"
                 checked={settings.donationAlerts}
-                onChange={(e) => handleInputChange("donationAlerts", e.target.checked)}
+                onChange={(e) =>
+                  handleInputChange("donationAlerts", e.target.checked)
+                }
                 className="w-4 h-4"
               />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <label className="text-sm font-medium">Issue Alerts</label>
-                <p className="text-xs text-gray-500">Get notified of new issues</p>
+                <p className="text-xs text-gray-500">
+                  Get notified of new issues
+                </p>
               </div>
               <input
                 type="checkbox"
                 checked={settings.issueAlerts}
-                onChange={(e) => handleInputChange("issueAlerts", e.target.checked)}
+                onChange={(e) =>
+                  handleInputChange("issueAlerts", e.target.checked)
+                }
                 className="w-4 h-4"
               />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm font-medium">User Registration Alerts</label>
-                <p className="text-xs text-gray-500">Get notified of new user registrations</p>
+                <label className="text-sm font-medium">
+                  User Registration Alerts
+                </label>
+                <p className="text-xs text-gray-500">
+                  Get notified of new user registrations
+                </p>
               </div>
               <input
                 type="checkbox"
                 checked={settings.userRegistrationAlerts}
-                onChange={(e) => handleInputChange("userRegistrationAlerts", e.target.checked)}
+                onChange={(e) =>
+                  handleInputChange("userRegistrationAlerts", e.target.checked)
+                }
                 className="w-4 h-4"
               />
             </div>
@@ -248,10 +281,17 @@ export default function SettingsPage() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Auto-approve Donations</label>
+              <label className="block text-sm font-medium mb-2">
+                Auto-approve Donations
+              </label>
               <select
                 value={settings.autoApproveDonations ? "true" : "false"}
-                onChange={(e) => handleInputChange("autoApproveDonations", e.target.value === "true")}
+                onChange={(e) =>
+                  handleInputChange(
+                    "autoApproveDonations",
+                    e.target.value === "true"
+                  )
+                }
                 className="w-full p-3 border rounded-lg"
               >
                 <option value="false">Manual Approval</option>
@@ -259,10 +299,17 @@ export default function SettingsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Orphanage Verification</label>
+              <label className="block text-sm font-medium mb-2">
+                Orphanage Verification
+              </label>
               <select
                 value={settings.requireOrphanageVerification ? "true" : "false"}
-                onChange={(e) => handleInputChange("requireOrphanageVerification", e.target.value === "true")}
+                onChange={(e) =>
+                  handleInputChange(
+                    "requireOrphanageVerification",
+                    e.target.value === "true"
+                  )
+                }
                 className="w-full p-3 border rounded-lg"
               >
                 <option value="true">Required</option>
@@ -270,10 +317,14 @@ export default function SettingsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Max File Upload Size</label>
+              <label className="block text-sm font-medium mb-2">
+                Max File Upload Size
+              </label>
               <select
                 value={settings.maxFileUploadSize}
-                onChange={(e) => handleInputChange("maxFileUploadSize", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("maxFileUploadSize", e.target.value)
+                }
                 className="w-full p-3 border rounded-lg"
               >
                 <option value="5MB">5MB</option>
@@ -283,10 +334,14 @@ export default function SettingsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Backup Frequency</label>
+              <label className="block text-sm font-medium mb-2">
+                Backup Frequency
+              </label>
               <select
                 value={settings.backupFrequency}
-                onChange={(e) => handleInputChange("backupFrequency", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("backupFrequency", e.target.value)
+                }
                 className="w-full p-3 border rounded-lg"
               >
                 <option value="daily">Daily</option>
@@ -309,10 +364,14 @@ export default function SettingsPage() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Two-Factor Authentication</label>
+              <label className="block text-sm font-medium mb-2">
+                Two-Factor Authentication
+              </label>
               <select
                 value={settings.twoFactorAuth ? "true" : "false"}
-                onChange={(e) => handleInputChange("twoFactorAuth", e.target.value === "true")}
+                onChange={(e) =>
+                  handleInputChange("twoFactorAuth", e.target.value === "true")
+                }
                 className="w-full p-3 border rounded-lg"
               >
                 <option value="true">Enabled</option>
@@ -320,10 +379,14 @@ export default function SettingsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Session Timeout</label>
+              <label className="block text-sm font-medium mb-2">
+                Session Timeout
+              </label>
               <select
                 value={settings.sessionTimeout}
-                onChange={(e) => handleInputChange("sessionTimeout", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("sessionTimeout", e.target.value)
+                }
                 className="w-full p-3 border rounded-lg"
               >
                 <option value="1 hour">1 Hour</option>
@@ -333,10 +396,14 @@ export default function SettingsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Password Policy</label>
+              <label className="block text-sm font-medium mb-2">
+                Password Policy
+              </label>
               <select
                 value={settings.passwordPolicy}
-                onChange={(e) => handleInputChange("passwordPolicy", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("passwordPolicy", e.target.value)
+                }
                 className="w-full p-3 border rounded-lg"
               >
                 <option value="basic">Basic</option>
@@ -345,10 +412,14 @@ export default function SettingsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">IP Whitelist</label>
+              <label className="block text-sm font-medium mb-2">
+                IP Whitelist
+              </label>
               <select
                 value={settings.ipWhitelist ? "true" : "false"}
-                onChange={(e) => handleInputChange("ipWhitelist", e.target.value === "true")}
+                onChange={(e) =>
+                  handleInputChange("ipWhitelist", e.target.value === "true")
+                }
                 className="w-full p-3 border rounded-lg"
               >
                 <option value="false">Disabled</option>

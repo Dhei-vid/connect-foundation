@@ -2,21 +2,18 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  BarChart3, 
-  DollarSign, 
-  TrendingUp, 
-  TrendingDown, 
-  PieChart, 
-  Calendar,
+import {
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  PieChart,
   Download,
   Plus,
   Eye,
   Edit,
   Trash2,
   Receipt,
-  Filter,
-  XCircle
+  XCircle,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,7 +30,7 @@ const mockFinancialRecords = [
     amount: 50000,
     date: new Date("2024-01-15"),
     receiptURL: "/api/receipts/receipt_1.pdf",
-    notes: "ABC Corporation monthly sponsorship"
+    notes: "ABC Corporation monthly sponsorship",
   },
   {
     id: "2",
@@ -43,7 +40,7 @@ const mockFinancialRecords = [
     amount: 15000,
     date: new Date("2024-01-20"),
     receiptURL: "/api/receipts/receipt_2.pdf",
-    notes: "Urgent medical supplies for children"
+    notes: "Urgent medical supplies for children",
   },
   {
     id: "3",
@@ -53,7 +50,7 @@ const mockFinancialRecords = [
     amount: 25000,
     date: new Date("2024-01-18"),
     receiptURL: "/api/receipts/receipt_3.pdf",
-    notes: "Multiple individual donations"
+    notes: "Multiple individual donations",
   },
   {
     id: "4",
@@ -63,7 +60,7 @@ const mockFinancialRecords = [
     amount: 8000,
     date: new Date("2024-01-22"),
     receiptURL: "/api/receipts/receipt_4.pdf",
-    notes: "Educational materials for 3 orphanages"
+    notes: "Educational materials for 3 orphanages",
   },
   {
     id: "5",
@@ -73,7 +70,7 @@ const mockFinancialRecords = [
     amount: 3000,
     date: new Date("2024-01-25"),
     receiptURL: "/api/receipts/receipt_5.pdf",
-    notes: "Monthly administrative expenses"
+    notes: "Monthly administrative expenses",
   },
   {
     id: "6",
@@ -83,49 +80,71 @@ const mockFinancialRecords = [
     amount: 100000,
     date: new Date("2024-01-10"),
     receiptURL: "/api/receipts/receipt_6.pdf",
-    notes: "Annual government grant"
-  }
+    notes: "Annual government grant",
+  },
 ];
 
-const incomeCategories = ["Donations", "Individual Donations", "Grants", "Fundraising", "Other Income"];
-const expenseCategories = ["Medical Supplies", "Education", "Food", "Shelter", "Administrative", "Transportation", "Other Expenses"];
+const incomeCategories = [
+  "Donations",
+  "Individual Donations",
+  "Grants",
+  "Fundraising",
+  "Other Income",
+];
+const expenseCategories = [
+  "Medical Supplies",
+  "Education",
+  "Food",
+  "Shelter",
+  "Administrative",
+  "Transportation",
+  "Other Expenses",
+];
 
 export default function FinancialPage() {
-  const [selectedPeriod, setSelectedPeriod] = useState<"month" | "quarter" | "year">("month");
-  const [filterType, setFilterType] = useState<"all" | "income" | "expense">("all");
+  const [selectedPeriod, setSelectedPeriod] = useState<
+    "month" | "quarter" | "year"
+  >("month");
+  const [filterType, setFilterType] = useState<"all" | "income" | "expense">(
+    "all"
+  );
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
   // Calculate financial summary
   const totalIncome = mockFinancialRecords
-    .filter(record => record.type === "income")
+    .filter((record) => record.type === "income")
     .reduce((sum, record) => sum + record.amount, 0);
-  
+
   const totalExpenses = mockFinancialRecords
-    .filter(record => record.type === "expense")
+    .filter((record) => record.type === "expense")
     .reduce((sum, record) => sum + record.amount, 0);
-  
+
   const netIncome = totalIncome - totalExpenses;
 
   // Filter records based on selected filters
-  const filteredRecords = mockFinancialRecords.filter(record => {
+  const filteredRecords = mockFinancialRecords.filter((record) => {
     if (filterType !== "all" && record.type !== filterType) return false;
     return true;
   });
 
   // Calculate category breakdown
-  const incomeByCategory = incomeCategories.map(category => ({
+  const incomeByCategory = incomeCategories.map((category) => ({
     category,
     amount: mockFinancialRecords
-      .filter(record => record.type === "income" && record.category === category)
-      .reduce((sum, record) => sum + record.amount, 0)
+      .filter(
+        (record) => record.type === "income" && record.category === category
+      )
+      .reduce((sum, record) => sum + record.amount, 0),
   }));
 
-  const expensesByCategory = expenseCategories.map(category => ({
+  const expensesByCategory = expenseCategories.map((category) => ({
     category,
     amount: mockFinancialRecords
-      .filter(record => record.type === "expense" && record.category === category)
-      .reduce((sum, record) => sum + record.amount, 0)
+      .filter(
+        (record) => record.type === "expense" && record.category === category
+      )
+      .reduce((sum, record) => sum + record.amount, 0),
   }));
 
   const handleAddRecord = () => {
@@ -175,7 +194,7 @@ export default function FinancialPage() {
 
       {/* Financial Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Income</CardTitle>
             <TrendingUp className="h-4 w-4 text-green-600" />
@@ -190,9 +209,11 @@ export default function FinancialPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Expenses
+            </CardTitle>
             <TrendingDown className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
@@ -205,40 +226,49 @@ export default function FinancialPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Net Income</CardTitle>
             <BarChart3 className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <div
+              className={`text-2xl font-bold ${
+                netIncome >= 0 ? "text-green-600" : "text-red-600"
+              }`}
+            >
               ${netIncome.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
-              {netIncome >= 0 ? 'Surplus' : 'Deficit'}
+              {netIncome >= 0 ? "Surplus" : "Deficit"}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Efficiency Ratio</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Efficiency Ratio
+            </CardTitle>
             <PieChart className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
-              {totalIncome > 0 ? Math.round(((totalIncome - totalExpenses) / totalIncome) * 100) : 0}%
+              {totalIncome > 0
+                ? Math.round(
+                    ((totalIncome - totalExpenses) / totalIncome) * 100
+                  )
+                : 0}
+              %
             </div>
-            <p className="text-xs text-muted-foreground">
-              Funds to programs
-            </p>
+            <p className="text-xs text-muted-foreground">Funds to programs</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Period Selector */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="p-6">
           <div className="flex gap-2">
             <Button
               variant={selectedPeriod === "month" ? "default" : "outline"}
@@ -264,61 +294,75 @@ export default function FinancialPage() {
 
       {/* Income vs Expenses Chart Placeholder */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="py-4">
           <CardHeader>
             <CardTitle>Income by Category</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {incomeByCategory.filter(item => item.amount > 0).map((item, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm">{item.category}</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-20 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-green-600 h-2 rounded-full" 
-                        style={{ width: `${(item.amount / totalIncome) * 100}%` }}
-                      ></div>
+              {incomeByCategory
+                .filter((item) => item.amount > 0)
+                .map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between"
+                  >
+                    <span className="text-sm">{item.category}</span>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-20 bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-green-600 h-2 rounded-full"
+                          style={{
+                            width: `${(item.amount / totalIncome) * 100}%`,
+                          }}
+                        ></div>
+                      </div>
+                      <span className="text-sm font-medium w-20 text-right">
+                        ${item.amount.toLocaleString()}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium w-20 text-right">
-                      ${item.amount.toLocaleString()}
-                    </span>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader>
             <CardTitle>Expenses by Category</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {expensesByCategory.filter(item => item.amount > 0).map((item, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm">{item.category}</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-20 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-red-600 h-2 rounded-full" 
-                        style={{ width: `${(item.amount / totalExpenses) * 100}%` }}
-                      ></div>
+              {expensesByCategory
+                .filter((item) => item.amount > 0)
+                .map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between"
+                  >
+                    <span className="text-sm">{item.category}</span>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-20 bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-red-600 h-2 rounded-full"
+                          style={{
+                            width: `${(item.amount / totalExpenses) * 100}%`,
+                          }}
+                        ></div>
+                      </div>
+                      <span className="text-sm font-medium w-20 text-right">
+                        ${item.amount.toLocaleString()}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium w-20 text-right">
-                      ${item.amount.toLocaleString()}
-                    </span>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Financial Records */}
-      <Card>
+      <Card className="py-4">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Financial Records</CardTitle>
@@ -351,26 +395,38 @@ export default function FinancialPage() {
               </thead>
               <tbody>
                 {filteredRecords.map((record) => (
-                  <tr key={record.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <tr
+                    key={record.id}
+                    className="border-b hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
                     <td className="py-3 px-4">
                       {record.date.toLocaleDateString()}
                     </td>
                     <td className="py-3 px-4">
-                      <Badge variant={record.type === "income" ? "default" : "secondary"}>
+                      <Badge
+                        variant={
+                          record.type === "income" ? "default" : "secondary"
+                        }
+                      >
                         {record.type}
                       </Badge>
                     </td>
-                    <td className="py-3 px-4">
-                      {record.category}
-                    </td>
+                    <td className="py-3 px-4">{record.category}</td>
                     <td className="py-3 px-4">
                       <div className="max-w-xs truncate">
                         {record.description}
                       </div>
                     </td>
                     <td className="py-3 px-4">
-                      <span className={`font-semibold ${record.type === "income" ? "text-green-600" : "text-red-600"}`}>
-                        {record.type === "income" ? "+" : "-"}${record.amount.toLocaleString()}
+                      <span
+                        className={`font-semibold ${
+                          record.type === "income"
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {record.type === "income" ? "+" : "-"}$
+                        {record.amount.toLocaleString()}
                       </span>
                     </td>
                     <td className="py-3 px-4">
@@ -439,18 +495,33 @@ export default function FinancialPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>Type:</span>
-                      <Badge variant={selectedRecord.type === "income" ? "default" : "secondary"}>
+                      <Badge
+                        variant={
+                          selectedRecord.type === "income"
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
                         {selectedRecord.type}
                       </Badge>
                     </div>
                     <div className="flex justify-between">
                       <span>Category:</span>
-                      <span className="font-medium">{selectedRecord.category}</span>
+                      <span className="font-medium">
+                        {selectedRecord.category}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Amount:</span>
-                      <span className={`font-medium ${selectedRecord.type === "income" ? "text-green-600" : "text-red-600"}`}>
-                        {selectedRecord.type === "income" ? "+" : "-"}${selectedRecord.amount.toLocaleString()}
+                      <span
+                        className={`font-medium ${
+                          selectedRecord.type === "income"
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {selectedRecord.type === "income" ? "+" : "-"}$
+                        {selectedRecord.amount.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -530,20 +601,28 @@ export default function FinancialPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Category</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Category
+                  </label>
                   <select className="w-full p-3 border rounded-lg">
                     <option value="">Select category</option>
-                    {incomeCategories.map(category => (
-                      <option key={category} value={category}>{category}</option>
+                    {incomeCategories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
                     ))}
-                    {expenseCategories.map(category => (
-                      <option key={category} value={category}>{category}</option>
+                    {expenseCategories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
                     ))}
                   </select>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Description</label>
+                <label className="block text-sm font-medium mb-2">
+                  Description
+                </label>
                 <Input placeholder="Enter description" />
               </div>
               <div>
@@ -556,7 +635,7 @@ export default function FinancialPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Notes</label>
-                <textarea 
+                <textarea
                   className="w-full p-3 border rounded-lg"
                   rows={3}
                   placeholder="Additional notes..."

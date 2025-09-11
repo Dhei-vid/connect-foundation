@@ -2,21 +2,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  AlertTriangle, 
-  Search, 
-  Filter, 
-  Eye, 
-  CheckCircle, 
-  Clock, 
-  XCircle, 
-  Building2, 
-  DollarSign, 
-  Calendar,
-  Users,
+import {
+  AlertTriangle,
+  Search,
+  Eye,
+  CheckCircle,
+  Clock,
+  XCircle,
+  Building2,
   MessageSquare,
-  MoreVertical,
-  Plus
+  Plus,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,7 +25,8 @@ const mockIssues = [
     orphanageId: "1",
     orphanageName: "Hope Children's Home",
     title: "Urgent Medical Supplies Needed",
-    description: "We need immediate medical supplies including antibiotics, pain relievers, and first aid materials for our children who are currently sick.",
+    description:
+      "We need immediate medical supplies including antibiotics, pain relievers, and first aid materials for our children who are currently sick.",
     category: "medical" as const,
     priority: "urgent" as const,
     status: "open" as const,
@@ -40,14 +36,15 @@ const mockIssues = [
     deadline: new Date("2024-02-15"),
     createdAt: new Date("2024-01-20"),
     updatedAt: new Date("2024-01-20"),
-    resolvedAt: undefined
+    resolvedAt: undefined,
   },
   {
     id: "2",
     orphanageId: "2",
     orphanageName: "Sunshine Orphanage",
     title: "Educational Materials Request",
-    description: "We need textbooks, notebooks, pencils, and other educational materials for our 32 children to continue their studies.",
+    description:
+      "We need textbooks, notebooks, pencils, and other educational materials for our 32 children to continue their studies.",
     category: "education" as const,
     priority: "high" as const,
     status: "in-progress" as const,
@@ -57,14 +54,15 @@ const mockIssues = [
     deadline: new Date("2024-02-01"),
     createdAt: new Date("2024-01-15"),
     updatedAt: new Date("2024-01-18"),
-    resolvedAt: undefined
+    resolvedAt: undefined,
   },
   {
     id: "3",
     orphanageId: "3",
     orphanageName: "Little Angels Home",
     title: "Food Supplies Shortage",
-    description: "We are running low on food supplies and need immediate assistance to feed our 28 children for the next month.",
+    description:
+      "We are running low on food supplies and need immediate assistance to feed our 28 children for the next month.",
     category: "food" as const,
     priority: "high" as const,
     status: "resolved" as const,
@@ -74,31 +72,37 @@ const mockIssues = [
     deadline: new Date("2024-01-25"),
     createdAt: new Date("2024-01-10"),
     updatedAt: new Date("2024-01-22"),
-    resolvedAt: new Date("2024-01-22")
+    resolvedAt: new Date("2024-01-22"),
   },
   {
     id: "4",
     orphanageId: "4",
     orphanageName: "Grace Orphanage",
     title: "Roof Repair Needed",
-    description: "Our main building roof is leaking and needs immediate repair before the rainy season starts.",
+    description:
+      "Our main building roof is leaking and needs immediate repair before the rainy season starts.",
     category: "shelter" as const,
     priority: "medium" as const,
     status: "open" as const,
-    images: ["/api/placeholder/400/300", "/api/placeholder/400/300", "/api/placeholder/400/300"],
+    images: [
+      "/api/placeholder/400/300",
+      "/api/placeholder/400/300",
+      "/api/placeholder/400/300",
+    ],
     estimatedCost: 8000,
     raisedAmount: 1200,
     deadline: new Date("2024-03-01"),
     createdAt: new Date("2024-01-18"),
     updatedAt: new Date("2024-01-18"),
-    resolvedAt: undefined
+    resolvedAt: undefined,
   },
   {
     id: "5",
     orphanageId: "1",
     orphanageName: "Hope Children's Home",
     title: "Clothing Donation Request",
-    description: "Our children need new clothes for the upcoming school year. We need uniforms, casual wear, and shoes.",
+    description:
+      "Our children need new clothes for the upcoming school year. We need uniforms, casual wear, and shoes.",
     category: "clothing" as const,
     priority: "low" as const,
     status: "closed" as const,
@@ -108,49 +112,63 @@ const mockIssues = [
     deadline: new Date("2024-01-30"),
     createdAt: new Date("2024-01-05"),
     updatedAt: new Date("2024-01-28"),
-    resolvedAt: new Date("2024-01-28")
-  }
+    resolvedAt: new Date("2024-01-28"),
+  },
 ];
 
 const categoryColors = {
   medical: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
   education: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
   food: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  shelter: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-  clothing: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-  other: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+  shelter:
+    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+  clothing:
+    "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+  other: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
 };
 
 const priorityColors = {
   low: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
-  medium: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+  medium:
+    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
   high: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
-  urgent: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+  urgent: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
 };
 
 const statusColors = {
   open: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  "in-progress": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+  "in-progress":
+    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
   resolved: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  closed: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+  closed: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
 };
 
 export default function IssuesPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"all" | "open" | "in-progress" | "resolved" | "closed">("all");
-  const [filterPriority, setFilterPriority] = useState<"all" | "low" | "medium" | "high" | "urgent">("all");
-  const [filterCategory, setFilterCategory] = useState<"all" | "medical" | "education" | "food" | "shelter" | "clothing" | "other">("all");
+  const [filterStatus, setFilterStatus] = useState<
+    "all" | "open" | "in-progress" | "resolved" | "closed"
+  >("all");
+  const [filterPriority, setFilterPriority] = useState<
+    "all" | "low" | "medium" | "high" | "urgent"
+  >("all");
+  const [filterCategory, setFilterCategory] = useState<
+    "all" | "medical" | "education" | "food" | "shelter" | "clothing" | "other"
+  >("all");
   const [selectedIssue, setSelectedIssue] = useState<any>(null);
 
-  const filteredIssues = mockIssues.filter(issue => {
-    const matchesSearch = issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         issue.orphanageName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         issue.description.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = filterStatus === "all" || issue.status === filterStatus;
-    const matchesPriority = filterPriority === "all" || issue.priority === filterPriority;
-    const matchesCategory = filterCategory === "all" || issue.category === filterCategory;
-    
+  const filteredIssues = mockIssues.filter((issue) => {
+    const matchesSearch =
+      issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      issue.orphanageName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      issue.description.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      filterStatus === "all" || issue.status === filterStatus;
+    const matchesPriority =
+      filterPriority === "all" || issue.priority === filterPriority;
+    const matchesCategory =
+      filterCategory === "all" || issue.category === filterCategory;
+
     return matchesSearch && matchesStatus && matchesPriority && matchesCategory;
   });
 
@@ -164,10 +182,21 @@ export default function IssuesPage() {
     console.log("Resolve issue:", issueId);
   };
 
-  const totalRaised = mockIssues.reduce((sum, issue) => sum + issue.raisedAmount, 0);
-  const totalNeeded = mockIssues.reduce((sum, issue) => sum + issue.estimatedCost, 0);
-  // @ts-expect-error - TypeScript inference issue with union types
-  const urgentIssues = mockIssues.filter(issue => issue.priority === "urgent" && issue.status !== "resolved" && issue.status !== "closed").length;
+  const totalRaised = mockIssues.reduce(
+    (sum, issue) => sum + issue.raisedAmount,
+    0
+  );
+  const totalNeeded = mockIssues.reduce(
+    (sum, issue) => sum + issue.estimatedCost,
+    0
+  );
+
+  // const urgentIssues = mockIssues.filter(
+  //   (issue) =>
+  //     issue.priority === "urgent" &&
+  //     issue.status !== "resolved" &&
+  //     issue.status !== "closed"
+  // ).length;
 
   return (
     <div className="space-y-6">
@@ -189,76 +218,88 @@ export default function IssuesPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Issues</CardTitle>
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{mockIssues.length}</div>
-            <p className="text-xs text-muted-foreground">
-              {urgentIssues} urgent
-            </p>
+            <p className="text-xs text-muted-foreground">{0} urgent</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Open Issues</CardTitle>
             <Clock className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
-              {mockIssues.filter(i => i.status === "open").length}
+              {mockIssues.filter((i) => i.status === "open").length}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">In Progress</CardTitle>
             <Clock className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">
-              {mockIssues.filter(i => i.status === "in-progress").length}
+              {mockIssues.filter((i) => i.status === "in-progress").length}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Resolved</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {mockIssues.filter(i => i.status === "resolved" || i.status === "closed").length}
+              {
+                mockIssues.filter(
+                  (i) => i.status === "resolved" || i.status === "closed"
+                ).length
+              }
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Financial Overview */}
-      <Card>
+      <Card className="py-4">
         <CardHeader>
           <CardTitle>Financial Overview</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">${totalRaised.toLocaleString()}</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Total Raised</div>
+              <div className="text-2xl font-bold text-green-600">
+                ${totalRaised.toLocaleString()}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Total Raised
+              </div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">${totalNeeded.toLocaleString()}</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Total Needed</div>
+              <div className="text-2xl font-bold text-blue-600">
+                ${totalNeeded.toLocaleString()}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Total Needed
+              </div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-600">
                 {Math.round((totalRaised / totalNeeded) * 100)}%
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Completion Rate</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Completion Rate
+              </div>
             </div>
           </div>
         </CardContent>
@@ -266,7 +307,7 @@ export default function IssuesPage() {
 
       {/* Filters */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="p-6">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
@@ -324,7 +365,7 @@ export default function IssuesPage() {
       <div className="space-y-4">
         {filteredIssues.map((issue) => (
           <Card key={issue.id} className="hover:shadow-lg transition-shadow">
-            <CardContent className="pt-6">
+            <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
@@ -339,12 +380,12 @@ export default function IssuesPage() {
                       {issue.status}
                     </Badge>
                   </div>
-                  
+
                   <div className="flex items-center text-sm text-gray-500 mb-2">
                     <Building2 className="w-4 h-4 mr-1" />
                     {issue.orphanageName}
                   </div>
-                  
+
                   <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
                     {issue.description}
                   </p>
@@ -352,16 +393,23 @@ export default function IssuesPage() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
                       <span className="text-gray-500">Estimated Cost:</span>
-                      <div className="font-medium">${issue.estimatedCost.toLocaleString()}</div>
+                      <div className="font-medium">
+                        ${issue.estimatedCost.toLocaleString()}
+                      </div>
                     </div>
                     <div>
                       <span className="text-gray-500">Raised:</span>
-                      <div className="font-medium">${issue.raisedAmount.toLocaleString()}</div>
+                      <div className="font-medium">
+                        ${issue.raisedAmount.toLocaleString()}
+                      </div>
                     </div>
                     <div>
                       <span className="text-gray-500">Progress:</span>
                       <div className="font-medium">
-                        {Math.round((issue.raisedAmount / issue.estimatedCost) * 100)}%
+                        {Math.round(
+                          (issue.raisedAmount / issue.estimatedCost) * 100
+                        )}
+                        %
                       </div>
                     </div>
                     <div>
@@ -385,17 +433,16 @@ export default function IssuesPage() {
                   {issue.status === "open" && (
                     <Button
                       size="sm"
-                      onClick={() => handleStatusUpdate(issue.id, "in-progress")}
+                      onClick={() =>
+                        handleStatusUpdate(issue.id, "in-progress")
+                      }
                     >
                       <Clock className="w-4 h-4 mr-2" />
                       Start
                     </Button>
                   )}
                   {issue.status === "in-progress" && (
-                    <Button
-                      size="sm"
-                      onClick={() => handleResolve(issue.id)}
-                    >
+                    <Button size="sm" onClick={() => handleResolve(issue.id)}>
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Resolve
                     </Button>
@@ -416,13 +463,31 @@ export default function IssuesPage() {
                 <div>
                   <CardTitle className="flex items-center gap-2">
                     {selectedIssue.title}
-                    <Badge className={categoryColors[selectedIssue.category as keyof typeof categoryColors]}>
+                    <Badge
+                      className={
+                        categoryColors[
+                          selectedIssue.category as keyof typeof categoryColors
+                        ]
+                      }
+                    >
                       {selectedIssue.category}
                     </Badge>
-                    <Badge className={priorityColors[selectedIssue.priority as keyof typeof priorityColors]}>
+                    <Badge
+                      className={
+                        priorityColors[
+                          selectedIssue.priority as keyof typeof priorityColors
+                        ]
+                      }
+                    >
                       {selectedIssue.priority}
                     </Badge>
-                    <Badge className={statusColors[selectedIssue.status as keyof typeof statusColors]}>
+                    <Badge
+                      className={
+                        statusColors[
+                          selectedIssue.status as keyof typeof statusColors
+                        ]
+                      }
+                    >
                       {selectedIssue.status}
                     </Badge>
                   </CardTitle>
@@ -454,22 +519,36 @@ export default function IssuesPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>Estimated Cost:</span>
-                      <span className="font-medium">${selectedIssue.estimatedCost.toLocaleString()}</span>
+                      <span className="font-medium">
+                        ${selectedIssue.estimatedCost.toLocaleString()}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Raised Amount:</span>
-                      <span className="font-medium">${selectedIssue.raisedAmount.toLocaleString()}</span>
+                      <span className="font-medium">
+                        ${selectedIssue.raisedAmount.toLocaleString()}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Remaining:</span>
                       <span className="font-medium">
-                        ${(selectedIssue.estimatedCost - selectedIssue.raisedAmount).toLocaleString()}
+                        $
+                        {(
+                          selectedIssue.estimatedCost -
+                          selectedIssue.raisedAmount
+                        ).toLocaleString()}
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full" 
-                        style={{ width: `${(selectedIssue.raisedAmount / selectedIssue.estimatedCost) * 100}%` }}
+                      <div
+                        className="bg-blue-600 h-2 rounded-full"
+                        style={{
+                          width: `${
+                            (selectedIssue.raisedAmount /
+                              selectedIssue.estimatedCost) *
+                            100
+                          }%`,
+                        }}
                       ></div>
                     </div>
                   </div>
@@ -514,11 +593,16 @@ export default function IssuesPage() {
                 <div>
                   <h3 className="font-semibold mb-2">Images</h3>
                   <div className="grid grid-cols-2 gap-2">
-                    {selectedIssue.images.map((image: string, index: number) => (
-                      <div key={index} className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                        <MessageSquare className="w-8 h-8 text-gray-400" />
-                      </div>
-                    ))}
+                    {selectedIssue.images.map(
+                      (image: string, index: number) => (
+                        <div
+                          key={index}
+                          className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
+                        >
+                          <MessageSquare className="w-8 h-8 text-gray-400" />
+                        </div>
+                      )
+                    )}
                   </div>
                 </div>
               )}

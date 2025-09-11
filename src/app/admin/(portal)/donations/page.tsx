@@ -2,21 +2,17 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  DollarSign, 
-  Search, 
-  Filter, 
-  Eye, 
-  CheckCircle, 
-  Clock, 
-  XCircle, 
-  User, 
-  Mail, 
-  Calendar,
+import {
+  DollarSign,
+  Search,
+  Eye,
+  CheckCircle,
+  Clock,
+  XCircle,
+  User,
   TrendingUp,
   TrendingDown,
   Download,
-  MoreVertical
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,7 +32,7 @@ const mockDonations = [
     anonymous: false,
     targetIssueId: "1",
     status: "completed" as const,
-    createdAt: new Date("2024-01-20")
+    createdAt: new Date("2024-01-20"),
   },
   {
     id: "2",
@@ -49,7 +45,7 @@ const mockDonations = [
     anonymous: true,
     targetIssueId: "1",
     status: "completed" as const,
-    createdAt: new Date("2024-01-19")
+    createdAt: new Date("2024-01-19"),
   },
   {
     id: "3",
@@ -62,7 +58,7 @@ const mockDonations = [
     anonymous: false,
     targetIssueId: "2",
     status: "completed" as const,
-    createdAt: new Date("2024-01-18")
+    createdAt: new Date("2024-01-18"),
   },
   {
     id: "4",
@@ -75,7 +71,7 @@ const mockDonations = [
     anonymous: false,
     targetIssueId: undefined,
     status: "pending" as const,
-    createdAt: new Date("2024-01-21")
+    createdAt: new Date("2024-01-21"),
   },
   {
     id: "5",
@@ -88,7 +84,7 @@ const mockDonations = [
     anonymous: false,
     targetIssueId: "3",
     status: "failed" as const,
-    createdAt: new Date("2024-01-17")
+    createdAt: new Date("2024-01-17"),
   },
   {
     id: "6",
@@ -101,29 +97,37 @@ const mockDonations = [
     anonymous: true,
     targetIssueId: undefined,
     status: "completed" as const,
-    createdAt: new Date("2024-01-16")
-  }
+    createdAt: new Date("2024-01-16"),
+  },
 ];
 
 const statusColors = {
-  pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-  completed: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  failed: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+  pending:
+    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+  completed:
+    "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+  failed: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
 };
 
 export default function DonationsPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "completed" | "failed">("all");
-  const [filterTimeframe, setFilterTimeframe] = useState<"all" | "today" | "week" | "month" | "year">("all");
+  const [filterStatus, setFilterStatus] = useState<
+    "all" | "pending" | "completed" | "failed"
+  >("all");
+  const [filterTimeframe, setFilterTimeframe] = useState<
+    "all" | "today" | "week" | "month" | "year"
+  >("all");
   const [selectedDonation, setSelectedDonation] = useState<any>(null);
 
-  const filteredDonations = mockDonations.filter(donation => {
-    const matchesSearch = donation.donorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         donation.donorEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         donation.message.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = filterStatus === "all" || donation.status === filterStatus;
-    
+  const filteredDonations = mockDonations.filter((donation) => {
+    const matchesSearch =
+      donation.donorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      donation.donorEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      donation.message.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      filterStatus === "all" || donation.status === filterStatus;
+
     const now = new Date();
     let matchesTimeframe = true;
     if (filterTimeframe !== "all") {
@@ -146,7 +150,7 @@ export default function DonationsPage() {
           break;
       }
     }
-    
+
     return matchesSearch && matchesStatus && matchesTimeframe;
   });
 
@@ -162,19 +166,22 @@ export default function DonationsPage() {
 
   // Calculate statistics
   const totalDonations = mockDonations.length;
-  const totalAmount = mockDonations.reduce((sum, donation) => sum + donation.amount, 0);
+  const totalAmount = mockDonations.reduce(
+    (sum, donation) => sum + donation.amount,
+    0
+  );
   const completedAmount = mockDonations
-    .filter(d => d.status === "completed")
+    .filter((d) => d.status === "completed")
     .reduce((sum, donation) => sum + donation.amount, 0);
   const pendingAmount = mockDonations
-    .filter(d => d.status === "pending")
+    .filter((d) => d.status === "pending")
     .reduce((sum, donation) => sum + donation.amount, 0);
   const failedAmount = mockDonations
-    .filter(d => d.status === "failed")
+    .filter((d) => d.status === "failed")
     .reduce((sum, donation) => sum + donation.amount, 0);
 
   // Recent donations (last 7 days)
-  const recentDonations = mockDonations.filter(donation => {
+  const recentDonations = mockDonations.filter((donation) => {
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     return donation.createdAt >= weekAgo;
   });
@@ -199,9 +206,11 @@ export default function DonationsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Donations</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Donations
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -212,20 +221,22 @@ export default function DonationsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Amount</CardTitle>
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalAmount.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              ${totalAmount.toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground">
               ${completedAmount.toLocaleString()} completed
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending</CardTitle>
             <Clock className="h-4 w-4 text-yellow-600" />
@@ -235,12 +246,13 @@ export default function DonationsPage() {
               ${pendingAmount.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
-              {mockDonations.filter(d => d.status === "pending").length} donations
+              {mockDonations.filter((d) => d.status === "pending").length}{" "}
+              donations
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Failed</CardTitle>
             <TrendingDown className="h-4 w-4 text-red-600" />
@@ -250,21 +262,25 @@ export default function DonationsPage() {
               ${failedAmount.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
-              {mockDonations.filter(d => d.status === "failed").length} donations
+              {mockDonations.filter((d) => d.status === "failed").length}{" "}
+              donations
             </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Recent Activity */}
-      <Card>
+      <Card className="py-4">
         <CardHeader>
           <CardTitle>Recent Donations</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {recentDonations.slice(0, 5).map((donation) => (
-              <div key={donation.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <div
+                key={donation.id}
+                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+              >
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
                     <User className="w-5 h-5 text-blue-600" />
@@ -279,7 +295,9 @@ export default function DonationsPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold">${donation.amount.toLocaleString()}</p>
+                  <p className="font-semibold">
+                    ${donation.amount.toLocaleString()}
+                  </p>
                   <Badge className={statusColors[donation.status]}>
                     {donation.status}
                   </Badge>
@@ -292,7 +310,7 @@ export default function DonationsPage() {
 
       {/* Filters */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="p-6">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
@@ -333,7 +351,7 @@ export default function DonationsPage() {
       </Card>
 
       {/* Donations Table */}
-      <Card>
+      <Card className="py-4">
         <CardHeader>
           <CardTitle>All Donations</CardTitle>
         </CardHeader>
@@ -352,11 +370,16 @@ export default function DonationsPage() {
               </thead>
               <tbody>
                 {filteredDonations.map((donation) => (
-                  <tr key={donation.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <tr
+                    key={donation.id}
+                    className="border-b hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
                     <td className="py-3 px-4">
                       <div>
                         <div className="font-medium">
-                          {donation.anonymous ? "Anonymous" : donation.donorName}
+                          {donation.anonymous
+                            ? "Anonymous"
+                            : donation.donorName}
                         </div>
                         <div className="text-sm text-gray-500">
                           {donation.donorEmail}
@@ -381,7 +404,9 @@ export default function DonationsPage() {
                     </td>
                     <td className="py-3 px-4">
                       {donation.targetIssueId ? (
-                        <span className="text-sm text-blue-600">Issue #{donation.targetIssueId}</span>
+                        <span className="text-sm text-blue-600">
+                          Issue #{donation.targetIssueId}
+                        </span>
                       ) : (
                         <span className="text-sm text-gray-500">General</span>
                       )}
@@ -398,7 +423,9 @@ export default function DonationsPage() {
                         {donation.status === "pending" && (
                           <Button
                             size="sm"
-                            onClick={() => handleStatusUpdate(donation.id, "completed")}
+                            onClick={() =>
+                              handleStatusUpdate(donation.id, "completed")
+                            }
                           >
                             <CheckCircle className="w-4 h-4" />
                           </Button>
@@ -407,7 +434,9 @@ export default function DonationsPage() {
                           <Button
                             size="sm"
                             variant="destructive"
-                            onClick={() => handleStatusUpdate(donation.id, "failed")}
+                            onClick={() =>
+                              handleStatusUpdate(donation.id, "failed")
+                            }
                           >
                             <XCircle className="w-4 h-4" />
                           </Button>
@@ -446,12 +475,16 @@ export default function DonationsPage() {
                     <div className="flex justify-between">
                       <span>Name:</span>
                       <span className="font-medium">
-                        {selectedDonation.anonymous ? "Anonymous" : selectedDonation.donorName}
+                        {selectedDonation.anonymous
+                          ? "Anonymous"
+                          : selectedDonation.donorName}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Email:</span>
-                      <span className="font-medium">{selectedDonation.donorEmail}</span>
+                      <span className="font-medium">
+                        {selectedDonation.donorEmail}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Anonymous:</span>
@@ -473,11 +506,19 @@ export default function DonationsPage() {
                     </div>
                     <div className="flex justify-between">
                       <span>Currency:</span>
-                      <span className="font-medium">{selectedDonation.currency}</span>
+                      <span className="font-medium">
+                        {selectedDonation.currency}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Status:</span>
-                      <Badge className={statusColors[selectedDonation.status as keyof typeof statusColors]}>
+                      <Badge
+                        className={
+                          statusColors[
+                            selectedDonation.status as keyof typeof statusColors
+                          ]
+                        }
+                      >
                         {selectedDonation.status}
                       </Badge>
                     </div>

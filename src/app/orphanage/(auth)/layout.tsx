@@ -2,20 +2,20 @@ import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-export default function AuthLayout({
+export default function OrphanageAuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <main className="min-h-screen grid grid-cols-2">
-      {/* left side */}
-      <div className="relative">
+      {/* left side - fixed */}
+      <div className="relative h-screen overflow-hidden">
         <div className="relative inset-0">
           <Image
-            className="object-cover object-center h-screen w-full"
+            className="object-cover object-bottom h-full w-full"
             src={
-              "https://images.unsplash.com/photo-1611183110451-7e156d15581d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGltYWdlcyUyMG9mJTIwaGFwcHklMjBibGFjayUyMGNoaWxkcmVufGVufDB8fDB8fHww"
+              "https://images.unsplash.com/photo-1609046395281-334c3b49552a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjZ8fGJsYWNrJTIwa2lkcyUyMGhhcHB5fGVufDB8fDB8fHww"
             }
             alt={"image of kids"}
             width={500}
@@ -47,10 +47,12 @@ export default function AuthLayout({
         </div>
       </div>
 
-      {/* right side */}
-      <main className="overflow-y-auto min-h-screen flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-md">{children}</div>
-      </main>
+      {/* right side - scrollable */}
+      <div className="h-screen overflow-y-auto">
+        <div className="min-h-full flex items-center justify-center p-8">
+          <div className="w-full max-w-4xl">{children}</div>
+        </div>
+      </div>
     </main>
   );
 }

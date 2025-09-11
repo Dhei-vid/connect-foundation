@@ -1,16 +1,14 @@
-"use client";
-
 import { Toaster } from "@/components/ui/sonner";
 
-export default function AdminLayout({
+export default function OrganizationsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <main>
       <Toaster />
-      <main>{children}</main>
-    </div>
+      <div>{children}</div>
+    </main>
   );
 }

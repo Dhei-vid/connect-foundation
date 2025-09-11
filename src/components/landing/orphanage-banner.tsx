@@ -1,8 +1,13 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { headerStyle } from "@/common/style";
 import { cn } from "@/lib/utils";
 
 const OrphanageBanner = () => {
+  const router = useRouter();
+
   return (
     <div className={"rounded-lg bg-main-blue p-8 2xl:py-12 text-center my-12"}>
       <div className="flex flex-col items-center justify-center space-y-5">
@@ -13,7 +18,11 @@ const OrphanageBanner = () => {
           Are you an orphanage seeking assistance or resources? Register today
           and become part of our growing community of care.
         </p>
-        <Button size={"lg"} className={"bg-main-red/70 hover:bg-main-red/50"}>
+        <Button
+          size={"lg"}
+          onClick={() => router.push("/orphanage/signup")}
+          className={"bg-main-red/70 hover:bg-main-red/50"}
+        >
           Register Now
         </Button>
       </div>

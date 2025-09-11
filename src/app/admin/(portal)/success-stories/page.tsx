@@ -2,21 +2,20 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Heart, 
-  Search, 
-  Plus, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  Building2, 
-  Users, 
-  DollarSign, 
+import {
+  Heart,
+  Search,
+  Plus,
+  Eye,
+  Edit,
+  Trash2,
+  Building2,
+  Users,
+  DollarSign,
   Calendar,
   Image as ImageIcon,
   CheckCircle,
-  Clock,
-  XCircle
+  XCircle,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,53 +29,65 @@ const mockSuccessStories = [
     orphanageId: "1",
     orphanageName: "Hope Children's Home",
     title: "New School Building Completed",
-    description: "We successfully built a new school building with 6 classrooms, a library, and computer lab for the children.",
-    impact: "45 children now have access to quality education in a modern facility. The new building includes proper ventilation, electricity, and safety features.",
+    description:
+      "We successfully built a new school building with 6 classrooms, a library, and computer lab for the children.",
+    impact:
+      "45 children now have access to quality education in a modern facility. The new building includes proper ventilation, electricity, and safety features.",
     images: ["/api/placeholder/400/300", "/api/placeholder/400/300"],
     beneficiaries: 45,
     cost: 150000,
     completedAt: new Date("2024-01-15"),
-    createdAt: new Date("2023-12-01")
+    createdAt: new Date("2023-12-01"),
   },
   {
     id: "2",
     orphanageId: "2",
     orphanageName: "Sunshine Orphanage",
     title: "Medical Equipment Donation",
-    description: "Provided essential medical equipment including first aid supplies, basic diagnostic tools, and emergency medical kits.",
-    impact: "All 32 children now have access to immediate medical care. The equipment has already helped treat 15 cases of minor injuries and illnesses.",
+    description:
+      "Provided essential medical equipment including first aid supplies, basic diagnostic tools, and emergency medical kits.",
+    impact:
+      "All 32 children now have access to immediate medical care. The equipment has already helped treat 15 cases of minor injuries and illnesses.",
     images: ["/api/placeholder/400/300"],
     beneficiaries: 32,
     cost: 25000,
     completedAt: new Date("2024-01-10"),
-    createdAt: new Date("2023-11-20")
+    createdAt: new Date("2023-11-20"),
   },
   {
     id: "3",
     orphanageId: "3",
     orphanageName: "Little Angels Home",
     title: "Nutrition Program Implementation",
-    description: "Established a comprehensive nutrition program with balanced meals, vitamin supplements, and nutrition education.",
-    impact: "28 children now receive 3 nutritious meals daily. Health improvements observed in 90% of children within 3 months.",
-    images: ["/api/placeholder/400/300", "/api/placeholder/400/300", "/api/placeholder/400/300"],
+    description:
+      "Established a comprehensive nutrition program with balanced meals, vitamin supplements, and nutrition education.",
+    impact:
+      "28 children now receive 3 nutritious meals daily. Health improvements observed in 90% of children within 3 months.",
+    images: [
+      "/api/placeholder/400/300",
+      "/api/placeholder/400/300",
+      "/api/placeholder/400/300",
+    ],
     beneficiaries: 28,
     cost: 18000,
     completedAt: new Date("2024-01-05"),
-    createdAt: new Date("2023-11-15")
+    createdAt: new Date("2023-11-15"),
   },
   {
     id: "4",
     orphanageId: "4",
     orphanageName: "Grace Orphanage",
     title: "Water Well Installation",
-    description: "Installed a deep water well with purification system to provide clean, safe drinking water for the orphanage.",
-    impact: "38 children and 9 staff members now have access to clean water 24/7. Reduced water-related illnesses by 80%.",
+    description:
+      "Installed a deep water well with purification system to provide clean, safe drinking water for the orphanage.",
+    impact:
+      "38 children and 9 staff members now have access to clean water 24/7. Reduced water-related illnesses by 80%.",
     images: ["/api/placeholder/400/300"],
     beneficiaries: 47,
     cost: 35000,
     completedAt: new Date("2023-12-20"),
-    createdAt: new Date("2023-10-30")
-  }
+    createdAt: new Date("2023-10-30"),
+  },
 ];
 
 export default function SuccessStoriesPage() {
@@ -84,14 +95,21 @@ export default function SuccessStoriesPage() {
   const [selectedStory, setSelectedStory] = useState<any>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const filteredStories = mockSuccessStories.filter(story =>
-    story.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    story.orphanageName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    story.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredStories = mockSuccessStories.filter(
+    (story) =>
+      story.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      story.orphanageName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      story.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalBeneficiaries = mockSuccessStories.reduce((sum, story) => sum + story.beneficiaries, 0);
-  const totalCost = mockSuccessStories.reduce((sum, story) => sum + story.cost, 0);
+  const totalBeneficiaries = mockSuccessStories.reduce(
+    (sum, story) => sum + story.beneficiaries,
+    0
+  );
+  const totalCost = mockSuccessStories.reduce(
+    (sum, story) => sum + story.cost,
+    0
+  );
 
   const handleEdit = (storyId: string) => {
     // TODO: Implement edit logic
@@ -129,19 +147,23 @@ export default function SuccessStoriesPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Stories</CardTitle>
             <Heart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockSuccessStories.length}</div>
+            <div className="text-2xl font-bold">
+              {mockSuccessStories.length}
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Beneficiaries</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Beneficiaries
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -149,27 +171,34 @@ export default function SuccessStoriesPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Investment</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Investment
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalCost.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              ${totalCost.toLocaleString()}
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">This Month</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {mockSuccessStories.filter(story => 
-                story.completedAt.getMonth() === new Date().getMonth() &&
-                story.completedAt.getFullYear() === new Date().getFullYear()
-              ).length}
+              {
+                mockSuccessStories.filter(
+                  (story) =>
+                    story.completedAt.getMonth() === new Date().getMonth() &&
+                    story.completedAt.getFullYear() === new Date().getFullYear()
+                ).length
+              }
             </div>
             <p className="text-xs text-muted-foreground">stories completed</p>
           </CardContent>
@@ -178,7 +207,7 @@ export default function SuccessStoriesPage() {
 
       {/* Search */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="p-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
@@ -194,7 +223,10 @@ export default function SuccessStoriesPage() {
       {/* Success Stories Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredStories.map((story) => (
-          <Card key={story.id} className="hover:shadow-lg transition-shadow">
+          <Card
+            key={story.id}
+            className="hover:shadow-lg transition-shadow py-4"
+          >
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div>
@@ -228,7 +260,9 @@ export default function SuccessStoriesPage() {
                     <DollarSign className="w-4 h-4 mr-1 text-gray-500" />
                     Cost
                   </span>
-                  <span className="font-medium">${story.cost.toLocaleString()}</span>
+                  <span className="font-medium">
+                    ${story.cost.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="flex items-center">
@@ -242,7 +276,8 @@ export default function SuccessStoriesPage() {
                 {story.images.length > 0 && (
                   <div className="flex items-center text-sm">
                     <ImageIcon className="w-4 h-4 mr-1 text-gray-500" />
-                    {story.images.length} image{story.images.length > 1 ? 's' : ''}
+                    {story.images.length} image
+                    {story.images.length > 1 ? "s" : ""}
                   </div>
                 )}
               </div>
@@ -318,11 +353,15 @@ export default function SuccessStoriesPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>Beneficiaries:</span>
-                      <span className="font-medium">{selectedStory.beneficiaries}</span>
+                      <span className="font-medium">
+                        {selectedStory.beneficiaries}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Total Cost:</span>
-                      <span className="font-medium">${selectedStory.cost.toLocaleString()}</span>
+                      <span className="font-medium">
+                        ${selectedStory.cost.toLocaleString()}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Completed:</span>
@@ -336,11 +375,16 @@ export default function SuccessStoriesPage() {
                 <div>
                   <h3 className="font-semibold mb-2">Images</h3>
                   <div className="grid grid-cols-2 gap-2">
-                    {selectedStory.images.map((image: string, index: number) => (
-                      <div key={index} className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                        <ImageIcon className="w-8 h-8 text-gray-400" />
-                      </div>
-                    ))}
+                    {selectedStory.images.map(
+                      (image: string, index: number) => (
+                        <div
+                          key={index}
+                          className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
+                        >
+                          <ImageIcon className="w-8 h-8 text-gray-400" />
+                        </div>
+                      )
+                    )}
                   </div>
                 </div>
               </div>
@@ -382,12 +426,16 @@ export default function SuccessStoriesPage() {
                 <Input placeholder="Enter story title" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Orphanage</label>
+                <label className="block text-sm font-medium mb-2">
+                  Orphanage
+                </label>
                 <Input placeholder="Select orphanage" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Description</label>
-                <textarea 
+                <label className="block text-sm font-medium mb-2">
+                  Description
+                </label>
+                <textarea
                   className="w-full p-3 border rounded-lg"
                   rows={3}
                   placeholder="Describe the project..."
@@ -395,7 +443,7 @@ export default function SuccessStoriesPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Impact</label>
-                <textarea 
+                <textarea
                   className="w-full p-3 border rounded-lg"
                   rows={3}
                   placeholder="Describe the impact achieved..."
@@ -403,7 +451,9 @@ export default function SuccessStoriesPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Beneficiaries</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Beneficiaries
+                  </label>
                   <Input type="number" placeholder="Number of beneficiaries" />
                 </div>
                 <div>

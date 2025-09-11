@@ -2,20 +2,18 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Building2, 
-  Search, 
-  Filter, 
-  Eye, 
-  CheckCircle, 
-  XCircle, 
-  MapPin, 
-  Phone, 
-  Mail, 
+import {
+  Building2,
+  Search,
+  Eye,
+  CheckCircle,
+  XCircle,
+  MapPin,
+  Phone,
+  Mail,
   Globe,
   Users,
   Calendar,
-  MoreVertical
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,7 +26,8 @@ const mockOrphanages = [
     id: "1",
     name: "Hope Children's Home",
     location: "Lagos, Nigeria",
-    description: "A loving home for orphaned and abandoned children, providing care, education, and hope for a better future.",
+    description:
+      "A loving home for orphaned and abandoned children, providing care, education, and hope for a better future.",
     contactEmail: "info@hopechildrenshome.org",
     contactPhone: "+234-801-234-5678",
     website: "www.hopechildrenshome.org",
@@ -39,13 +38,14 @@ const mockOrphanages = [
     createdAt: new Date("2023-01-15"),
     updatedAt: new Date("2024-01-10"),
     logoURL: "/api/placeholder/100/100",
-    coverImageURL: "/api/placeholder/400/200"
+    coverImageURL: "/api/placeholder/400/200",
   },
   {
     id: "2",
     name: "Sunshine Orphanage",
     location: "Abuja, Nigeria",
-    description: "Dedicated to providing quality care and education to children in need.",
+    description:
+      "Dedicated to providing quality care and education to children in need.",
     contactEmail: "contact@sunshineorphanage.org",
     contactPhone: "+234-802-345-6789",
     website: "www.sunshineorphanage.org",
@@ -56,13 +56,14 @@ const mockOrphanages = [
     createdAt: new Date("2023-03-20"),
     updatedAt: new Date("2024-01-05"),
     logoURL: "/api/placeholder/100/100",
-    coverImageURL: "/api/placeholder/400/200"
+    coverImageURL: "/api/placeholder/400/200",
   },
   {
     id: "3",
     name: "Little Angels Home",
     location: "Port Harcourt, Nigeria",
-    description: "Creating a nurturing environment where every child can thrive and reach their potential.",
+    description:
+      "Creating a nurturing environment where every child can thrive and reach their potential.",
     contactEmail: "info@littleangelshome.org",
     contactPhone: "+234-803-456-7890",
     childrenCount: 28,
@@ -72,13 +73,14 @@ const mockOrphanages = [
     createdAt: new Date("2023-05-10"),
     updatedAt: new Date("2024-01-08"),
     logoURL: "/api/placeholder/100/100",
-    coverImageURL: "/api/placeholder/400/200"
+    coverImageURL: "/api/placeholder/400/200",
   },
   {
     id: "4",
     name: "Grace Orphanage",
     location: "Kano, Nigeria",
-    description: "Providing shelter, education, and love to children who need it most.",
+    description:
+      "Providing shelter, education, and love to children who need it most.",
     contactEmail: "grace@graceorphanage.org",
     contactPhone: "+234-804-567-8901",
     childrenCount: 38,
@@ -88,23 +90,27 @@ const mockOrphanages = [
     createdAt: new Date("2023-07-15"),
     updatedAt: new Date("2024-01-12"),
     logoURL: "/api/placeholder/100/100",
-    coverImageURL: "/api/placeholder/400/200"
-  }
+    coverImageURL: "/api/placeholder/400/200",
+  },
 ];
 
 export default function OrphanagesPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"all" | "verified" | "pending">("all");
+  const [filterStatus, setFilterStatus] = useState<
+    "all" | "verified" | "pending"
+  >("all");
   const [selectedOrphanage, setSelectedOrphanage] = useState<any>(null);
 
-  const filteredOrphanages = mockOrphanages.filter(orphanage => {
-    const matchesSearch = orphanage.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         orphanage.location.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesFilter = filterStatus === "all" || 
-                         (filterStatus === "verified" && orphanage.verified) ||
-                         (filterStatus === "pending" && !orphanage.verified);
-    
+  const filteredOrphanages = mockOrphanages.filter((orphanage) => {
+    const matchesSearch =
+      orphanage.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      orphanage.location.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesFilter =
+      filterStatus === "all" ||
+      (filterStatus === "verified" && orphanage.verified) ||
+      (filterStatus === "pending" && !orphanage.verified);
+
     return matchesSearch && matchesFilter;
   });
 
@@ -138,9 +144,11 @@ export default function OrphanagesPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Orphanages</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Orphanages
+            </CardTitle>
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -148,33 +156,35 @@ export default function OrphanagesPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Verified</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {mockOrphanages.filter(o => o.verified).length}
+              {mockOrphanages.filter((o) => o.verified).length}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending</CardTitle>
             <XCircle className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
-              {mockOrphanages.filter(o => !o.verified).length}
+              {mockOrphanages.filter((o) => !o.verified).length}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Children</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Children
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -187,7 +197,7 @@ export default function OrphanagesPage() {
 
       {/* Filters */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
@@ -227,7 +237,10 @@ export default function OrphanagesPage() {
       {/* Orphanages List */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredOrphanages.map((orphanage) => (
-          <Card key={orphanage.id} className="hover:shadow-lg transition-shadow">
+          <Card
+            key={orphanage.id}
+            className="hover:shadow-lg transition-shadow py-4"
+          >
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-3">
@@ -251,11 +264,12 @@ export default function OrphanagesPage() {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
                 {orphanage.description}
               </p>
-              
+
               <div className="space-y-2 mb-4">
                 <div className="flex items-center text-sm">
                   <Users className="w-4 h-4 mr-2 text-gray-500" />
-                  {orphanage.childrenCount} children, {orphanage.staffCount} staff
+                  {orphanage.childrenCount} children, {orphanage.staffCount}{" "}
+                  staff
                 </div>
                 <div className="flex items-center text-sm">
                   <Calendar className="w-4 h-4 mr-2 text-gray-500" />
@@ -361,7 +375,10 @@ export default function OrphanagesPage() {
                     <div>Children: {selectedOrphanage.childrenCount}</div>
                     <div>Staff: {selectedOrphanage.staffCount}</div>
                     <div>Founded: {selectedOrphanage.foundedYear}</div>
-                    <div>Status: {selectedOrphanage.verified ? "Verified" : "Pending"}</div>
+                    <div>
+                      Status:{" "}
+                      {selectedOrphanage.verified ? "Verified" : "Pending"}
+                    </div>
                   </div>
                 </div>
               </div>
