@@ -46,7 +46,7 @@ export default function Page() {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           <Button
-            onClick={() => router.push("signin")}
+            onClick={() => router.push("/admin/signin")}
             size="lg"
             className="w-full sm:w-auto"
           >

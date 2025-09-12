@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Heart, Users, Globe, Shield, Star } from "lucide-react";
+import { Heart, Users, Globe, Shield, Star, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -283,7 +283,7 @@ export default function Page() {
                 size="lg"
                 className="text-lg px-8 py-3 bg-main-red rounded-full"
               >
-                Join Our Team &gt;
+                Join Our Team <ChevronRight size={20} />
               </Button>
             </div>
 
@@ -362,7 +362,7 @@ export default function Page() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="border-white text-white hover:bg-white hover:text-main-blue"
+                  className="bg-transparent border-white text-white hover:bg-white hover:text-main-blue"
                 >
                   See Our Impact
                 </Button>

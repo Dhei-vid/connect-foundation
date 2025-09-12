@@ -10,32 +10,38 @@ import {
   Shield,
   TrendingUp,
 } from "lucide-react";
+import { TopNav } from "@/components/navigation/top-nav";
+import HeroLayout from "@/components/general/hero-layout";
 
 export default function Page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      {/* Hero Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            Make a <span className="text-primary">Difference</span>
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
-            Your donation can change a child&apos;s life forever. Every dollar
-            counts and goes directly to providing food, shelter, education, and
-            care for children in need.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8 py-3">
-              <Heart className="w-5 h-5 mr-2" />
-              Donate Now
-            </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-3">
-              Learn How It Works
-            </Button>
+      <HeroLayout>
+        <TopNav />
+
+        {/* Hero Section */}
+        <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto text-center">
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+              Make a <span className="text-primary">Difference</span>
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
+              Your donation can change a child&apos;s life forever. Every dollar
+              counts and goes directly to providing food, shelter, education,
+              and care for children in need.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="text-lg px-8 py-3">
+                <Heart className="w-5 h-5 mr-2" />
+                Donate Now
+              </Button>
+              <Button variant="outline" size="lg" className="text-lg px-8 py-3">
+                Learn How It Works
+              </Button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </HeroLayout>
 
       {/* Impact Stats */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
