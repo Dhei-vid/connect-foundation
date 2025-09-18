@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       "fra1.digitaloceanspaces.com",
+      "flowbite.s3.amazonaws.com",
       "destinyimpactchurch.org",
       "via.placeholder.com",
       "images.unsplash.com",

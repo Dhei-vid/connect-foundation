@@ -9,7 +9,6 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
-import { animate } from "framer-motion";
 
 const aboutUsNavItems = [
   {
@@ -159,7 +158,7 @@ export function TopNav() {
         <div className="ml-auto">
           <button
             onClick={() => router.push("/donate")}
-            className="cursor-pointer rounded-full bg-main-red py-3 px-8 text-white hover:bg-main-red/80 transition-colors duration-200"
+            className="cursor-pointer rounded-full bg-main-red/70 py-3 px-8 text-white hover:bg-main-blue transition-colors duration-200"
           >
             Donate
           </button>
@@ -219,7 +218,7 @@ export function TopNav() {
             </div>
 
             <Button
-              className="rounded-full bg-main-red text-white hover:bg-main-red/80 px-6 py-2 transition-colors duration-200"
+              className="transition-all ease-in-out duration-200 rounded-full bg-main-red/70 backdrop-blur-lg text-white hover:bg-main-blue px-6 py-2 transition-colors duration-200"
               onClick={() => router.push("/donate")}
             >
               Donate
@@ -328,7 +327,7 @@ export function TopNav() {
 
               <div className="pt-2 sm:pt-3 border-t border-gray-200">
                 <Button
-                  className="w-full rounded-full bg-main-red text-white hover:bg-main-red/80 py-2 sm:py-3 transition-colors duration-200"
+                  className="w-full rounded-full bg-main-red/70 text-white hover:bg-main-blue py-2 sm:py-3 transition-colors duration-200"
                   onClick={() => {
                     closeMobileMenu();
                     router.push("/donate");
