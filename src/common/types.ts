@@ -116,6 +116,34 @@ export interface ContactInquiry {
   updatedAt: Date;
 }
 
+export interface Volunteer {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  dateOfBirth: Date;
+  gender: Gender;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  skills: string[];
+  interests: string[];
+  availability: "weekdays" | "weekends" | "both" | "flexible";
+  experience: "none" | "beginner" | "intermediate" | "advanced";
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  emergencyContactRelation: string;
+  backgroundCheckCompleted: boolean;
+  status: "pending" | "approved" | "rejected" | "suspended";
+  assignedOrphanageId?: string;
+  assignedOrphanageName?: string;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface Theme {
   mode: "light" | "dark";
   primary: string;
