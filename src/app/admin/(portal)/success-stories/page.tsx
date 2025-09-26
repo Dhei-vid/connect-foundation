@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Heart,
   Search,
@@ -16,116 +16,118 @@ import {
   Image as ImageIcon,
   CheckCircle,
   XCircle,
+  Filter,
+  ArrowRight,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-
-// Mock data - in real app, this would come from your database
-const mockSuccessStories = [
-  {
-    id: "1",
-    orphanageId: "1",
-    orphanageName: "Hope Children's Home",
-    title: "New School Building Completed",
-    description:
-      "We successfully built a new school building with 6 classrooms, a library, and computer lab for the children.",
-    impact:
-      "45 children now have access to quality education in a modern facility. The new building includes proper ventilation, electricity, and safety features.",
-    images: ["/api/placeholder/400/300", "/api/placeholder/400/300"],
-    beneficiaries: 45,
-    cost: 150000,
-    completedAt: new Date("2024-01-15"),
-    createdAt: new Date("2023-12-01"),
-  },
-  {
-    id: "2",
-    orphanageId: "2",
-    orphanageName: "Sunshine Orphanage",
-    title: "Medical Equipment Donation",
-    description:
-      "Provided essential medical equipment including first aid supplies, basic diagnostic tools, and emergency medical kits.",
-    impact:
-      "All 32 children now have access to immediate medical care. The equipment has already helped treat 15 cases of minor injuries and illnesses.",
-    images: ["/api/placeholder/400/300"],
-    beneficiaries: 32,
-    cost: 25000,
-    completedAt: new Date("2024-01-10"),
-    createdAt: new Date("2023-11-20"),
-  },
-  {
-    id: "3",
-    orphanageId: "3",
-    orphanageName: "Little Angels Home",
-    title: "Nutrition Program Implementation",
-    description:
-      "Established a comprehensive nutrition program with balanced meals, vitamin supplements, and nutrition education.",
-    impact:
-      "28 children now receive 3 nutritious meals daily. Health improvements observed in 90% of children within 3 months.",
-    images: [
-      "/api/placeholder/400/300",
-      "/api/placeholder/400/300",
-      "/api/placeholder/400/300",
-    ],
-    beneficiaries: 28,
-    cost: 18000,
-    completedAt: new Date("2024-01-05"),
-    createdAt: new Date("2023-11-15"),
-  },
-  {
-    id: "4",
-    orphanageId: "4",
-    orphanageName: "Grace Orphanage",
-    title: "Water Well Installation",
-    description:
-      "Installed a deep water well with purification system to provide clean, safe drinking water for the orphanage.",
-    impact:
-      "38 children and 9 staff members now have access to clean water 24/7. Reduced water-related illnesses by 80%.",
-    images: ["/api/placeholder/400/300"],
-    beneficiaries: 47,
-    cost: 35000,
-    completedAt: new Date("2023-12-20"),
-    createdAt: new Date("2023-10-30"),
-  },
-];
+import { SelectField } from "@/components/ui/form-field";
+import { SelectItem } from "@/components/ui/select";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { 
+  getSuccessStories, 
+  getSuccessStoriesByOrphanage, 
+  getSuccessStoryStats,
+  deleteSuccessStory 
+} from "@/firebase/success-stories";
+import { getOrphanages } from "@/firebase/orphanages";
+import { getIssues } from "@/firebase/issues";
+import { toast } from "sonner";
+import { formatFirebaseDate } from "@/lib/date-utils";
+import type { SuccessStory, Orphanage, Issue } from "@/common/types";
+import LoadingSpinner from "@/components/general/spinner";
 
 export default function SuccessStoriesPage() {
+  const router = useRouter();
+  const [successStories, setSuccessStories] = useState<SuccessStory[]>([]);
+  const [orphanages, setOrphanages] = useState<Orphanage[]>([]);
+  const [issues, setIssues] = useState<Issue[]>([]);
+  const [stats, setStats] = useState({
+    total: 0,
+    totalBeneficiaries: 0,
+    totalCost: 0,
+    byOrphanage: {} as { [orphanageId: string]: number },
+  });
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStory, setSelectedStory] = useState<any>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [filterOrphanage, setFilterOrphanage] = useState("all");
+  const [selectedStory, setSelectedStory] = useState<SuccessStory | null>(null);
+  const [viewMode, setViewMode] = useState<"all" | "by-orphanage">("all");
 
-  const filteredStories = mockSuccessStories.filter(
-    (story) =>
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [storiesData, orphanagesData, issuesData, statsData] = await Promise.all([
+        getSuccessStories(),
+        getOrphanages(),
+        getIssues(),
+        getSuccessStoryStats(),
+      ]);
+      setSuccessStories(storiesData);
+      setOrphanages(orphanagesData);
+      setIssues(issuesData);
+      setStats(statsData);
+    } catch (error) {
+      console.error("Error loading data:", error);
+      toast.error("Failed to load success stories");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteStory = async (storyId: string) => {
+    try {
+      await deleteSuccessStory(storyId);
+      await loadData();
+      setSelectedStory(null);
+      toast.success("Success story deleted successfully");
+    } catch (error) {
+      console.error("Error deleting success story:", error);
+      toast.error("Failed to delete success story");
+    }
+  };
+
+  const filteredStories = successStories.filter((story) => {
+    const matchesSearch =
       story.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       story.orphanageName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      story.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      story.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      story.impact.toLowerCase().includes(searchTerm.toLowerCase());
 
-  const totalBeneficiaries = mockSuccessStories.reduce(
-    (sum, story) => sum + story.beneficiaries,
-    0
-  );
-  const totalCost = mockSuccessStories.reduce(
-    (sum, story) => sum + story.cost,
-    0
-  );
+    const matchesOrphanage =
+      filterOrphanage === "all" || story.orphanageId === filterOrphanage;
 
-  const handleEdit = (storyId: string) => {
-    // TODO: Implement edit logic
-    console.log("Edit story:", storyId);
+    return matchesSearch && matchesOrphanage;
+  });
+
+  const getOrphanageName = (orphanageId: string) => {
+    const orphanage = orphanages.find((o) => o.id === orphanageId);
+    return orphanage?.name || "Unknown Orphanage";
   };
 
-  const handleDelete = (storyId: string) => {
-    // TODO: Implement delete logic
-    console.log("Delete story:", storyId);
+  const getIssueTitle = (issueId: string) => {
+    const issue = issues.find((i) => i.id === issueId);
+    return issue?.title || "Unknown Issue";
   };
 
-  const handleCreate = () => {
-    // TODO: Implement create logic
-    console.log("Create new story");
-    setShowCreateModal(false);
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center">
+          <LoadingSpinner />
+          <p className="text-gray-600 dark:text-gray-400">
+            Loading success stories...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -136,16 +138,25 @@ export default function SuccessStoriesPage() {
             Success Stories
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Manage and showcase successful projects and their impact
+            Track and manage success stories from resolved issues
           </p>
         </div>
-        <Button onClick={() => setShowCreateModal(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Success Story
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setViewMode(viewMode === "all" ? "by-orphanage" : "all")}
+            variant="outline"
+          >
+            <Filter className="w-4 h-4 mr-2" />
+            {viewMode === "all" ? "Group by Orphanage" : "Show All"}
+          </Button>
+          <Button>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Story
+          </Button>
+        </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -153,172 +164,235 @@ export default function SuccessStoriesPage() {
             <Heart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {mockSuccessStories.length}
-            </div>
+            <div className="text-2xl font-bold">{stats.total}</div>
           </CardContent>
         </Card>
 
         <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Beneficiaries
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Beneficiaries</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalBeneficiaries}</div>
+            <div className="text-2xl font-bold">{stats.totalBeneficiaries}</div>
           </CardContent>
         </Card>
 
         <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Investment
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Investment</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              ${totalCost.toLocaleString()}
-            </div>
+            <div className="text-2xl font-bold">${stats.totalCost.toLocaleString()}</div>
           </CardContent>
         </Card>
 
         <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">This Month</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Orphanages</CardTitle>
+            <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {
-                mockSuccessStories.filter(
-                  (story) =>
-                    story.completedAt.getMonth() === new Date().getMonth() &&
-                    story.completedAt.getFullYear() === new Date().getFullYear()
-                ).length
-              }
-            </div>
-            <p className="text-xs text-muted-foreground">stories completed</p>
+            <div className="text-2xl font-bold">{Object.keys(stats.byOrphanage).length}</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Search */}
+      {/* Filters */}
       <Card>
         <CardContent className="p-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Search success stories..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+          <div className="grid grid-cols-5 gap-4">
+            <div className="col-span-4 flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search success stories..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <div className="col-span-1">
+              <SelectField
+                value={filterOrphanage}
+                placeholder="Orphanage"
+                onValueChange={(value: string) => setFilterOrphanage(value)}
+              >
+                <SelectItem value="all">All Orphanages</SelectItem>
+                {orphanages.map((orphanage) => (
+                  <SelectItem key={orphanage.id} value={orphanage.id}>
+                    {orphanage.name}
+                  </SelectItem>
+                ))}
+              </SelectField>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Success Stories Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredStories.map((story) => (
-          <Card
-            key={story.id}
-            className="hover:shadow-lg transition-shadow py-4"
-          >
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-lg mb-2">{story.title}</CardTitle>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Building2 className="w-4 h-4 mr-1" />
-                    {story.orphanageName}
+      {/* Success Stories List */}
+      {viewMode === "all" ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredStories.map((story) => (
+            <Card key={story.id} className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                      <Heart className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">{story.title}</h3>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <Building2 className="w-4 h-4 mr-1" />
+                        {story.orphanageName}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <Badge variant="default">
-                  <CheckCircle className="w-3 h-3 mr-1" />
-                  Completed
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
-                {story.description}
-              </p>
-
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center">
-                    <Users className="w-4 h-4 mr-1 text-gray-500" />
-                    Beneficiaries
-                  </span>
-                  <span className="font-medium">{story.beneficiaries}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center">
-                    <DollarSign className="w-4 h-4 mr-1 text-gray-500" />
-                    Cost
-                  </span>
-                  <span className="font-medium">
-                    ${story.cost.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-1 text-gray-500" />
+                  <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                     Completed
-                  </span>
-                  <span className="font-medium">
-                    {story.completedAt.toLocaleDateString()}
-                  </span>
+                  </Badge>
                 </div>
-                {story.images.length > 0 && (
-                  <div className="flex items-center text-sm">
-                    <ImageIcon className="w-4 h-4 mr-1 text-gray-500" />
-                    {story.images.length} image
-                    {story.images.length > 1 ? "s" : ""}
+
+                <div className="space-y-3 mb-4">
+                  <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                    {story.description}
                   </div>
-                )}
-              </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                    <strong>Impact:</strong> {story.impact}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    <strong>Related Issue:</strong> {getIssueTitle(story.issueId)}
+                  </div>
+                </div>
 
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setSelectedStory(story)}
-                >
-                  <Eye className="w-4 h-4 mr-2" />
-                  View Details
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleEdit(story.id)}
-                >
-                  <Edit className="w-4 h-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => handleDelete(story.id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+                  <div>
+                    <span className="text-gray-500">Beneficiaries:</span>
+                    <div className="font-medium">{story.beneficiaries}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Cost:</span>
+                    <div className="font-medium">${story.cost.toLocaleString()}</div>
+                  </div>
+                </div>
 
-      {/* Story Details Modal */}
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setSelectedStory(story)}
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Details
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                  <ConfirmationDialog
+                    itemName={story.title}
+                    itemType="success story"
+                    onConfirm={() => handleDeleteStory(story.id)}
+                  >
+                    <Button size="sm" variant="destructive">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </ConfirmationDialog>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {Object.entries(
+            filteredStories.reduce((acc, story) => {
+              if (!acc[story.orphanageId]) {
+                acc[story.orphanageId] = [];
+              }
+              acc[story.orphanageId].push(story);
+              return acc;
+            }, {} as { [key: string]: SuccessStory[] })
+          ).map(([orphanageId, stories]) => (
+            <Card key={orphanageId} className="py-4">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="w-5 h-5" />
+                  {getOrphanageName(orphanageId)}
+                  <Badge className="ml-2">
+                    {stories.length} {stories.length === 1 ? "Story" : "Stories"}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {stories.map((story) => (
+                    <Card key={story.id} className="hover:shadow-lg transition-shadow">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <h4 className="font-semibold text-sm">{story.title}</h4>
+                          <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs">
+                            Completed
+                          </Badge>
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">
+                          {story.description}
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                          <div>
+                            <span className="text-gray-500">Beneficiaries:</span>
+                            <div className="font-medium">{story.beneficiaries}</div>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Cost:</span>
+                            <div className="font-medium">${story.cost.toLocaleString()}</div>
+                          </div>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1 text-xs"
+                            onClick={() => setSelectedStory(story)}
+                          >
+                            <Eye className="w-3 h-3 mr-1" />
+                            View
+                          </Button>
+                          <Button size="sm" variant="outline" className="text-xs">
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Success Story Details Modal */}
       {selectedStory && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>{selectedStory.title}</CardTitle>
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    {selectedStory.title}
+                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                      Completed
+                    </Badge>
+                  </CardTitle>
+                  <div className="flex items-center text-sm text-gray-500 mt-2">
+                    <Building2 className="w-4 h-4 mr-1" />
+                    {selectedStory.orphanageName}
+                  </div>
+                </div>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -326,10 +400,6 @@ export default function SuccessStoriesPage() {
                 >
                   <XCircle className="w-4 h-4" />
                 </Button>
-              </div>
-              <div className="flex items-center text-sm text-gray-500">
-                <Building2 className="w-4 h-4 mr-1" />
-                {selectedStory.orphanageName}
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -347,130 +417,94 @@ export default function SuccessStoriesPage() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h3 className="font-semibold mb-2">Related Issue</h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {getIssueTitle(selectedStory.issueId)}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-2">Project Details</h3>
+                  <h3 className="font-semibold mb-2">Statistics</h3>
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>Beneficiaries:</span>
-                      <span className="font-medium">
-                        {selectedStory.beneficiaries}
-                      </span>
+                      <span className="font-medium">{selectedStory.beneficiaries}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Total Cost:</span>
-                      <span className="font-medium">
-                        ${selectedStory.cost.toLocaleString()}
-                      </span>
+                      <span className="font-medium">${selectedStory.cost.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Completed:</span>
                       <span className="font-medium">
-                        {selectedStory.completedAt.toLocaleDateString()}
+                        {formatFirebaseDate(selectedStory.completedAt)}
                       </span>
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold mb-2">Images</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {selectedStory.images.map(
-                      (image: string, index: number) => (
-                        <div
-                          key={index}
-                          className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
-                        >
-                          <ImageIcon className="w-8 h-8 text-gray-400" />
-                        </div>
-                      )
-                    )}
+                  <h3 className="font-semibold mb-2">Timeline</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span>Created:</span>
+                      <span className="font-medium">
+                        {formatFirebaseDate(selectedStory.createdAt)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Last Updated:</span>
+                      <span className="font-medium">
+                        {formatFirebaseDate(selectedStory.updatedAt)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
 
+              {selectedStory.images && selectedStory.images.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-2">Images</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {selectedStory.images.map((image, index) => (
+                      <div
+                        key={index}
+                        className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
+                      >
+                        <ImageIcon className="w-8 h-8 text-gray-400" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex gap-2 pt-4">
-                <Button
-                  onClick={() => {
-                    handleEdit(selectedStory.id);
-                    setSelectedStory(null);
-                  }}
-                  className="flex-1"
-                >
+                <Button variant="outline" className="flex-1">
                   <Edit className="w-4 h-4 mr-2" />
                   Edit Story
                 </Button>
+                <ConfirmationDialog
+                  itemName={selectedStory.title}
+                  itemType="success story"
+                  onConfirm={() => {
+                    handleDeleteStory(selectedStory.id);
+                    setSelectedStory(null);
+                  }}
+                  variant="destructive"
+                >
+                  <Button variant="destructive" className="flex-1">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete Story
+                  </Button>
+                </ConfirmationDialog>
                 <Button
                   variant="outline"
                   onClick={() => setSelectedStory(null)}
                   className="flex-1"
                 >
                   Close
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Create Story Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-2xl">
-            <CardHeader>
-              <CardTitle>Create New Success Story</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Title</label>
-                <Input placeholder="Enter story title" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Orphanage
-                </label>
-                <Input placeholder="Select orphanage" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Description
-                </label>
-                <textarea
-                  className="w-full p-3 border rounded-lg"
-                  rows={3}
-                  placeholder="Describe the project..."
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Impact</label>
-                <textarea
-                  className="w-full p-3 border rounded-lg"
-                  rows={3}
-                  placeholder="Describe the impact achieved..."
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Beneficiaries
-                  </label>
-                  <Input type="number" placeholder="Number of beneficiaries" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Cost</label>
-                  <Input type="number" placeholder="Total cost" />
-                </div>
-              </div>
-              <div className="flex gap-2 pt-4">
-                <Button onClick={handleCreate} className="flex-1">
-                  Create Story
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowCreateModal(false)}
-                  className="flex-1"
-                >
-                  Cancel
                 </Button>
               </div>
             </CardContent>

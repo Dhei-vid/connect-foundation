@@ -16,6 +16,8 @@ export default function AdminPortalLayout({
   const { isAuthenticated, user, isLoading } = useAuthContext();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  console.log("User:", user);
+
   // If loading, show loading state
   if (isLoading) {
     return (
@@ -53,7 +55,7 @@ export default function AdminPortalLayout({
         )}
       </aside>
 
-      <div className="flex-1 flex flex-col overflow-hidden w-fit">
+      <div className="flex-1 flex flex-col overflow-hidden scrollbar-width w-fit">
         {user && (
           <PortalNavbar
             user={user}

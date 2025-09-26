@@ -34,8 +34,8 @@ export default function Page() {
             {isAuthenticated ? (
               <span>
                 You are Authenticated. Click on{" "}
-                <span className="text-main-red font-bold">Go to Home</span> to
-                continue
+                <span className="text-main-red font-bold">Go to Dashboard</span>{" "}
+                to continue
               </span>
             ) : (
               "You are not authenticated. Go to sign in page"

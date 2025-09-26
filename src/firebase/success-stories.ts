@@ -1,0 +1,236 @@
+import {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  getDoc,
+  query,
+  where,
+  orderBy,
+  limit,
+  Timestamp,
+} from "firebase/firestore";
+import { db } from "@/config/firebase";
+import type { SuccessStory } from "@/common/types";
+
+// --------------------
+// SUCCESS STORIES CRUD OPERATIONS
+// --------------------
+
+// Create a new success story
+export async function createSuccessStory(
+  successStoryData: Omit<SuccessStory, "id" | "createdAt" | "updatedAt">
+): Promise<string> {
+  try {
+    const docRef = await addDoc(collection(db, "success-stories"), {
+      ...successStoryData,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error("Error creating success story:", error);
+    throw error;
+  }
+}
+
+// Update a success story
+export async function updateSuccessStory(
+  successStoryId: string,
+  updates: Partial<SuccessStory>
+): Promise<void> {
+  try {
+    const successStoryRef = doc(db, "success-stories", successStoryId);
+    await updateDoc(successStoryRef, {
+      ...updates,
+      updatedAt: Timestamp.now(),
+    });
+  } catch (error) {
+    console.error("Error updating success story:", error);
+    throw error;
+  }
+}
+
+// Delete a success story
+export async function deleteSuccessStory(successStoryId: string): Promise<void> {
+  try {
+    await deleteDoc(doc(db, "success-stories", successStoryId));
+  } catch (error) {
+    console.error("Error deleting success story:", error);
+    throw error;
+  }
+}
+
+// Get a single success story by ID
+export async function getSuccessStory(successStoryId: string): Promise<SuccessStory | null> {
+  try {
+    const docRef = doc(db, "success-stories", successStoryId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        ...data,
+        createdAt: data.createdAt?.toDate?.(),
+        updatedAt: data.updatedAt?.toDate?.(),
+        completedAt: data.completedAt?.toDate?.(),
+      } as SuccessStory;
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error getting success story:", error);
+    throw error;
+  }
+}
+
+// Get success stories with optional filters
+export async function getSuccessStories(filters?: {
+  orphanageId?: string;
+  issueId?: string;
+  limitCount?: number;
+}): Promise<SuccessStory[]> {
+  try {
+    const successStoriesRef = collection(db, "success-stories");
+    const constraints = [];
+
+    // Apply filters
+    if (filters?.orphanageId) {
+      constraints.push(where("orphanageId", "==", filters.orphanageId));
+    }
+    if (filters?.issueId) {
+      constraints.push(where("issueId", "==", filters.issueId));
+    }
+
+    // Always order by creation date (newest first)
+    constraints.push(orderBy("createdAt", "desc"));
+
+    // Apply limit if specified
+    if (filters?.limitCount) {
+      constraints.push(limit(filters.limitCount));
+    }
+
+    const q = query(successStoriesRef, ...constraints);
+    const querySnapshot = await getDocs(q);
+
+    const successStories = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate?.(),
+        updatedAt: data.updatedAt?.toDate?.(),
+        completedAt: data.completedAt?.toDate?.(),
+      } as SuccessStory;
+    });
+
+    return successStories;
+  } catch (error) {
+    console.error("Error getting success stories:", error);
+    throw error;
+  }
+}
+
+// Get success stories grouped by orphanage
+export async function getSuccessStoriesByOrphanage(): Promise<{
+  [orphanageId: string]: {
+    orphanageName: string;
+    successStories: SuccessStory[];
+    totalBeneficiaries: number;
+    totalCost: number;
+  };
+}> {
+  try {
+    const allSuccessStories = await getSuccessStories();
+    
+    const grouped = allSuccessStories.reduce((acc, story) => {
+      if (!acc[story.orphanageId]) {
+        acc[story.orphanageId] = {
+          orphanageName: story.orphanageName,
+          successStories: [],
+          totalBeneficiaries: 0,
+          totalCost: 0,
+        };
+      }
+      
+      acc[story.orphanageId].successStories.push(story);
+      acc[story.orphanageId].totalBeneficiaries += story.beneficiaries;
+      acc[story.orphanageId].totalCost += story.cost;
+      
+      return acc;
+    }, {} as { [orphanageId: string]: { orphanageName: string; successStories: SuccessStory[]; totalBeneficiaries: number; totalCost: number; } });
+
+    return grouped;
+  } catch (error) {
+    console.error("Error getting success stories by orphanage:", error);
+    throw error;
+  }
+}
+
+// Search success stories by title, description, or orphanage name
+export async function searchSuccessStories(searchTerm: string): Promise<SuccessStory[]> {
+  try {
+    const allSuccessStories = await getSuccessStories();
+
+    return allSuccessStories.filter(
+      (story) =>
+        story.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        story.orphanageName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        story.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        story.impact.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  } catch (error) {
+    console.error("Error searching success stories:", error);
+    throw error;
+  }
+}
+
+// Get statistics on success stories
+export async function getSuccessStoryStats(): Promise<{
+  total: number;
+  totalBeneficiaries: number;
+  totalCost: number;
+  byOrphanage: { [orphanageId: string]: number };
+}> {
+  try {
+    const allSuccessStories = await getSuccessStories();
+
+    const byOrphanage = allSuccessStories.reduce((acc, story) => {
+      acc[story.orphanageId] = (acc[story.orphanageId] || 0) + 1;
+      return acc;
+    }, {} as { [orphanageId: string]: number });
+
+    return {
+      total: allSuccessStories.length,
+      totalBeneficiaries: allSuccessStories.reduce((sum, story) => sum + story.beneficiaries, 0),
+      totalCost: allSuccessStories.reduce((sum, story) => sum + story.cost, 0),
+      byOrphanage,
+    };
+  } catch (error) {
+    console.error("Error getting success story stats:", error);
+    throw error;
+  }
+}
+
+// Get success stories for a specific issue
+export async function getSuccessStoriesForIssue(issueId: string): Promise<SuccessStory[]> {
+  try {
+    return await getSuccessStories({ issueId });
+  } catch (error) {
+    console.error("Error getting success stories for issue:", error);
+    throw error;
+  }
+}
+
+// Get success stories for a specific orphanage
+export async function getSuccessStoriesForOrphanage(orphanageId: string): Promise<SuccessStory[]> {
+  try {
+    return await getSuccessStories({ orphanageId });
+  } catch (error) {
+    console.error("Error getting success stories for orphanage:", error);
+    throw error;
+  }
+}

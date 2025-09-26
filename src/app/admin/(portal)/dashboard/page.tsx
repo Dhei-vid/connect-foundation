@@ -28,6 +28,7 @@ import {
 import { getRecentDonations } from "@/firebase/donations";
 import { getNewContactInquiries } from "@/firebase/enquiries";
 import { getPendingVolunteers } from "@/firebase/volunteers";
+import type { Donation, Volunteer, ContactInquiry } from "@/common/types";
 
 interface DashboardStats {
   donations: {
@@ -73,10 +74,42 @@ export default function AdminDashboardPage() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
+      console.log("Loading dashboard data...");
       const dashboardStats = await getDashboardStats();
+      console.log("Dashboard stats loaded:", dashboardStats);
       setStats(dashboardStats);
     } catch (error) {
       console.error("Error loading dashboard data:", error);
+      // Set some default stats to prevent complete failure
+      setStats({
+        donations: {
+          totalAmount: 0,
+          totalCount: 0,
+          thisMonth: 0,
+          thisWeek: 0,
+        },
+        orphanages: {
+          total: 0,
+          verified: 0,
+          pending: 0,
+        },
+        issues: {
+          total: 0,
+          open: 0,
+          resolved: 0,
+          urgent: 0,
+        },
+        volunteers: {
+          total: 0,
+          approved: 0,
+          pending: 0,
+        },
+        inquiries: {
+          total: 0,
+          new: 0,
+          replied: 0,
+        },
+      });
     } finally {
       setLoading(false);
     }
@@ -306,7 +339,7 @@ export default function AdminDashboardPage() {
 
 // Recent Donations Component
 function RecentDonationsList() {
-  const [donations, setDonations] = useState<any[]>([]);
+  const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -315,10 +348,13 @@ function RecentDonationsList() {
 
   const loadRecentDonations = async () => {
     try {
+      console.log("Loading recent donations...");
       const recentDonations = await getRecentDonations(5);
+      console.log("Recent donations loaded:", recentDonations);
       setDonations(recentDonations);
     } catch (error) {
       console.error("Error loading recent donations:", error);
+      setDonations([]);
     } finally {
       setLoading(false);
     }
@@ -370,7 +406,7 @@ function RecentDonationsList() {
 
 // Pending Volunteers Component
 function PendingVolunteersList() {
-  const [volunteers, setVolunteers] = useState<any[]>([]);
+  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -379,10 +415,13 @@ function PendingVolunteersList() {
 
   const loadPendingVolunteers = async () => {
     try {
+      console.log("Loading pending volunteers...");
       const pendingVolunteers = await getPendingVolunteers();
+      console.log("Pending volunteers loaded:", pendingVolunteers);
       setVolunteers(pendingVolunteers.slice(0, 5)); // Show only first 5
     } catch (error) {
       console.error("Error loading pending volunteers:", error);
+      setVolunteers([]);
     } finally {
       setLoading(false);
     }
@@ -412,7 +451,7 @@ function PendingVolunteersList() {
               </div>
               <div>
                 <p className="font-medium">
-                  {volunteer.firstName} {volunteer.lastName}
+                  {volunteer.firstname} {volunteer.lastname}
                 </p>
                 <p className="text-sm text-gray-500">{volunteer.email}</p>
               </div>
@@ -434,7 +473,7 @@ function PendingVolunteersList() {
 
 // New Inquiries Component
 function NewInquiriesList() {
-  const [inquiries, setInquiries] = useState<any[]>([]);
+  const [inquiries, setInquiries] = useState<ContactInquiry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -443,10 +482,13 @@ function NewInquiriesList() {
 
   const loadNewInquiries = async () => {
     try {
+      console.log("Loading new inquiries...");
       const newInquiries = await getNewContactInquiries();
+      console.log("New inquiries loaded:", newInquiries);
       setInquiries(newInquiries.slice(0, 5)); // Show only first 5
     } catch (error) {
       console.error("Error loading new inquiries:", error);
+      setInquiries([]);
     } finally {
       setLoading(false);
     }

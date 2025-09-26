@@ -70,9 +70,9 @@ export function FloatingNav() {
   };
 
   const getNavItems = () => {
-    if (user?.role === "admin") {
+    if (user?.role === "ADMIN") {
       return [...navItems, ...adminItems];
-    } else if (user?.role === "orphanage") {
+    } else if (user?.role === "ORPHANAGE") {
       return [...navItems, ...orphanageItems];
     }
     return navItems;

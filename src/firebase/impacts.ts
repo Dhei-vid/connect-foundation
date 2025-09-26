@@ -77,13 +77,15 @@ export async function getIssues(filters?: {
     if (filters?.orphanageId)
       constraints.push(where("orphanageId", "==", filters.orphanageId));
 
-    // Always order by createdAt
-    constraints.push(orderBy("createdAt", "desc"));
+    // Only add orderBy if we don't have orphanageId filter to avoid index requirement
+    if (!filters?.orphanageId) {
+      constraints.push(orderBy("createdAt", "desc"));
+    }
 
     const q = query(issuesRef, ...constraints);
     const querySnapshot = await getDocs(q);
 
-    return querySnapshot.docs.map((doc) => {
+    const issues = querySnapshot.docs.map((doc) => {
       const data = doc.data();
       return {
         id: doc.id,
@@ -94,6 +96,17 @@ export async function getIssues(filters?: {
         resolvedAt: data.resolvedAt?.toDate?.(),
       } as Issue;
     });
+
+    // Sort by createdAt in memory if we filtered by orphanageId
+    if (filters?.orphanageId) {
+      return issues.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA; // Descending order
+      });
+    }
+
+    return issues;
   } catch (error) {
     console.error("Error getting issues:", error);
     throw error;

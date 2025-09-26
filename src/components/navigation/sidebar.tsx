@@ -16,6 +16,7 @@ import {
   Sparkles,
   // Settings,
   HelpCircle,
+  HandHelping,
 } from "lucide-react";
 
 interface PortalSidebarProps {
@@ -79,6 +80,18 @@ const navigationItems: NavItem[] = [
     href: "/admin/contact",
     lucideIcon: SmartphoneNfc,
     roles: ["ADMIN"],
+  },
+  {
+    name: "Dashboard",
+    href: "/orphanage/dashboard",
+    lucideIcon: LayoutDashboard,
+    roles: ["ORPHANAGE"],
+  },
+  {
+    name: "Requests",
+    href: "/orphanage/request",
+    lucideIcon: HandHelping,
+    roles: ["ORPHANAGE"],
   },
   // {
   //   name: "Settings",

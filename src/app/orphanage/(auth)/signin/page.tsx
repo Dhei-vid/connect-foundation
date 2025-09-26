@@ -22,7 +22,7 @@ export default function OrphanageSignInPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/orphanage");
+      router.push("/orphanage/dashboard");
     }
   }, [isAuthenticated, router]);
 
@@ -35,7 +35,7 @@ export default function OrphanageSignInPage() {
       const success = await signIn(email, password);
       if (success) {
         toast.success("Signed in successfully");
-        router.push("/orphanage");
+        router.push("/orphanage/dashboard");
       } else {
         setError("Invalid email or password");
       }

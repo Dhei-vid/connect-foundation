@@ -33,6 +33,8 @@ export async function signUpWithEmail(
       email: user.email!,
       displayName,
       role,
+      onboardingCompleted: role === "ADMIN", // Admins don't need onboarding
+      verified: role === "ADMIN", // Admins don't need verification
       createdAt: new Date(),
       lastLoginAt: new Date(),
     };
@@ -114,12 +116,17 @@ export async function createOrphanageProfile(
   orphanageData: Omit<Orphanage, "id" | "createdAt" | "updatedAt">
 ): Promise<void> {
   try {
+    // Filter out undefined values to avoid Firestore errors
+    const cleanData = Object.fromEntries(
+      Object.entries(orphanageData).filter(([_, value]) => value !== undefined)
+    );
+
     const orphanage: Orphanage = {
       id: userId,
-      ...orphanageData,
+      ...cleanData,
       createdAt: new Date(),
       updatedAt: new Date(),
-    };
+    } as Orphanage;
 
     await setDoc(doc(db, "orphanages", userId), orphanage);
   } catch (error) {
@@ -142,4 +149,18 @@ export async function getCurrentUser(): Promise<User | null> {
   }
 
   return null;
+}
+
+export async function updateUserOnboardingStatus(
+  userId: string,
+  onboardingCompleted: boolean
+): Promise<void> {
+  try {
+    await updateDoc(doc(db, "users", userId), {
+      onboardingCompleted,
+    });
+  } catch (error) {
+    console.error("Error updating onboarding status:", error);
+    throw error;
+  }
 }

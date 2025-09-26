@@ -19,7 +19,12 @@ interface AuthContextType {
   isAdmin: boolean;
   isOrphanage: boolean;
   signIn: (email: string, password: string) => Promise<boolean>;
-  signUp: (email: string, password: string, displayName: string, role: "ADMIN" | "ORPHANAGE") => Promise<User>;
+  signUp: (
+    email: string,
+    password: string,
+    displayName: string,
+    role: "ADMIN" | "ORPHANAGE"
+  ) => Promise<User>;
   signOut: () => Promise<void>;
   requireAuth: () => void;
 }
@@ -57,7 +62,12 @@ function AppProviders({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, displayName: string, role: "ADMIN" | "ORPHANAGE"): Promise<User> => {
+  const signUp = async (
+    email: string,
+    password: string,
+    displayName: string,
+    role: "ADMIN" | "ORPHANAGE"
+  ): Promise<User> => {
     try {
       const user = await signUpWithEmail(email, password, displayName, role);
       return user;

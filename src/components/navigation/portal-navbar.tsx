@@ -33,6 +33,7 @@ interface PortalNavbarProps {
 }
 
 export default function PortalNavbar({ user, onMenuClick }: PortalNavbarProps) {
+  const router = useRouter();
   const { signOut } = useAuthContext();
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
@@ -40,7 +41,11 @@ export default function PortalNavbar({ user, onMenuClick }: PortalNavbarProps) {
   const [navigationLoading, setNavigationLoading] = useState<string | null>(
     null
   );
-  const router = useRouter();
+
+  // Get the users name
+  const name = user?.displayName?.split(" ") || [];
+  const firstname = name[0] || "Not";
+  const lastname = name[1] || "Available";
 
   // Initialize theme from localStorage on mount
   useEffect(() => {
@@ -99,7 +104,12 @@ export default function PortalNavbar({ user, onMenuClick }: PortalNavbarProps) {
       // trigger logout
       await signOut();
       toast.success("Logged out successfully!");
-      router.push("/admin/signin");
+
+      if (user?.role === "ADMIN") {
+        router.push("/admin/signin");
+      } else if (user?.role === "ORPHANAGE") {
+        router.push("/orphanage/signin");
+      }
     } catch (error) {
       console.error("Logout error:", error);
       toast.error("Logout failed, but redirecting anyway");
@@ -128,7 +138,9 @@ export default function PortalNavbar({ user, onMenuClick }: PortalNavbarProps) {
           <div className="hidden md:block">
             <h1 className="text-2xl font-semibold text-foreground">
               Welcome,{" "}
-              {`${user?.firstName ?? "User"} ${user?.lastName ?? "User"}`}
+              {user?.role === "ORPHANAGE"
+                ? `${firstname} ${lastname}`
+                : `${user?.firstname} ${user?.lastname}`}
             </h1>
           </div>
         </div>
@@ -168,9 +180,11 @@ export default function PortalNavbar({ user, onMenuClick }: PortalNavbarProps) {
             <DropdownMenuTrigger asChild>
               <button className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full">
                 <PersonAvatar
-                  name={`${user?.displayName ?? "User"} ${
-                    user?.lastName ?? "User"
-                  }`}
+                  name={
+                    user?.role === "ORPHANAGE"
+                      ? `${firstname} ${lastname}`
+                      : `${user?.firstname} ${user?.lastname}`
+                  }
                   size="lg"
                   className="cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all"
                 />
@@ -180,7 +194,9 @@ export default function PortalNavbar({ user, onMenuClick }: PortalNavbarProps) {
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">
-                    {`${user?.firstName} ${user?.lastName}`}
+                    {user?.role === "ORPHANAGE"
+                      ? `${firstname} ${lastname}`
+                      : `${user?.firstname} ${user?.lastname}`}
                   </p>
                   <p className="text-xs leading-none text-muted-foreground">
                     {user.email}
@@ -191,26 +207,27 @@ export default function PortalNavbar({ user, onMenuClick }: PortalNavbarProps) {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {dropDownItems.map(({ title, action, Icon }, index) => (
-                <DropdownMenuItem
-                  className={"cursor-pointer"}
-                  key={index}
-                  onClick={action}
-                  disabled={navigationLoading === title}
-                >
-                  {navigationLoading === title ? (
-                    <>
-                      <LoadingSpinner />
-                      {title}...
-                    </>
-                  ) : (
-                    <>
-                      <Icon />
-                      {title}
-                    </>
-                  )}
-                </DropdownMenuItem>
-              ))}
+              {user!.role === "ADMIN" &&
+                dropDownItems.map(({ title, action, Icon }, index) => (
+                  <DropdownMenuItem
+                    className={"cursor-pointer"}
+                    key={index}
+                    onClick={action}
+                    disabled={navigationLoading === title}
+                  >
+                    {navigationLoading === title ? (
+                      <>
+                        <LoadingSpinner />
+                        {title}...
+                      </>
+                    ) : (
+                      <>
+                        <Icon />
+                        {title}
+                      </>
+                    )}
+                  </DropdownMenuItem>
+                ))}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className={"cursor-pointer"}

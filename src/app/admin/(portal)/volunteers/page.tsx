@@ -8,22 +8,17 @@ import {
   Eye,
   CheckCircle,
   XCircle,
-  UserCheck,
   Clock,
-  MapPin,
-  Star,
   Phone,
   Mail,
-  Calendar,
   Shield,
-  Building2,
-  Download,
   Plus,
-  Edit,
   Trash2,
   AlertTriangle,
   Check,
   Ban,
+  Target,
+  Edit,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,24 +31,76 @@ import {
   approveVolunteer,
   rejectVolunteer,
   suspendVolunteer,
-  updateBackgroundCheckStatus,
+  deleteVolunteer,
 } from "@/firebase/volunteers";
+import {
+  getVolunteerOpportunities,
+  getVolunteerOpportunityStats,
+  deleteVolunteerOpportunity,
+  toggleVolunteerOpportunityStatus,
+} from "@/firebase/volunteer-opportunities";
 import { getOrphanages } from "@/firebase/orphanages";
-import type { Volunteer } from "@/common/types";
+import { AddVolunteerOpportunityModal } from "@/components/admin/add-volunteer-opportunity-modal";
+import { EditVolunteerOpportunityModal } from "@/components/admin/edit-volunteer-opportunity-modal";
+import { DeleteConfirmation } from "@/components/ui/confirmation-dialog";
+import { toast } from "sonner";
+import type {
+  Volunteer,
+  Orphanage,
+  VolunteerOpportunity,
+} from "@/common/types";
+import { SelectField } from "@/components/ui/form-field";
+import { SelectItem } from "@/components/ui/select";
+
+type StatusFilterProps =
+  | "all"
+  | "none"
+  | "beginner"
+  | "intermediate"
+  | "advanced";
+type ExperienceFilterType =
+  | "all"
+  | "none"
+  | "beginner"
+  | "intermediate"
+  | "advanced";
 
 export default function VolunteersPage() {
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
-  const [orphanages, setOrphanages] = useState<any[]>([]);
-  const [stats, setStats] = useState<any>(null);
+  const [volunteerOpportunities, setVolunteerOpportunities] = useState<
+    VolunteerOpportunity[]
+  >([]);
+  const [orphanages, setOrphanages] = useState<Orphanage[]>([]);
+  const [stats, setStats] = useState<{
+    total: number;
+    pending: number;
+    approved: number;
+    rejected: number;
+    suspended: number;
+    withBackgroundCheck: number;
+    assigned: number;
+  } | null>(null);
+  const [opportunityStats, setOpportunityStats] = useState<{
+    total: number;
+    active: number;
+    inactive: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<
-    "all" | "pending" | "approved" | "rejected" | "suspended"
-  >("all");
+  const [filter, setFilter] = useState<{
+    status: StatusFilterProps;
+    experience: ExperienceFilterType;
+  }>({
+    status: "all",
+    experience: "all",
+  });
   const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(
     null
   );
   const [showFilters, setShowFilters] = useState(false);
+  const [activeTab, setActiveTab] = useState<"volunteers" | "opportunities">(
+    "volunteers"
+  );
 
   useEffect(() => {
     loadVolunteersData();
@@ -62,14 +109,24 @@ export default function VolunteersPage() {
   const loadVolunteersData = async () => {
     try {
       setLoading(true);
-      const [volunteersData, orphanagesData, statsData] = await Promise.all([
+      const [
+        volunteersData,
+        opportunitiesData,
+        orphanagesData,
+        statsData,
+        opportunityStatsData,
+      ] = await Promise.all([
         getVolunteers(),
+        getVolunteerOpportunities(),
         getOrphanages(),
         getVolunteerStats(),
+        getVolunteerOpportunityStats(),
       ]);
       setVolunteers(volunteersData);
+      setVolunteerOpportunities(opportunitiesData);
       setOrphanages(orphanagesData);
       setStats(statsData);
+      setOpportunityStats(opportunityStatsData);
     } catch (error) {
       console.error("Error loading volunteers data:", error);
     } finally {
@@ -129,6 +186,36 @@ export default function VolunteersPage() {
     }
   };
 
+  const handleDeleteOpportunity = async (opportunityId: string) => {
+    try {
+      await deleteVolunteerOpportunity(opportunityId);
+      await loadVolunteersData();
+    } catch (error) {
+      console.error("Error deleting volunteer opportunity:", error);
+    }
+  };
+
+  const handleToggleOpportunityStatus = async (opportunityId: string) => {
+    try {
+      await toggleVolunteerOpportunityStatus(opportunityId);
+      await loadVolunteersData();
+    } catch (error) {
+      console.error("Error toggling volunteer opportunity status:", error);
+    }
+  };
+
+  const handleDeleteVolunteer = async (volunteerId: string) => {
+    try {
+      await deleteVolunteer(volunteerId);
+      await loadVolunteersData();
+      setSelectedVolunteer(null);
+      toast.success("Volunteer deleted successfully");
+    } catch (error) {
+      console.error("Error deleting volunteer:", error);
+      toast.error("Failed to delete volunteer");
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "approved":
@@ -176,23 +263,49 @@ export default function VolunteersPage() {
             Volunteers Management
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Manage and oversee volunteer applications and assignments
+            Manage volunteers and volunteer opportunities
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
-            <Download className="w-4 h-4 mr-2" />
-            Export
-          </Button>
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Volunteer
-          </Button>
+          {activeTab === "volunteers" ? (
+            <></>
+          ) : (
+            <AddVolunteerOpportunityModal onSuccess={loadVolunteersData}>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Opportunity
+              </Button>
+            </AddVolunteerOpportunityModal>
+          )}
         </div>
       </div>
 
+      {/* Tabs */}
+      <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg w-fit">
+        <button
+          onClick={() => setActiveTab("volunteers")}
+          className={`cursor-pointer px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            activeTab === "volunteers"
+              ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+          }`}
+        >
+          Volunteers
+        </button>
+        <button
+          onClick={() => setActiveTab("opportunities")}
+          className={`cursor-pointer px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            activeTab === "opportunities"
+              ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+          }`}
+        >
+          Opportunities
+        </button>
+      </div>
+
       {/* Stats Cards */}
-      {stats && (
+      {activeTab === "volunteers" && stats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card className="py-4">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -254,6 +367,55 @@ export default function VolunteersPage() {
         </div>
       )}
 
+      {activeTab === "opportunities" && opportunityStats && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="py-4">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Opportunities
+              </CardTitle>
+              <Target className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{opportunityStats.total}</div>
+              <p className="text-xs text-muted-foreground">
+                All volunteer opportunities
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="py-4">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active</CardTitle>
+              <CheckCircle className="h-4 w-4 text-green-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                {opportunityStats.active}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Currently available
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="py-4">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Inactive</CardTitle>
+              <Ban className="h-4 w-4 text-gray-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-gray-600">
+                {opportunityStats.inactive}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Temporarily disabled
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Search and Filters */}
       <Card>
         <CardContent className="p-6">
@@ -262,7 +424,7 @@ export default function VolunteersPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
-                  placeholder="Search volunteers by name, email, or skills..."
+                  placeholder="Search volunteers by name, or email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSearch()}
@@ -293,32 +455,54 @@ export default function VolunteersPage() {
             <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Status
-                  </label>
-                  <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value as any)}
-                    className="w-full px-3 py-2 border rounded-lg text-sm"
+                  <SelectField
+                    value={filter.status}
+                    label={"Status"}
+                    placeholder="Status"
+                    onValueChange={(value: string) =>
+                      setFilter({
+                        ...filter,
+                        status: value as StatusFilterProps,
+                      })
+                    }
                   >
-                    <option value="all">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                    <option value="suspended">Suspended</option>
-                  </select>
+                    {[
+                      "all",
+                      "pending",
+                      "approved",
+                      "rejected",
+                      "suspended",
+                    ].map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status === "all" ? "All Statuses" : status}
+                      </SelectItem>
+                    ))}
+                  </SelectField>
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Experience
-                  </label>
-                  <select className="w-full px-3 py-2 border rounded-lg text-sm">
-                    <option value="all">All Experience</option>
-                    <option value="none">No Experience</option>
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                  </select>
+                  <SelectField
+                    value={filter.experience}
+                    label={"Experience"}
+                    placeholder="Experience"
+                    onValueChange={(value: string) =>
+                      setFilter({
+                        ...filter,
+                        experience: value as ExperienceFilterType,
+                      })
+                    }
+                  >
+                    {[
+                      "all",
+                      "none",
+                      "beginner",
+                      "intermediate",
+                      "advanced",
+                    ].map((experience) => (
+                      <SelectItem key={experience} value={experience}>
+                        {experience === "all" ? "All Experiences" : experience}
+                      </SelectItem>
+                    ))}
+                  </SelectField>
                 </div>
                 <div className="flex items-end">
                   <Button className="w-full">Apply Filters</Button>
@@ -330,145 +514,257 @@ export default function VolunteersPage() {
       </Card>
 
       {/* Volunteers Table */}
-      <Card className="py-4">
-        <CardHeader>
-          <CardTitle>All Volunteers ({volunteers.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-4">Volunteer</th>
-                  <th className="text-left py-3 px-4">Contact</th>
-                  <th className="text-left py-3 px-4">Experience</th>
-                  <th className="text-left py-3 px-4">Skills</th>
-                  <th className="text-left py-3 px-4">Status</th>
-                  <th className="text-left py-3 px-4">Background Check</th>
-                  <th className="text-left py-3 px-4">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {volunteers.map((volunteer) => (
-                  <tr
-                    key={volunteer.id}
-                    className="border-b hover:bg-gray-50 dark:hover:bg-gray-800"
-                  >
-                    <td className="py-3 px-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                          <Users className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <div className="font-medium">
-                            {volunteer.firstName} {volunteer.lastName}
+      {activeTab === "volunteers" && (
+        <Card className="py-4">
+          <CardHeader>
+            <CardTitle>All Volunteers ({volunteers.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4">Volunteer</th>
+                    <th className="text-left py-3 px-4">Contact</th>
+                    <th className="text-left py-3 px-4">Experience</th>
+                    <th className="text-left py-3 px-4">Skills</th>
+                    <th className="text-left py-3 px-4">Status</th>
+                    <th className="text-left py-3 px-4">Background Check</th>
+                    <th className="text-left py-3 px-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {volunteers.map((volunteer) => (
+                    <tr
+                      key={volunteer.id}
+                      className="border-b hover:bg-gray-50 dark:hover:bg-gray-800"
+                    >
+                      <td className="py-3 px-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                            <Users className="w-5 h-5 text-blue-600" />
                           </div>
-                          <div className="text-sm text-gray-500">
-                            {volunteer.city}, {volunteer.state}
+                          <div>
+                            <div className="font-medium">
+                              {volunteer.firstname} {volunteer.lastname}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {volunteer.city}, {volunteer.state}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="space-y-1">
-                        <div className="flex items-center text-sm">
-                          <Mail className="w-3 h-3 mr-2" />
-                          {volunteer.email}
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center text-sm">
+                            <Mail className="w-3 h-3 mr-2" />
+                            {volunteer.email}
+                          </div>
+                          <div className="flex items-center text-sm text-gray-500">
+                            <Phone className="w-3 h-3 mr-2" />
+                            {volunteer.phone}
+                          </div>
                         </div>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Phone className="w-3 h-3 mr-2" />
-                          {volunteer.phone}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <Badge
-                        className={getExperienceColor(volunteer.experience)}
-                      >
-                        {volunteer.experience}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex flex-wrap gap-1">
-                        {volunteer.skills.slice(0, 2).map((skill, index) => (
-                          <Badge
-                            key={index}
-                            variant="outline"
-                            className="text-xs"
-                          >
-                            {skill}
-                          </Badge>
-                        ))}
-                        {volunteer.skills.length > 2 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{volunteer.skills.length - 2}
-                          </Badge>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <Badge className={getStatusColor(volunteer.status)}>
-                        {volunteer.status}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center">
-                        {volunteer.backgroundCheckCompleted ? (
-                          <Shield className="w-4 h-4 text-green-600 mr-1" />
-                        ) : (
-                          <AlertTriangle className="w-4 h-4 text-yellow-600 mr-1" />
-                        )}
-                        <span className="text-sm">
-                          {volunteer.backgroundCheckCompleted
-                            ? "Completed"
-                            : "Pending"}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setSelectedVolunteer(volunteer)}
+                      </td>
+                      <td className="py-3 px-4">
+                        <Badge
+                          className={getExperienceColor(volunteer.experience)}
                         >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        {volunteer.status === "pending" && (
-                          <>
-                            <Button
-                              size="sm"
-                              onClick={() => handleApprove(volunteer.id)}
+                          {volunteer.experience}
+                        </Badge>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex flex-wrap gap-1">
+                          {/* {volunteer.skills.slice(0, 2).map((skill, index) => (
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className="text-xs"
                             >
-                              <Check className="w-4 h-4" />
-                            </Button>
+                              {skill}
+                            </Badge>
+                          ))}
+                          {volunteer.skills.length > 2 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{volunteer.skills.length - 2}
+                            </Badge>
+                          )} */}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <Badge className={getStatusColor(volunteer.status)}>
+                          {volunteer.status}
+                        </Badge>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center">
+                          {volunteer.backgroundCheckCompleted ? (
+                            <Shield className="w-4 h-4 text-green-600 mr-1" />
+                          ) : (
+                            <AlertTriangle className="w-4 h-4 text-yellow-600 mr-1" />
+                          )}
+                          <span className="text-sm">
+                            {volunteer.backgroundCheckCompleted
+                              ? "Completed"
+                              : "Pending"}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setSelectedVolunteer(volunteer)}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          {volunteer.status === "pending" && (
+                            <>
+                              <Button
+                                size="sm"
+                                onClick={() => handleApprove(volunteer.id)}
+                              >
+                                <Check className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleReject(volunteer.id)}
+                              >
+                                <XCircle className="w-4 h-4" />
+                              </Button>
+                            </>
+                          )}
+                          {volunteer.status === "approved" && (
                             <Button
                               size="sm"
                               variant="destructive"
-                              onClick={() => handleReject(volunteer.id)}
+                              onClick={() => handleSuspend(volunteer.id)}
                             >
-                              <XCircle className="w-4 h-4" />
+                              <Ban className="w-4 h-4" />
                             </Button>
-                          </>
-                        )}
-                        {volunteer.status === "approved" && (
+                          )}
+                          <DeleteConfirmation
+                            itemName={`${volunteer.firstname} ${volunteer.lastname}`}
+                            itemType="volunteer"
+                            onConfirm={() =>
+                              handleDeleteVolunteer(volunteer.id)
+                            }
+                          >
+                            <Button size="sm" variant="destructive">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </DeleteConfirmation>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Opportunities Table */}
+      {activeTab === "opportunities" && (
+        <Card className="py-4">
+          <CardHeader>
+            <CardTitle>
+              Volunteer Opportunities ({volunteerOpportunities.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4">Title</th>
+                    <th className="text-left py-3 px-4">Description</th>
+                    <th className="text-left py-3 px-4">Time Commitment</th>
+                    <th className="text-left py-3 px-4">Location</th>
+                    <th className="text-left py-3 px-4">Status</th>
+                    <th className="text-left py-3 px-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {volunteerOpportunities.map((opportunity) => (
+                    <tr
+                      key={opportunity.id}
+                      className="border-b hover:bg-gray-50 dark:hover:bg-gray-800"
+                    >
+                      <td className="py-3 px-4">
+                        <div className="font-medium">{opportunity.title}</div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate">
+                          {opportunity.description}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="text-sm">
+                          {opportunity.timeCommitment}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="text-sm">{opportunity.location}</div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <Badge
+                          className={
+                            opportunity.isActive
+                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                              : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                          }
+                        >
+                          {opportunity.isActive ? "Active" : "Inactive"}
+                        </Badge>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex gap-2">
+                          <EditVolunteerOpportunityModal
+                            opportunity={opportunity}
+                            onSuccess={loadVolunteersData}
+                          >
+                            <Button size="sm" variant="outline">
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          </EditVolunteerOpportunityModal>
                           <Button
                             size="sm"
-                            variant="destructive"
-                            onClick={() => handleSuspend(volunteer.id)}
+                            variant="outline"
+                            onClick={() =>
+                              handleToggleOpportunityStatus(opportunity.id)
+                            }
                           >
-                            <Ban className="w-4 h-4" />
+                            {opportunity.isActive ? (
+                              <Ban className="w-4 h-4" />
+                            ) : (
+                              <Check className="w-4 h-4" />
+                            )}
                           </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+                          <DeleteConfirmation
+                            itemName={opportunity.title}
+                            itemType="volunteer opportunity"
+                            onConfirm={() =>
+                              handleDeleteOpportunity(opportunity.id)
+                            }
+                          >
+                            <Button size="sm" variant="destructive">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </DeleteConfirmation>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Volunteer Details Modal */}
       {selectedVolunteer && (
@@ -495,8 +791,8 @@ export default function VolunteersPage() {
                     <div className="flex justify-between">
                       <span>Name:</span>
                       <span className="font-medium">
-                        {selectedVolunteer.firstName}{" "}
-                        {selectedVolunteer.lastName}
+                        {selectedVolunteer.firstname}{" "}
+                        {selectedVolunteer.lastname}
                       </span>
                     </div>
                     <div className="flex justify-between">

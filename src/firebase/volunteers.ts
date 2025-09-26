@@ -242,8 +242,8 @@ export async function assignVolunteerToOrphanage(
 export async function unassignVolunteerFromOrphanage(volunteerId: string): Promise<void> {
   try {
     await updateVolunteer(volunteerId, {
-      assignedOrphanageId: null,
-      assignedOrphanageName: null,
+      assignedOrphanageId: undefined,
+      assignedOrphanageName: undefined,
     });
   } catch (error) {
     console.error("Error unassigning volunteer from orphanage:", error);

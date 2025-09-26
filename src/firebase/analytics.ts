@@ -8,11 +8,34 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
-import { getDonationStats, getDonationsByTimeframe } from "./donations";
-import { getOrphanages } from "./orphanages";
+import { getDonationStats, getDonationsByDateRange } from "./donations";
+import { getOrphanageProfile } from "./orphanages";
 import { getIssues } from "./impacts";
 import { getVolunteers } from "./volunteers";
-import { getContactInquiries } from "./enquiries";
+import { getContactInquiries } from "./user";
+import type { Orphanage } from "@/common/types";
+
+// Helper function to get all orphanages
+async function getOrphanages(): Promise<Orphanage[]> {
+  try {
+    const orphanagesRef = collection(db, "orphanages");
+    const q = query(orphanagesRef, orderBy("createdAt", "desc"));
+    const querySnapshot = await getDocs(q);
+    
+    return querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate?.(),
+        updatedAt: data.updatedAt?.toDate?.(),
+      } as Orphanage;
+    });
+  } catch (error) {
+    console.error("Error getting orphanages:", error);
+    throw error;
+  }
+}
 
 // --------------------
 // DASHBOARD ANALYTICS
@@ -48,52 +71,88 @@ export async function getDashboardStats(): Promise<{
   };
 }> {
   try {
+    console.log("Getting dashboard stats...");
+    
     // Get current date ranges
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startOfWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    // Get donation stats
-    const [allDonations, monthlyDonations, weeklyDonations] = await Promise.all([
-      getDonationStats(),
-      getDonationStats({ startDate: startOfMonth }),
-      getDonationStats({ startDate: startOfWeek }),
-    ]);
+    // Get donation stats with error handling
+    let allDonations, monthlyDonations, weeklyDonations;
+    try {
+      [allDonations, monthlyDonations, weeklyDonations] = await Promise.all(
+        [
+          getDonationStats(),
+          getDonationStats({ startDate: startOfMonth }),
+          getDonationStats({ startDate: startOfWeek }),
+        ]
+      );
+    } catch (error) {
+      console.error("Error getting donation stats:", error);
+      allDonations = { totalAmount: 0, totalDonations: 0 };
+      monthlyDonations = { totalAmount: 0 };
+      weeklyDonations = { totalAmount: 0 };
+    }
 
-    // Get orphanage stats
-    const allOrphanages = await getOrphanages();
-    const orphanageStats = {
-      total: allOrphanages.length,
-      verified: allOrphanages.filter(o => o.verified).length,
-      pending: allOrphanages.filter(o => !o.verified).length,
-    };
+    // Get orphanage stats with error handling
+    let orphanageStats;
+    try {
+      const allOrphanages = await getOrphanages();
+      orphanageStats = {
+        total: allOrphanages.length,
+        verified: allOrphanages.filter((o) => o.verified).length,
+        pending: allOrphanages.filter((o) => !o.verified).length,
+      };
+    } catch (error) {
+      console.error("Error getting orphanage stats:", error);
+      orphanageStats = { total: 0, verified: 0, pending: 0 };
+    }
 
-    // Get issue stats
-    const allIssues = await getIssues();
-    const issueStats = {
-      total: allIssues.length,
-      open: allIssues.filter(i => i.status === "open").length,
-      resolved: allIssues.filter(i => i.status === "resolved").length,
-      urgent: allIssues.filter(i => i.priority === "urgent").length,
-    };
+    // Get issue stats with error handling
+    let issueStats;
+    try {
+      const allIssues = await getIssues();
+      issueStats = {
+        total: allIssues.length,
+        open: allIssues.filter((i) => i.status === "open").length,
+        resolved: allIssues.filter((i) => i.status === "resolved").length,
+        urgent: allIssues.filter((i) => i.priority === "urgent").length,
+      };
+    } catch (error) {
+      console.error("Error getting issue stats:", error);
+      issueStats = { total: 0, open: 0, resolved: 0, urgent: 0 };
+    }
 
-    // Get volunteer stats
-    const allVolunteers = await getVolunteers();
-    const volunteerStats = {
-      total: allVolunteers.length,
-      approved: allVolunteers.filter(v => v.status === "approved").length,
-      pending: allVolunteers.filter(v => v.status === "pending").length,
-    };
+    // Get volunteer stats with error handling
+    let volunteerStats;
+    try {
+      const allVolunteers = await getVolunteers();
+      volunteerStats = {
+        total: allVolunteers.length,
+        approved: allVolunteers.filter((v) => v.status === "approved").length,
+        pending: allVolunteers.filter((v) => v.status === "pending").length,
+      };
+    } catch (error) {
+      console.error("Error getting volunteer stats:", error);
+      volunteerStats = { total: 0, approved: 0, pending: 0 };
+    }
 
-    // Get inquiry stats
-    const allInquiries = await getContactInquiries();
-    const inquiryStats = {
-      total: allInquiries.length,
-      new: allInquiries.filter(i => i.status === "new").length,
-      replied: allInquiries.filter(i => i.status === "replied").length,
-    };
+    // Get inquiry stats with error handling
+    let inquiryStats;
+    try {
+      const allInquiries = await getContactInquiries();
+      inquiryStats = {
+        total: allInquiries.length,
+        new: allInquiries.filter((i) => i.status === "new").length,
+        replied: allInquiries.filter((i) => i.status === "replied").length,
+      };
+    } catch (error) {
+      console.error("Error getting inquiry stats:", error);
+      inquiryStats = { total: 0, new: 0, replied: 0 };
+    }
 
-    return {
+    const result = {
       donations: {
         totalAmount: allDonations.totalAmount,
         totalCount: allDonations.totalDonations,
@@ -105,6 +164,9 @@ export async function getDashboardStats(): Promise<{
       volunteers: volunteerStats,
       inquiries: inquiryStats,
     };
+
+    console.log("Dashboard stats result:", result);
+    return result;
   } catch (error) {
     console.error("Error getting dashboard stats:", error);
     throw error;
@@ -115,7 +177,9 @@ export async function getDashboardStats(): Promise<{
 // FINANCIAL ANALYTICS
 // --------------------
 
-export async function getFinancialOverview(timeframe: "week" | "month" | "quarter" | "year"): Promise<{
+export async function getFinancialOverview(
+  timeframe: "week" | "month" | "quarter" | "year"
+): Promise<{
   donations: {
     total: number;
     average: number;
@@ -169,14 +233,24 @@ export async function getFinancialOverview(timeframe: "week" | "month" | "quarte
     ]);
 
     // Calculate trend
-    const trend = previousDonations.totalAmount > 0 
-      ? ((currentDonations.totalAmount - previousDonations.totalAmount) / previousDonations.totalAmount) * 100
-      : 0;
+    const trend =
+      previousDonations.totalAmount > 0
+        ? ((currentDonations.totalAmount - previousDonations.totalAmount) /
+            previousDonations.totalAmount) *
+          100
+        : 0;
 
     // Calculate issue statistics
-    const totalRaised = allIssues.reduce((sum, issue) => sum + issue.raisedAmount, 0);
-    const totalNeeded = allIssues.reduce((sum, issue) => sum + issue.estimatedCost, 0);
-    const completionRate = totalNeeded > 0 ? (totalRaised / totalNeeded) * 100 : 0;
+    const totalRaised = allIssues.reduce(
+      (sum, issue) => sum + issue.raisedAmount,
+      0
+    );
+    const totalNeeded = allIssues.reduce(
+      (sum, issue) => sum + issue.estimatedCost,
+      0
+    );
+    const completionRate =
+      totalNeeded > 0 ? (totalRaised / totalNeeded) * 100 : 0;
 
     // Get top categories (this would need to be implemented based on your categorization)
     const topCategories = [
@@ -228,18 +302,24 @@ export async function getGrowthMetrics(): Promise<{
 
     // Get data for the last 6 months
     const [donations, orphanages, volunteers] = await Promise.all([
-      getDonations({ startDate: sixMonthsAgo }),
+      getDonationsByDateRange(sixMonthsAgo, now),
       getOrphanages(),
       getVolunteers(),
     ]);
 
     // Process donations data
-    const donationsByDate = new Map<string, { amount: number; count: number }>();
-    const donationsByMonth = new Map<string, { amount: number; count: number }>();
+    const donationsByDate = new Map<
+      string,
+      { amount: number; count: number }
+    >();
+    const donationsByMonth = new Map<
+      string,
+      { amount: number; count: number }
+    >();
 
-    donations.forEach(donation => {
+    donations.forEach((donation) => {
       if (donation.status === "completed") {
-        const date = donation.createdAt.toISOString().split('T')[0];
+        const date = donation.createdAt.toISOString().split("T")[0];
         const month = donation.createdAt.toISOString().substring(0, 7);
 
         // Daily aggregation
@@ -262,16 +342,22 @@ export async function getGrowthMetrics(): Promise<{
 
     // Process orphanage registrations
     const orphanageRegistrations = new Map<string, number>();
-    orphanages.forEach(orphanage => {
+    orphanages.forEach((orphanage) => {
       const month = orphanage.createdAt.toISOString().substring(0, 7);
-      orphanageRegistrations.set(month, (orphanageRegistrations.get(month) || 0) + 1);
+      orphanageRegistrations.set(
+        month,
+        (orphanageRegistrations.get(month) || 0) + 1
+      );
     });
 
     // Process volunteer applications
     const volunteerApplications = new Map<string, number>();
-    volunteers.forEach(volunteer => {
+    volunteers.forEach((volunteer) => {
       const month = volunteer.createdAt.toISOString().substring(0, 7);
-      volunteerApplications.set(month, (volunteerApplications.get(month) || 0) + 1);
+      volunteerApplications.set(
+        month,
+        (volunteerApplications.get(month) || 0) + 1
+      );
     });
 
     return {
@@ -307,32 +393,32 @@ export async function getGrowthMetrics(): Promise<{
 export async function exportData(
   collection: string,
   format: "json" | "csv",
-  filters?: Record<string, any>
+  filters?: Record<string, unknown>
 ): Promise<{ data: string; filename: string }> {
   try {
-    let data: any[] = [];
+    let data: unknown[] = [];
     let filename = "";
 
     switch (collection) {
       case "donations":
-        data = await getDonations(filters);
-        filename = `donations_${new Date().toISOString().split('T')[0]}`;
+        data = await getDonationsByDateRange(filters?.startDate || new Date(0), filters?.endDate || new Date());
+        filename = `donations_${new Date().toISOString().split("T")[0]}`;
         break;
       case "orphanages":
-        data = await getOrphanages(filters);
-        filename = `orphanages_${new Date().toISOString().split('T')[0]}`;
+        data = await getOrphanages();
+        filename = `orphanages_${new Date().toISOString().split("T")[0]}`;
         break;
       case "issues":
         data = await getIssues(filters);
-        filename = `issues_${new Date().toISOString().split('T')[0]}`;
+        filename = `issues_${new Date().toISOString().split("T")[0]}`;
         break;
       case "volunteers":
         data = await getVolunteers(filters);
-        filename = `volunteers_${new Date().toISOString().split('T')[0]}`;
+        filename = `volunteers_${new Date().toISOString().split("T")[0]}`;
         break;
       case "inquiries":
         data = await getContactInquiries(filters);
-        filename = `inquiries_${new Date().toISOString().split('T')[0]}`;
+        filename = `inquiries_${new Date().toISOString().split("T")[0]}`;
         break;
       default:
         throw new Error(`Unknown collection: ${collection}`);
@@ -360,22 +446,24 @@ export async function exportData(
 // HELPER FUNCTIONS
 // --------------------
 
-function convertToCSV(data: any[]): string {
+function convertToCSV(data: unknown[]): string {
   if (data.length === 0) return "";
-  
+
   const headers = Object.keys(data[0]);
   const csvRows = [headers.join(",")];
-  
+
   for (const row of data) {
-    const values = headers.map(header => {
+    const values = headers.map((header) => {
       const value = row[header];
       if (value === null || value === undefined) return "";
-      if (typeof value === "object") return `"${JSON.stringify(value).replace(/"/g, '""')}"`;
-      if (typeof value === "string" && value.includes(",")) return `"${value.replace(/"/g, '""')}"`;
+      if (typeof value === "object")
+        return `"${JSON.stringify(value).replace(/"/g, '""')}"`;
+      if (typeof value === "string" && value.includes(","))
+        return `"${value.replace(/"/g, '""')}"`;
       return value;
     });
     csvRows.push(values.join(","));
   }
-  
+
   return csvRows.join("\n");
 }

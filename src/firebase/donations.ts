@@ -100,7 +100,7 @@ export async function getDonations(filters?: {
   status?: Donation["status"];
   donorId?: string;
   donorEmail?: string;
-  targetIssueId?: string;
+  targetIssueId?: string | string[];
   anonymous?: boolean;
   startDate?: Date;
   endDate?: Date;
@@ -120,15 +120,22 @@ export async function getDonations(filters?: {
     if (filters?.donorEmail) {
       constraints.push(where("donorEmail", "==", filters.donorEmail));
     }
-    if (filters?.targetIssueId) {
-      constraints.push(where("targetIssueId", "==", filters.targetIssueId));
-    }
     if (filters?.anonymous !== undefined) {
       constraints.push(where("anonymous", "==", filters.anonymous));
     }
 
-    // Always order by creation date
-    constraints.push(orderBy("createdAt", "desc"));
+    // Handle targetIssueId filtering - only add if it's a single string to avoid index issues
+    if (filters?.targetIssueId) {
+      if (typeof filters.targetIssueId === 'string') {
+        constraints.push(where("targetIssueId", "==", filters.targetIssueId));
+      }
+      // For arrays, we'll filter client-side
+    }
+
+    // Only add orderBy if we don't have targetIssueId filter to avoid index requirement
+    if (!filters?.targetIssueId) {
+      constraints.push(orderBy("createdAt", "desc"));
+    }
 
     // Apply limit if specified
     if (filters?.limitCount) {
@@ -147,12 +154,24 @@ export async function getDonations(filters?: {
       } as Donation;
     });
 
+    // Apply client-side filtering for arrays of targetIssueId
+    if (filters?.targetIssueId && Array.isArray(filters.targetIssueId)) {
+      donations = donations.filter(donation => 
+        donation.targetIssueId && filters.targetIssueId!.includes(donation.targetIssueId)
+      );
+    }
+
     // Apply client-side date filtering if provided
     if (filters?.startDate) {
       donations = donations.filter(donation => donation.createdAt >= filters.startDate!);
     }
     if (filters?.endDate) {
       donations = donations.filter(donation => donation.createdAt <= filters.endDate!);
+    }
+
+    // Sort by creation date if we filtered by targetIssueId
+    if (filters?.targetIssueId) {
+      donations.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     }
 
     return donations;

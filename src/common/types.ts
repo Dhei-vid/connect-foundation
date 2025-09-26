@@ -3,14 +3,16 @@ import { Gender } from "./enums";
 export interface User {
   uid: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  avatar: string;
+  firstname?: string;
+  lastname?: string;
+  avatar?: string;
   country?: string;
   gender?: Gender;
   displayName?: string;
   photoURL?: string;
   role: "ADMIN" | "ORPHANAGE";
+  onboardingCompleted: boolean;
+  verified: boolean;
   createdAt: Date;
   lastLoginAt: Date;
 }
@@ -70,6 +72,8 @@ export interface SuccessStory {
   id: string;
   orphanageId: string;
   orphanageName: string;
+  issueId: string; // Link to the resolved issue
+  issueTitle: string; // Title of the resolved issue
   title: string;
   description: string;
   impact: string;
@@ -78,6 +82,7 @@ export interface SuccessStory {
   cost: number;
   completedAt: Date;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Donation {
@@ -118,8 +123,8 @@ export interface ContactInquiry {
 
 export interface Volunteer {
   id: string;
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   email: string;
   phone: string;
   dateOfBirth: Date;
@@ -140,6 +145,20 @@ export interface Volunteer {
   assignedOrphanageId?: string;
   assignedOrphanageName?: string;
   notes?: string;
+  image?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface VolunteerOpportunity {
+  id: string;
+  title: string;
+  description: string;
+  timeCommitment: string;
+  location: string;
+  image?: string;
+  icon?: string;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
