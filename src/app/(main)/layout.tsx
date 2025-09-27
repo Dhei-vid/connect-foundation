@@ -1,4 +1,5 @@
 import { Footer } from "@/components/landing/footer";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function MainLayout({
   children,
@@ -7,6 +8,7 @@ export default function MainLayout({
 }) {
   return (
     <main>
+      <Toaster />
       <div>{children}</div>
       <Footer />
     </main>

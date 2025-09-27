@@ -23,7 +23,7 @@ export async function createContactInquiry(
   inquiryData: Omit<ContactInquiry, "id" | "status" | "createdAt" | "updatedAt">
 ): Promise<string> {
   try {
-    const docRef = await addDoc(collection(db, "contactInquiries"), {
+    const docRef = await addDoc(collection(db, "contacts"), {
       ...inquiryData,
       status: "new",
       createdAt: Timestamp.now(),
@@ -41,7 +41,7 @@ export async function updateContactInquiryStatus(
   status: ContactInquiry["status"]
 ): Promise<void> {
   try {
-    const inquiryRef = doc(db, "contactInquiries", inquiryId);
+    const inquiryRef = doc(db, "contacts", inquiryId);
     await updateDoc(inquiryRef, {
       status,
       updatedAt: Timestamp.now(),
@@ -54,16 +54,18 @@ export async function updateContactInquiryStatus(
 
 export async function deleteContactInquiry(inquiryId: string): Promise<void> {
   try {
-    await deleteDoc(doc(db, "contactInquiries", inquiryId));
+    await deleteDoc(doc(db, "contacts", inquiryId));
   } catch (error) {
     console.error("Error deleting contact inquiry:", error);
     throw error;
   }
 }
 
-export async function getContactInquiry(inquiryId: string): Promise<ContactInquiry | null> {
+export async function getContactInquiry(
+  inquiryId: string
+): Promise<ContactInquiry | null> {
   try {
-    const docRef = doc(db, "contactInquiries", inquiryId);
+    const docRef = doc(db, "contacts", inquiryId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -89,7 +91,7 @@ export async function getContactInquiries(filters?: {
   limitCount?: number;
 }): Promise<ContactInquiry[]> {
   try {
-    const inquiriesRef = collection(db, "contactInquiries");
+    const inquiriesRef = collection(db, "contacts");
     const constraints = [];
 
     // Apply filters
@@ -139,13 +141,13 @@ export async function getContactInquiryStats(): Promise<{
 }> {
   try {
     const allInquiries = await getContactInquiries();
-    
+
     return {
       total: allInquiries.length,
-      new: allInquiries.filter(i => i.status === "new").length,
-      read: allInquiries.filter(i => i.status === "read").length,
-      replied: allInquiries.filter(i => i.status === "replied").length,
-      closed: allInquiries.filter(i => i.status === "closed").length,
+      new: allInquiries.filter((i) => i.status === "new").length,
+      read: allInquiries.filter((i) => i.status === "read").length,
+      replied: allInquiries.filter((i) => i.status === "replied").length,
+      closed: allInquiries.filter((i) => i.status === "closed").length,
     };
   } catch (error) {
     console.error("Error getting contact inquiry stats:", error);
@@ -157,9 +159,11 @@ export async function getContactInquiryStats(): Promise<{
 // BULK OPERATIONS
 // --------------------
 
-export async function markMultipleInquiriesAsRead(inquiryIds: string[]): Promise<void> {
+export async function markMultipleInquiriesAsRead(
+  inquiryIds: string[]
+): Promise<void> {
   try {
-    const updatePromises = inquiryIds.map(id => 
+    const updatePromises = inquiryIds.map((id) =>
       updateContactInquiryStatus(id, "read")
     );
     await Promise.all(updatePromises);
@@ -169,9 +173,11 @@ export async function markMultipleInquiriesAsRead(inquiryIds: string[]): Promise
   }
 }
 
-export async function markMultipleInquiriesAsClosed(inquiryIds: string[]): Promise<void> {
+export async function markMultipleInquiriesAsClosed(
+  inquiryIds: string[]
+): Promise<void> {
   try {
-    const updatePromises = inquiryIds.map(id => 
+    const updatePromises = inquiryIds.map((id) =>
       updateContactInquiryStatus(id, "closed")
     );
     await Promise.all(updatePromises);

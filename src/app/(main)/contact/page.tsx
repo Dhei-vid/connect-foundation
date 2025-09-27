@@ -1,15 +1,82 @@
+"use client";
+
+import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { heroLayoutStyle } from "@/common/style";
 
 import { TopNav } from "@/components/navigation/top-nav";
 import HeroLayout from "@/components/general/hero-layout";
+import { createContactInquiry } from "@/firebase/enquiries";
+import { ContactInquiry } from "@/common/types";
+import { InputField, TextareaField } from "@/components/ui/form-field";
+import { toast } from "sonner";
 
 export default function Page() {
+  const [formData, setFormData] = useState<Partial<ContactInquiry>>({
+    firstname: "",
+    lastname: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+  const [isPending, startTransition] = useTransition();
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    startTransition(async () => {
+      // Validate required fields
+      if (
+        !formData.firstname ||
+        !formData.lastname ||
+        !formData.email ||
+        !formData.subject ||
+        !formData.message
+      ) {
+        toast.error("Please fill in all required fields");
+        return;
+      }
+
+      try {
+        const inquiryId = await createContactInquiry({
+          firstname: formData.firstname,
+          lastname: formData.lastname,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        });
+
+        console.log("Contact inquiry created with ID:", inquiryId);
+        toast.success("Message sent successfully! We'll get back to you soon.");
+
+        // Reset form
+        setFormData({
+          firstname: "",
+          lastname: "",
+          email: "",
+          subject: "",
+          message: "",
+        });
+      } catch (error) {
+        console.error("Error creating contact inquiry:", error);
+        toast.error("Failed to send message. Please try again.");
+      }
+    });
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   return (
     <div className="min-h-screen ">
       <HeroLayout
@@ -47,80 +114,75 @@ export default function Page() {
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                   Send us a Message
                 </h2>
-                <form className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label
-                        htmlFor="firstName"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                      >
-                        First Name
-                      </label>
-                      <Input
-                        id="firstName"
+                      <InputField
+                        label={"First Name"}
+                        id="firstname"
+                        name="firstname"
                         type="text"
                         placeholder="Your first name"
-                        className="w-full"
+                        className={"w-full"}
+                        value={formData.firstname || ""}
+                        onChange={handleInputChange}
+                        required
                       />
                     </div>
                     <div>
-                      <label
-                        htmlFor="lastName"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                      >
-                        Last Name
-                      </label>
-                      <Input
-                        id="lastName"
+                      <InputField
+                        label={"Last Name"}
+                        id="lastname"
+                        name="lastname"
                         type="text"
                         placeholder="Your last name"
                         className="w-full"
+                        value={formData.lastname || ""}
+                        onChange={handleInputChange}
+                        required
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
-                      Email Address
-                    </label>
-                    <Input
+                    <InputField
+                      label={"Email Address"}
                       id="email"
+                      name="email"
                       type="email"
                       placeholder="your.email@example.com"
                       className="w-full"
+                      value={formData.email || ""}
+                      onChange={handleInputChange}
+                      required
                     />
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="subject"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
-                      Subject
-                    </label>
-                    <Input
+                    <InputField
+                      label={"Subject"}
                       id="subject"
+                      name="subject"
                       type="text"
                       placeholder="What is this about?"
                       className="w-full"
+                      value={formData.subject || ""}
+                      onChange={handleInputChange}
+                      required
                     />
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="message"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
-                      Message
-                    </label>
-                    <Textarea
+                    <TextareaField
+                      label={"Message"}
                       id="message"
+                      name="message"
                       placeholder="Tell us more about your inquiry..."
                       rows={5}
                       className="w-full"
+                      value={formData.message || ""}
+                      onChange={handleInputChange}
+                      required
                     />
                   </div>
 
@@ -128,9 +190,19 @@ export default function Page() {
                     type="submit"
                     className="w-full bg-main-red hover:bg-main-red/90"
                     size="lg"
+                    disabled={isPending}
                   >
-                    <Send className="w-4 h-4 mr-2" />
-                    Send Message
+                    {isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 mr-2" />
+                        Send Message
+                      </>
+                    )}
                   </Button>
                 </form>
               </Card>

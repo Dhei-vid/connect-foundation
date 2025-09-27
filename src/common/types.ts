@@ -112,7 +112,8 @@ export interface FinancialRecord {
 
 export interface ContactInquiry {
   id: string;
-  name: string;
+  firstname: string;
+  lastname: string;
   email: string;
   subject: string;
   message: string;
