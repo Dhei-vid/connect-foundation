@@ -128,7 +128,7 @@ export interface Volunteer {
   lastname: string;
   email: string;
   phone: string;
-  dateOfBirth: Date;
+  age: number;
   gender: Gender;
   address: string;
   city: string;

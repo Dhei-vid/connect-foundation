@@ -61,7 +61,9 @@ export async function deleteVolunteer(volunteerId: string): Promise<void> {
   }
 }
 
-export async function getVolunteer(volunteerId: string): Promise<Volunteer | null> {
+export async function getVolunteer(
+  volunteerId: string
+): Promise<Volunteer | null> {
   try {
     const docRef = doc(db, "volunteers", volunteerId);
     const docSnap = await getDoc(docRef);
@@ -71,7 +73,6 @@ export async function getVolunteer(volunteerId: string): Promise<Volunteer | nul
       return {
         id: docSnap.id,
         ...data,
-        dateOfBirth: data.dateOfBirth?.toDate?.(),
         createdAt: data.createdAt?.toDate?.(),
         updatedAt: data.updatedAt?.toDate?.(),
       } as Volunteer;
@@ -103,7 +104,9 @@ export async function getVolunteers(filters?: {
       constraints.push(where("status", "==", filters.status));
     }
     if (filters?.assignedOrphanageId) {
-      constraints.push(where("assignedOrphanageId", "==", filters.assignedOrphanageId));
+      constraints.push(
+        where("assignedOrphanageId", "==", filters.assignedOrphanageId)
+      );
     }
     if (filters?.availability) {
       constraints.push(where("availability", "==", filters.availability));
@@ -134,7 +137,6 @@ export async function getVolunteers(filters?: {
       return {
         id: doc.id,
         ...data,
-        dateOfBirth: data.dateOfBirth?.toDate?.(),
         createdAt: data.createdAt?.toDate?.(),
         updatedAt: data.updatedAt?.toDate?.(),
       } as Volunteer;
@@ -142,8 +144,8 @@ export async function getVolunteers(filters?: {
 
     // Apply client-side filtering for array fields
     if (filters?.skills && filters.skills.length > 0) {
-      volunteers = volunteers.filter(volunteer =>
-        filters.skills!.some(skill => volunteer.skills.includes(skill))
+      volunteers = volunteers.filter((volunteer) =>
+        filters.skills!.some((skill) => volunteer.skills.includes(skill))
       );
     }
 
@@ -162,7 +164,9 @@ export async function getApprovedVolunteers(): Promise<Volunteer[]> {
   return getVolunteers({ status: "approved" });
 }
 
-export async function getVolunteersByOrphanage(orphanageId: string): Promise<Volunteer[]> {
+export async function getVolunteersByOrphanage(
+  orphanageId: string
+): Promise<Volunteer[]> {
   return getVolunteers({ assignedOrphanageId: orphanageId });
 }
 
@@ -185,7 +189,10 @@ export async function approveVolunteer(
   }
 }
 
-export async function rejectVolunteer(volunteerId: string, notes?: string): Promise<void> {
+export async function rejectVolunteer(
+  volunteerId: string,
+  notes?: string
+): Promise<void> {
   try {
     await updateVolunteer(volunteerId, {
       status: "rejected",
@@ -197,7 +204,10 @@ export async function rejectVolunteer(volunteerId: string, notes?: string): Prom
   }
 }
 
-export async function suspendVolunteer(volunteerId: string, notes?: string): Promise<void> {
+export async function suspendVolunteer(
+  volunteerId: string,
+  notes?: string
+): Promise<void> {
   try {
     await updateVolunteer(volunteerId, {
       status: "suspended",
@@ -239,7 +249,9 @@ export async function assignVolunteerToOrphanage(
   }
 }
 
-export async function unassignVolunteerFromOrphanage(volunteerId: string): Promise<void> {
+export async function unassignVolunteerFromOrphanage(
+  volunteerId: string
+): Promise<void> {
   try {
     await updateVolunteer(volunteerId, {
       assignedOrphanageId: undefined,
@@ -262,15 +274,17 @@ export async function getVolunteerStats(): Promise<{
 }> {
   try {
     const allVolunteers = await getVolunteers();
-    
+
     return {
       total: allVolunteers.length,
-      pending: allVolunteers.filter(v => v.status === "pending").length,
-      approved: allVolunteers.filter(v => v.status === "approved").length,
-      rejected: allVolunteers.filter(v => v.status === "rejected").length,
-      suspended: allVolunteers.filter(v => v.status === "suspended").length,
-      withBackgroundCheck: allVolunteers.filter(v => v.backgroundCheckCompleted).length,
-      assigned: allVolunteers.filter(v => v.assignedOrphanageId).length,
+      pending: allVolunteers.filter((v) => v.status === "pending").length,
+      approved: allVolunteers.filter((v) => v.status === "approved").length,
+      rejected: allVolunteers.filter((v) => v.status === "rejected").length,
+      suspended: allVolunteers.filter((v) => v.status === "suspended").length,
+      withBackgroundCheck: allVolunteers.filter(
+        (v) => v.backgroundCheckCompleted
+      ).length,
+      assigned: allVolunteers.filter((v) => v.assignedOrphanageId).length,
     };
   } catch (error) {
     console.error("Error getting volunteer stats:", error);
@@ -282,20 +296,23 @@ export async function getVolunteerStats(): Promise<{
 // SEARCH AND FILTER FUNCTIONS
 // --------------------
 
-export async function searchVolunteers(searchTerm: string): Promise<Volunteer[]> {
+export async function searchVolunteers(
+  searchTerm: string
+): Promise<Volunteer[]> {
   try {
     const allVolunteers = await getVolunteers();
-    
-    return allVolunteers.filter(volunteer =>
-      volunteer.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      volunteer.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      volunteer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      volunteer.skills.some(skill => 
-        skill.toLowerCase().includes(searchTerm.toLowerCase())
-      ) ||
-      volunteer.interests.some(interest => 
-        interest.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+
+    return allVolunteers.filter(
+      (volunteer) =>
+        volunteer.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        volunteer.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        volunteer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        volunteer.skills.some((skill) =>
+          skill.toLowerCase().includes(searchTerm.toLowerCase())
+        ) ||
+        volunteer.interests.some((interest) =>
+          interest.toLowerCase().includes(searchTerm.toLowerCase())
+        )
     );
   } catch (error) {
     console.error("Error searching volunteers:", error);
@@ -303,12 +320,14 @@ export async function searchVolunteers(searchTerm: string): Promise<Volunteer[]>
   }
 }
 
-export async function getVolunteersBySkills(skills: string[]): Promise<Volunteer[]> {
+export async function getVolunteersBySkills(
+  skills: string[]
+): Promise<Volunteer[]> {
   try {
     const allVolunteers = await getVolunteers();
-    
-    return allVolunteers.filter(volunteer =>
-      skills.some(skill => volunteer.skills.includes(skill))
+
+    return allVolunteers.filter((volunteer) =>
+      skills.some((skill) => volunteer.skills.includes(skill))
     );
   } catch (error) {
     console.error("Error getting volunteers by skills:", error);
@@ -316,6 +335,9 @@ export async function getVolunteersBySkills(skills: string[]): Promise<Volunteer
   }
 }
 
-export async function getVolunteersByLocation(city?: string, state?: string): Promise<Volunteer[]> {
+export async function getVolunteersByLocation(
+  city?: string,
+  state?: string
+): Promise<Volunteer[]> {
   return getVolunteers({ city, state });
 }

@@ -68,7 +68,7 @@ export function Footer() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
                 viewport={{ once: true }}
-                className="mb-6 w-full lg:w-96 2xl:w-[12rem]"
+                className="mb-6 w-full lg:w-96 2xl:w-[20rem]"
               >
                 <div className="flex items-center gap-3 mb-4">
                   <Image

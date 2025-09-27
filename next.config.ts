@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
       "images.unsplash.com",
       "plus.unsplash.com",
       "images.pexels.com",
+      "abroadship.org",
     ].map((hostname) => ({
       protocol: "https",
       hostname,
