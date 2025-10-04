@@ -352,7 +352,7 @@ export default function OrphanageSignUpPage() {
           Already have an account?{" "}
           <Link
             href="/orphanage/signin"
-            className="text-blue-600 hover:underline"
+            className="text-main-red font-semibold  hover:underline"
           >
             Sign in here
           </Link>

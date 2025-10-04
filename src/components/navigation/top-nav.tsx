@@ -27,7 +27,6 @@ const dropdownConfig = {
     items: [
       { label: "Financial Reports", href: "/report" },
       { label: "Success Stories", href: "/impact" },
-      { label: "Transparency", href: "/transparency" },
     ],
   },
 };
@@ -36,7 +35,6 @@ const navItems = [
   { label: "Home", href: "/" },
   { label: "About Us", href: "/about-us", hasDropdown: true },
   { label: "Impact", href: "/impact", hasDropdown: true },
-  { label: "Report", href: "/report" },
   { label: "Volunteer", href: "/volunteer" },
   { label: "Contact", href: "/contact" },
 ];

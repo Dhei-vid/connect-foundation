@@ -13,9 +13,9 @@ export default function OrphanageAuthLayout({
       <div className="relative h-screen overflow-hidden">
         <div className="relative inset-0">
           <Image
-            className="object-cover object-bottom h-full w-full"
+            className="bg-cover bg-center h-full w-full"
             src={
-              "https://images.unsplash.com/photo-1609046395281-334c3b49552a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjZ8fGJsYWNrJTIwa2lkcyUyMGhhcHB5fGVufDB8fDB8fHww"
+              "https://images.unsplash.com/photo-1505148359496-35d8d1ec9645?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjY1fHxibGFjayUyMGNoaWxkcmVuJTIwaW4lMjBzY2hvb2x8ZW58MHx8MHx8fDA%3D"
             }
             alt={"image of kids"}
             width={500}

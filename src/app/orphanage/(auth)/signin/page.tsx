@@ -123,7 +123,7 @@ export default function OrphanageSignInPage() {
           Don&apos;t have an account?{" "}
           <Link
             href="/orphanage/signup"
-            className="text-blue-600 hover:underline"
+            className="text-main-red font-semibold hover:underline"
           >
             Sign up here
           </Link>

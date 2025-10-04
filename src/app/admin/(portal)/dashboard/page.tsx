@@ -3,16 +3,12 @@
 import React, { useState, useEffect } from "react";
 import {
   Users,
-  Heart,
   DollarSign,
   AlertTriangle,
   TrendingUp,
-  TrendingDown,
-  Eye,
   MessageCircle,
   Building2,
   UserCheck,
-  Calendar,
   BarChart3,
   Activity,
   Target,
@@ -20,11 +16,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  getDashboardStats,
-  getGrowthMetrics,
-  getFinancialOverview,
-} from "@/firebase/analytics";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getDashboardStats } from "@/firebase/analytics";
 import { getRecentDonations } from "@/firebase/donations";
 import { getNewContactInquiries } from "@/firebase/enquiries";
 import { getPendingVolunteers } from "@/firebase/volunteers";
@@ -66,6 +59,8 @@ export default function AdminDashboardPage() {
   const [timeframe, setTimeframe] = useState<
     "week" | "month" | "quarter" | "year"
   >("month");
+
+  console.log("STATS ", stats);
 
   useEffect(() => {
     loadDashboardData();
@@ -117,8 +112,101 @@ export default function AdminDashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      <div className="space-y-6">
+        {/* Header Skeleton */}
+        <div className="flex items-center justify-between">
+          <div>
+            <Skeleton className="h-8 w-64 mb-2" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <Skeleton className="h-10 w-24" />
+        </div>
+
+        {/* Key Metrics Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="py-4">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-4" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-20 mb-2" />
+                <Skeleton className="h-3 w-32 mb-2" />
+                <Skeleton className="h-4 w-24" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Recent Activity & Quick Actions Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-2 py-4">
+            <CardHeader>
+              <Skeleton className="h-6 w-32" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <Skeleton className="w-10 h-10 rounded-full" />
+                      <div>
+                        <Skeleton className="h-4 w-24 mb-2" />
+                        <Skeleton className="h-3 w-16" />
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <Skeleton className="h-4 w-16 mb-2" />
+                      <Skeleton className="h-6 w-20" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="py-4">
+            <CardHeader>
+              <Skeleton className="h-6 w-24" />
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full" />
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Pending Items Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {[...Array(2)].map((_, i) => (
+            <Card key={i} className="py-4">
+              <CardHeader>
+                <Skeleton className="h-6 w-32" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {[...Array(3)].map((_, j) => (
+                    <div key={j} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <Skeleton className="w-10 h-10 rounded-full" />
+                        <div>
+                          <Skeleton className="h-4 w-24 mb-2" />
+                          <Skeleton className="h-3 w-32" />
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <Skeleton className="h-4 w-16 mb-2" />
+                        <Skeleton className="h-6 w-20" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }
@@ -361,7 +449,25 @@ function RecentDonationsList() {
   };
 
   if (loading) {
-    return <div className="text-center py-4">Loading recent donations...</div>;
+    return (
+      <div className="space-y-3">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <div>
+                <Skeleton className="h-4 w-24 mb-2" />
+                <Skeleton className="h-3 w-16" />
+              </div>
+            </div>
+            <div className="text-right">
+              <Skeleton className="h-4 w-16 mb-2" />
+              <Skeleton className="h-6 w-20" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   }
 
   return (
@@ -429,7 +535,23 @@ function PendingVolunteersList() {
 
   if (loading) {
     return (
-      <div className="text-center py-4">Loading pending volunteers...</div>
+      <div className="space-y-3">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <div>
+                <Skeleton className="h-4 w-24 mb-2" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+            </div>
+            <div className="text-right">
+              <Skeleton className="h-6 w-20 mb-2" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          </div>
+        ))}
+      </div>
     );
   }
 
@@ -495,7 +617,25 @@ function NewInquiriesList() {
   };
 
   if (loading) {
-    return <div className="text-center py-4">Loading new inquiries...</div>;
+    return (
+      <div className="space-y-3">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <div>
+                <Skeleton className="h-4 w-24 mb-2" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+            </div>
+            <div className="text-right">
+              <Skeleton className="h-3 w-16 mb-2" />
+              <Skeleton className="h-6 w-20" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   }
 
   return (
@@ -513,7 +653,9 @@ function NewInquiriesList() {
                 <MessageCircle className="w-5 h-5 text-purple-600" />
               </div>
               <div>
-                <p className="font-medium">{inquiry.name}</p>
+                <p className="font-medium">
+                  {inquiry.firstname} {inquiry.lastname}
+                </p>
                 <p className="text-sm text-gray-500">{inquiry.subject}</p>
               </div>
             </div>

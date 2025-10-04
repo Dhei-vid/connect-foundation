@@ -24,6 +24,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   getVolunteers,
   getVolunteerStats,
@@ -101,6 +122,7 @@ export default function VolunteersPage() {
   const [activeTab, setActiveTab] = useState<"volunteers" | "opportunities">(
     "volunteers"
   );
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
     loadVolunteersData();
@@ -147,11 +169,37 @@ export default function VolunteersPage() {
     }
   };
 
+  const handleConfirmStatusChange = async (volunteerId: string, action: 'approve' | 'reject' | 'suspend') => {
+    try {
+      setActionLoading(volunteerId);
+      
+      if (action === 'approve') {
+        await approveVolunteer(volunteerId, undefined, undefined, "Approved by admin");
+        toast.success("Volunteer approved successfully");
+      } else if (action === 'reject') {
+        await rejectVolunteer(volunteerId, "Rejected by admin");
+        toast.success("Volunteer rejected successfully");
+      } else if (action === 'suspend') {
+        await suspendVolunteer(volunteerId, "Suspended by admin");
+        toast.success("Volunteer suspended successfully");
+      }
+      
+      await loadVolunteersData();
+      setSelectedVolunteer(null);
+    } catch (error) {
+      console.error(`Error ${action}ing volunteer:`, error);
+      toast.error(`Failed to ${action} volunteer. Please try again.`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleApprove = async (
     volunteerId: string,
     assignedOrphanageId?: string
   ) => {
     try {
+      setActionLoading(volunteerId);
       const orphanage = orphanages.find((o) => o.id === assignedOrphanageId);
       await approveVolunteer(
         volunteerId,
@@ -161,28 +209,42 @@ export default function VolunteersPage() {
       );
       await loadVolunteersData();
       setSelectedVolunteer(null);
+      toast.success("Volunteer approved successfully");
     } catch (error) {
       console.error("Error approving volunteer:", error);
+      toast.error("Failed to approve volunteer. Please try again.");
+    } finally {
+      setActionLoading(null);
     }
   };
 
   const handleReject = async (volunteerId: string) => {
     try {
+      setActionLoading(volunteerId);
       await rejectVolunteer(volunteerId, "Rejected by admin");
       await loadVolunteersData();
       setSelectedVolunteer(null);
+      toast.success("Volunteer rejected successfully");
     } catch (error) {
       console.error("Error rejecting volunteer:", error);
+      toast.error("Failed to reject volunteer. Please try again.");
+    } finally {
+      setActionLoading(null);
     }
   };
 
   const handleSuspend = async (volunteerId: string) => {
     try {
+      setActionLoading(volunteerId);
       await suspendVolunteer(volunteerId, "Suspended by admin");
       await loadVolunteersData();
       setSelectedVolunteer(null);
+      toast.success("Volunteer suspended successfully");
     } catch (error) {
       console.error("Error suspending volunteer:", error);
+      toast.error("Failed to suspend volunteer. Please try again.");
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -206,13 +268,16 @@ export default function VolunteersPage() {
 
   const handleDeleteVolunteer = async (volunteerId: string) => {
     try {
+      setActionLoading(volunteerId);
       await deleteVolunteer(volunteerId);
       await loadVolunteersData();
       setSelectedVolunteer(null);
       toast.success("Volunteer deleted successfully");
     } catch (error) {
       console.error("Error deleting volunteer:", error);
-      toast.error("Failed to delete volunteer");
+      toast.error("Failed to delete volunteer. Please try again.");
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -248,8 +313,71 @@ export default function VolunteersPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      <div className="space-y-6">
+        {/* Header Skeleton */}
+        <div className="flex items-center justify-between">
+          <div>
+            <Skeleton className="h-8 w-64 mb-2" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <Skeleton className="h-10 w-32" />
+        </div>
+
+        {/* Stats Cards Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="py-4">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-4" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-16 mb-2" />
+                <Skeleton className="h-3 w-32" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Filters Skeleton */}
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex flex-col lg:flex-row gap-4">
+              <div className="flex-1">
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-32" />
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Volunteers Grid Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <Card key={i} className="p-6">
+              <div className="flex items-start space-x-4 mb-4">
+                <Skeleton className="w-16 h-16 rounded-full" />
+                <div className="flex-1">
+                  <Skeleton className="h-5 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-1/2 mb-2" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
+              </div>
+              <div className="space-y-2 mb-4">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+              </div>
+              <div className="flex gap-2">
+                <Skeleton className="h-6 w-16" />
+                <Skeleton className="h-6 w-20" />
+              </div>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }
@@ -616,34 +744,124 @@ export default function VolunteersPage() {
                             size="sm"
                             variant="outline"
                             onClick={() => setSelectedVolunteer(volunteer)}
+                            disabled={actionLoading === volunteer.id}
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
                           {volunteer.status === "pending" && (
                             <>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
                               <Button
                                 size="sm"
-                                onClick={() => handleApprove(volunteer.id)}
+                                    disabled={actionLoading === volunteer.id}
                               >
+                                    {actionLoading === volunteer.id ? (
+                                      <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                    ) : (
                                 <Check className="w-4 h-4" />
+                                    )}
                               </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Approve Volunteer</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to approve <strong>{volunteer.firstname} {volunteer.lastname}</strong>? 
+                                      This will change their status to approved and they will be able to participate in volunteer activities.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleConfirmStatusChange(volunteer.id, 'approve')}
+                                      disabled={actionLoading === volunteer.id}
+                                    >
+                                      {actionLoading === volunteer.id ? (
+                                        <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                                      ) : null}
+                                      Approve
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
                               <Button
                                 size="sm"
                                 variant="destructive"
-                                onClick={() => handleReject(volunteer.id)}
+                                    disabled={actionLoading === volunteer.id}
                               >
+                                    {actionLoading === volunteer.id ? (
+                                      <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                    ) : (
                                 <XCircle className="w-4 h-4" />
+                                    )}
                               </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Reject Volunteer</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to reject <strong>{volunteer.firstname} {volunteer.lastname}</strong>? 
+                                      This will change their status to rejected and they will not be able to participate in volunteer activities.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleConfirmStatusChange(volunteer.id, 'reject')}
+                                      disabled={actionLoading === volunteer.id}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      {actionLoading === volunteer.id ? (
+                                        <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                                      ) : null}
+                                      Reject
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             </>
                           )}
                           {volunteer.status === "approved" && (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
                             <Button
                               size="sm"
                               variant="destructive"
-                              onClick={() => handleSuspend(volunteer.id)}
+                                  disabled={actionLoading === volunteer.id}
                             >
+                                  {actionLoading === volunteer.id ? (
+                                    <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                  ) : (
                               <Ban className="w-4 h-4" />
+                                  )}
                             </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Suspend Volunteer</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to suspend <strong>{volunteer.firstname} {volunteer.lastname}</strong>? 
+                                    This will change their status to suspended and they will not be able to participate in volunteer activities until reactivated.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleConfirmStatusChange(volunteer.id, 'suspend')}
+                                    disabled={actionLoading === volunteer.id}
+                                    className="bg-red-600 hover:bg-red-700"
+                                  >
+                                    {actionLoading === volunteer.id ? (
+                                      <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                                    ) : null}
+                                    Suspend
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           )}
                           <DeleteConfirmation
                             itemName={`${volunteer.firstname} ${volunteer.lastname}`}
@@ -652,8 +870,16 @@ export default function VolunteersPage() {
                               handleDeleteVolunteer(volunteer.id)
                             }
                           >
-                            <Button size="sm" variant="destructive">
+                            <Button 
+                              size="sm" 
+                              variant="destructive"
+                              disabled={actionLoading === volunteer.id}
+                            >
+                              {actionLoading === volunteer.id ? (
+                                <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                              ) : (
                               <Trash2 className="w-4 h-4" />
+                              )}
                             </Button>
                           </DeleteConfirmation>
                         </div>
@@ -767,22 +993,16 @@ export default function VolunteersPage() {
       )}
 
       {/* Volunteer Details Modal */}
-      {selectedVolunteer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Volunteer Details</CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedVolunteer(null)}
-                >
-                  <XCircle className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
+      <Dialog open={!!selectedVolunteer} onOpenChange={() => setSelectedVolunteer(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Volunteer Details</DialogTitle>
+            <DialogDescription>
+              Complete information about {selectedVolunteer?.firstname} {selectedVolunteer?.lastname}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedVolunteer && (
+            <div className="space-y-6">
               {/* Personal Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -808,9 +1028,9 @@ export default function VolunteersPage() {
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Date of Birth:</span>
+                      <span>Age:</span>
                       <span className="font-medium">
-                        {selectedVolunteer.dateOfBirth.toLocaleDateString()}
+                        {selectedVolunteer.age} years old
                       </span>
                     </div>
                   </div>
@@ -885,48 +1105,139 @@ export default function VolunteersPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2 pt-4">
+              <DialogFooter className="flex gap-2 pt-4">
                 {selectedVolunteer.status === "pending" && (
                   <>
-                    <Button
-                      onClick={() => handleApprove(selectedVolunteer.id)}
-                      className="flex-1"
-                    >
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Approve
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleReject(selectedVolunteer.id)}
-                      className="flex-1"
-                    >
-                      <XCircle className="w-4 h-4 mr-2" />
-                      Reject
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          className="flex-1"
+                          disabled={actionLoading === selectedVolunteer.id}
+                        >
+                          {actionLoading === selectedVolunteer.id ? (
+                            <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                          ) : (
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                          )}
+                          Approve
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Approve Volunteer</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to approve <strong>{selectedVolunteer.firstname} {selectedVolunteer.lastname}</strong>? 
+                            This will change their status to approved and they will be able to participate in volunteer activities.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleConfirmStatusChange(selectedVolunteer.id, 'approve')}
+                            disabled={actionLoading === selectedVolunteer.id}
+                          >
+                            {actionLoading === selectedVolunteer.id ? (
+                              <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                            ) : null}
+                            Approve
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          className="flex-1"
+                          disabled={actionLoading === selectedVolunteer.id}
+                        >
+                          {actionLoading === selectedVolunteer.id ? (
+                            <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                          ) : (
+                            <XCircle className="w-4 h-4 mr-2" />
+                          )}
+                          Reject
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Reject Volunteer</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to reject <strong>{selectedVolunteer.firstname} {selectedVolunteer.lastname}</strong>? 
+                            This will change their status to rejected and they will not be able to participate in volunteer activities.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleConfirmStatusChange(selectedVolunteer.id, 'reject')}
+                            disabled={actionLoading === selectedVolunteer.id}
+                            className="bg-red-600 hover:bg-red-700"
+                          >
+                            {actionLoading === selectedVolunteer.id ? (
+                              <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                            ) : null}
+                            Reject
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </>
                 )}
                 {selectedVolunteer.status === "approved" && (
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleSuspend(selectedVolunteer.id)}
-                    className="flex-1"
-                  >
-                    <Ban className="w-4 h-4 mr-2" />
-                    Suspend
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        className="flex-1"
+                        disabled={actionLoading === selectedVolunteer.id}
+                      >
+                        {actionLoading === selectedVolunteer.id ? (
+                          <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                        ) : (
+                          <Ban className="w-4 h-4 mr-2" />
+                        )}
+                        Suspend
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Suspend Volunteer</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to suspend <strong>{selectedVolunteer.firstname} {selectedVolunteer.lastname}</strong>? 
+                          This will change their status to suspended and they will not be able to participate in volunteer activities until reactivated.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleConfirmStatusChange(selectedVolunteer.id, 'suspend')}
+                          disabled={actionLoading === selectedVolunteer.id}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          {actionLoading === selectedVolunteer.id ? (
+                            <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                          ) : null}
+                          Suspend
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 )}
                 <Button
                   variant="outline"
                   onClick={() => setSelectedVolunteer(null)}
                   className="flex-1"
+                  disabled={actionLoading === selectedVolunteer.id}
                 >
                   Close
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }

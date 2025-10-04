@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   DollarSign,
   Search,
@@ -13,93 +13,22 @@ import {
   TrendingUp,
   TrendingDown,
   Download,
+  RefreshCw,
+  AlertCircle,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { getDonations, getDonationStats, updateDonationStatus, getRecentDonations } from "@/firebase/donations";
+import type { Donation } from "@/common/types";
 
-// Mock data - in real app, this would come from your database
-const mockDonations = [
-  {
-    id: "1",
-    donorId: "donor_1",
-    donorName: "John Smith",
-    donorEmail: "john.smith@email.com",
-    amount: 5000,
-    currency: "USD",
-    message: "Hope this helps the children in need. God bless!",
-    anonymous: false,
-    targetIssueId: "1",
-    status: "completed" as const,
-    createdAt: new Date("2024-01-20"),
-  },
-  {
-    id: "2",
-    donorId: "donor_2",
-    donorName: "Anonymous",
-    donorEmail: "anonymous@email.com",
-    amount: 2500,
-    currency: "USD",
-    message: "For the medical supplies",
-    anonymous: true,
-    targetIssueId: "1",
-    status: "completed" as const,
-    createdAt: new Date("2024-01-19"),
-  },
-  {
-    id: "3",
-    donorId: "donor_3",
-    donorName: "Sarah Johnson",
-    donorEmail: "sarah.j@email.com",
-    amount: 1000,
-    currency: "USD",
-    message: "Supporting education for children",
-    anonymous: false,
-    targetIssueId: "2",
-    status: "completed" as const,
-    createdAt: new Date("2024-01-18"),
-  },
-  {
-    id: "4",
-    donorId: "donor_4",
-    donorName: "Michael Brown",
-    donorEmail: "m.brown@email.com",
-    amount: 3000,
-    currency: "USD",
-    message: "",
-    anonymous: false,
-    targetIssueId: undefined,
-    status: "pending" as const,
-    createdAt: new Date("2024-01-21"),
-  },
-  {
-    id: "5",
-    donorId: "donor_5",
-    donorName: "Emily Davis",
-    donorEmail: "emily.davis@email.com",
-    amount: 1500,
-    currency: "USD",
-    message: "For food supplies",
-    anonymous: false,
-    targetIssueId: "3",
-    status: "failed" as const,
-    createdAt: new Date("2024-01-17"),
-  },
-  {
-    id: "6",
-    donorId: "donor_6",
-    donorName: "Anonymous",
-    donorEmail: "donor@email.com",
-    amount: 7500,
-    currency: "USD",
-    message: "General donation to help all children",
-    anonymous: true,
-    targetIssueId: undefined,
-    status: "completed" as const,
-    createdAt: new Date("2024-01-16"),
-  },
-];
+// Loading and error states
+interface LoadingState {
+  donations: boolean;
+  stats: boolean;
+  recent: boolean;
+}
 
 const statusColors = {
   pending:
@@ -110,6 +39,25 @@ const statusColors = {
 };
 
 export default function DonationsPage() {
+  const [donations, setDonations] = useState<Donation[]>([]);
+  const [recentDonations, setRecentDonations] = useState<Donation[]>([]);
+  const [stats, setStats] = useState({
+    totalDonations: 0,
+    totalAmount: 0,
+    averageAmount: 0,
+    completedDonations: 0,
+    pendingDonations: 0,
+    failedDonations: 0,
+    anonymousDonations: 0,
+    targetedDonations: 0,
+    generalDonations: 0,
+  });
+  const [loading, setLoading] = useState<LoadingState>({
+    donations: true,
+    stats: true,
+    recent: true,
+  });
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<
     "all" | "pending" | "completed" | "failed"
@@ -117,13 +65,49 @@ export default function DonationsPage() {
   const [filterTimeframe, setFilterTimeframe] = useState<
     "all" | "today" | "week" | "month" | "year"
   >("all");
-  const [selectedDonation, setSelectedDonation] = useState<any>(null);
+  const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
 
-  const filteredDonations = mockDonations.filter((donation) => {
+  // Load data on component mount
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setError(null);
+      
+      // Load donations, stats, and recent donations in parallel
+      const [donationsData, statsData, recentData] = await Promise.all([
+        getDonations(),
+        getDonationStats(),
+        getRecentDonations(10)
+      ]);
+
+      setDonations(donationsData);
+      setStats(statsData);
+      setRecentDonations(recentData);
+      
+      setLoading({
+        donations: false,
+        stats: false,
+        recent: false,
+      });
+    } catch (err) {
+      console.error("Error loading donations data:", err);
+      setError("Failed to load donations data. Please try again.");
+      setLoading({
+        donations: false,
+        stats: false,
+        recent: false,
+      });
+    }
+  };
+
+  const filteredDonations = donations.filter((donation) => {
     const matchesSearch =
       donation.donorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       donation.donorEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      donation.message.toLowerCase().includes(searchTerm.toLowerCase());
+      (donation.message && donation.message.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesStatus =
       filterStatus === "all" || donation.status === filterStatus;
@@ -154,9 +138,28 @@ export default function DonationsPage() {
     return matchesSearch && matchesStatus && matchesTimeframe;
   });
 
-  const handleStatusUpdate = (donationId: string, newStatus: string) => {
-    // TODO: Implement status update logic
-    console.log("Update donation status:", donationId, newStatus);
+  const handleStatusUpdate = async (donationId: string, newStatus: Donation["status"]) => {
+    try {
+      await updateDonationStatus(donationId, newStatus);
+      
+      // Update local state
+      setDonations(prev => 
+        prev.map(donation => 
+          donation.id === donationId 
+            ? { ...donation, status: newStatus }
+            : donation
+        )
+      );
+      
+      // Reload stats to reflect changes
+      const updatedStats = await getDonationStats();
+      setStats(updatedStats);
+      
+      console.log("Donation status updated successfully");
+    } catch (err) {
+      console.error("Error updating donation status:", err);
+      setError("Failed to update donation status. Please try again.");
+    }
   };
 
   const handleExport = () => {
@@ -164,27 +167,17 @@ export default function DonationsPage() {
     console.log("Export donations");
   };
 
-  // Calculate statistics
-  const totalDonations = mockDonations.length;
-  const totalAmount = mockDonations.reduce(
-    (sum, donation) => sum + donation.amount,
-    0
-  );
-  const completedAmount = mockDonations
-    .filter((d) => d.status === "completed")
-    .reduce((sum, donation) => sum + donation.amount, 0);
-  const pendingAmount = mockDonations
+  const handleRefresh = () => {
+    loadData();
+  };
+
+  // Calculate additional stats for display
+  const pendingAmount = donations
     .filter((d) => d.status === "pending")
     .reduce((sum, donation) => sum + donation.amount, 0);
-  const failedAmount = mockDonations
+  const failedAmount = donations
     .filter((d) => d.status === "failed")
     .reduce((sum, donation) => sum + donation.amount, 0);
-
-  // Recent donations (last 7 days)
-  const recentDonations = mockDonations.filter((donation) => {
-    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    return donation.createdAt >= weekAgo;
-  });
 
   return (
     <div className="space-y-6">
@@ -198,11 +191,37 @@ export default function DonationsPage() {
             Track and manage all donations received
           </p>
         </div>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleRefresh} 
+            variant="outline"
+            disabled={loading.donations || loading.stats}
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${(loading.donations || loading.stats) ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
         <Button onClick={handleExport}>
           <Download className="w-4 h-4 mr-2" />
           Export Data
         </Button>
       </div>
+      </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center">
+          <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
+          <span className="text-red-800">{error}</span>
+          <Button 
+            onClick={() => setError(null)} 
+            variant="ghost" 
+            size="sm" 
+            className="ml-auto"
+          >
+            <XCircle className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -214,9 +233,19 @@ export default function DonationsPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalDonations}</div>
+            <div className="text-2xl font-bold">
+              {loading.stats ? (
+                <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+              ) : (
+                stats.totalDonations
+              )}
+            </div>
             <p className="text-xs text-muted-foreground">
-              {recentDonations.length} this week
+              {loading.recent ? (
+                <div className="animate-pulse bg-gray-200 h-4 w-20 rounded"></div>
+              ) : (
+                `${recentDonations.length} recent`
+              )}
             </p>
           </CardContent>
         </Card>
@@ -228,10 +257,18 @@ export default function DonationsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${totalAmount.toLocaleString()}
+              {loading.stats ? (
+                <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
+              ) : (
+                `₦${stats.totalAmount.toLocaleString()}`
+              )}
             </div>
             <p className="text-xs text-muted-foreground">
-              ${completedAmount.toLocaleString()} completed
+              {loading.stats ? (
+                <div className="animate-pulse bg-gray-200 h-4 w-32 rounded"></div>
+              ) : (
+                `₦${stats.averageAmount.toLocaleString()} average`
+              )}
             </p>
           </CardContent>
         </Card>
@@ -243,11 +280,18 @@ export default function DonationsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">
-              ${pendingAmount.toLocaleString()}
+              {loading.stats ? (
+                <div className="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
+              ) : (
+                `₦${pendingAmount.toLocaleString()}`
+              )}
             </div>
             <p className="text-xs text-muted-foreground">
-              {mockDonations.filter((d) => d.status === "pending").length}{" "}
-              donations
+              {loading.stats ? (
+                <div className="animate-pulse bg-gray-200 h-4 w-16 rounded"></div>
+              ) : (
+                `${stats.pendingDonations} donations`
+              )}
             </p>
           </CardContent>
         </Card>
@@ -259,11 +303,18 @@ export default function DonationsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
-              ${failedAmount.toLocaleString()}
+              {loading.stats ? (
+                <div className="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
+              ) : (
+                `₦${failedAmount.toLocaleString()}`
+              )}
             </div>
             <p className="text-xs text-muted-foreground">
-              {mockDonations.filter((d) => d.status === "failed").length}{" "}
-              donations
+              {loading.stats ? (
+                <div className="animate-pulse bg-gray-200 h-4 w-16 rounded"></div>
+              ) : (
+                `${stats.failedDonations} donations`
+              )}
             </p>
           </CardContent>
         </Card>
@@ -275,6 +326,25 @@ export default function DonationsPage() {
           <CardTitle>Recent Donations</CardTitle>
         </CardHeader>
         <CardContent>
+          {loading.recent ? (
+            <div className="space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+                    <div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse mb-2"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse mb-2"></div>
+                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-20 animate-pulse"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
           <div className="space-y-3">
             {recentDonations.slice(0, 5).map((donation) => (
               <div
@@ -296,7 +366,7 @@ export default function DonationsPage() {
                 </div>
                 <div className="text-right">
                   <p className="font-semibold">
-                    ${donation.amount.toLocaleString()}
+                      ₦{donation.amount.toLocaleString()}
                   </p>
                   <Badge className={statusColors[donation.status]}>
                     {donation.status}
@@ -305,6 +375,7 @@ export default function DonationsPage() {
               </div>
             ))}
           </div>
+          )}
         </CardContent>
       </Card>
 
@@ -353,9 +424,28 @@ export default function DonationsPage() {
       {/* Donations Table */}
       <Card className="py-4">
         <CardHeader>
-          <CardTitle>All Donations</CardTitle>
+          <CardTitle>All Donations ({filteredDonations.length})</CardTitle>
         </CardHeader>
         <CardContent>
+          {loading.donations ? (
+            <div className="space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex items-center justify-between p-4 border-b">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+                    <div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse mb-2"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse"></div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 animate-pulse mb-2"></div>
+                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -369,7 +459,14 @@ export default function DonationsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredDonations.map((donation) => (
+                  {filteredDonations.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-8 text-gray-500">
+                        No donations found
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredDonations.map((donation) => (
                   <tr
                     key={donation.id}
                     className="border-b hover:bg-gray-50 dark:hover:bg-gray-800"
@@ -388,7 +485,7 @@ export default function DonationsPage() {
                     </td>
                     <td className="py-3 px-4">
                       <div className="font-semibold">
-                        ${donation.amount.toLocaleString()}
+                            ₦{donation.amount.toLocaleString()}
                       </div>
                       <div className="text-sm text-gray-500">
                         {donation.currency}
@@ -444,10 +541,12 @@ export default function DonationsPage() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                    ))
+                  )}
               </tbody>
             </table>
           </div>
+          )}
         </CardContent>
       </Card>
 
@@ -501,7 +600,7 @@ export default function DonationsPage() {
                     <div className="flex justify-between">
                       <span>Amount:</span>
                       <span className="font-medium">
-                        ${selectedDonation.amount.toLocaleString()}
+                        ₦{selectedDonation.amount.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between">

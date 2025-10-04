@@ -2,17 +2,17 @@ import {
   collection,
   getDocs,
   query,
-  where,
   orderBy,
+  where,
   limit,
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { getDonationStats, getDonationsByDateRange } from "./donations";
-import { getOrphanageProfile } from "./orphanages";
 import { getIssues } from "./impacts";
 import { getVolunteers } from "./volunteers";
 import { getContactInquiries } from "./user";
+import { getOrphanageProfile } from "./orphanages";
 import type { Orphanage } from "@/common/types";
 
 // Helper function to get all orphanages
@@ -21,7 +21,7 @@ async function getOrphanages(): Promise<Orphanage[]> {
     const orphanagesRef = collection(db, "orphanages");
     const q = query(orphanagesRef, orderBy("createdAt", "desc"));
     const querySnapshot = await getDocs(q);
-    
+
     return querySnapshot.docs.map((doc) => {
       const data = doc.data();
       return {
@@ -72,7 +72,7 @@ export async function getDashboardStats(): Promise<{
 }> {
   try {
     console.log("Getting dashboard stats...");
-    
+
     // Get current date ranges
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -81,13 +81,11 @@ export async function getDashboardStats(): Promise<{
     // Get donation stats with error handling
     let allDonations, monthlyDonations, weeklyDonations;
     try {
-      [allDonations, monthlyDonations, weeklyDonations] = await Promise.all(
-        [
-          getDonationStats(),
-          getDonationStats({ startDate: startOfMonth }),
-          getDonationStats({ startDate: startOfWeek }),
-        ]
-      );
+      [allDonations, monthlyDonations, weeklyDonations] = await Promise.all([
+        getDonationStats(),
+        getDonationStats({ startDate: startOfMonth }),
+        getDonationStats({ startDate: startOfWeek }),
+      ]);
     } catch (error) {
       console.error("Error getting donation stats:", error);
       allDonations = { totalAmount: 0, totalDonations: 0 };
@@ -401,7 +399,10 @@ export async function exportData(
 
     switch (collection) {
       case "donations":
-        data = await getDonationsByDateRange(filters?.startDate || new Date(0), filters?.endDate || new Date());
+        data = await getDonationsByDateRange(
+          filters?.startDate || new Date(0),
+          filters?.endDate || new Date()
+        );
         filename = `donations_${new Date().toISOString().split("T")[0]}`;
         break;
       case "orphanages":

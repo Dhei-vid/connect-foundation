@@ -42,10 +42,18 @@ export async function updateVolunteer(
 ): Promise<void> {
   try {
     const volunteerRef = doc(db, "volunteers", volunteerId);
-    await updateDoc(volunteerRef, {
-      ...updates,
+    
+    // Filter out undefined values to avoid Firebase errors
+    const filteredUpdates = Object.fromEntries(
+      Object.entries(updates).filter(([_, value]) => value !== undefined)
+    );
+    
+    const updateData = {
+      ...filteredUpdates,
       updatedAt: Timestamp.now(),
-    });
+    };
+    
+    await updateDoc(volunteerRef, updateData);
   } catch (error) {
     console.error("Error updating volunteer:", error);
     throw error;
@@ -177,12 +185,22 @@ export async function approveVolunteer(
   notes?: string
 ): Promise<void> {
   try {
-    await updateVolunteer(volunteerId, {
-      status: "approved",
-      assignedOrphanageId,
-      assignedOrphanageName,
-      notes,
-    });
+    // Only include defined values in the update
+    const updates: Partial<Volunteer> = {
+      status: "approved" as const,
+    };
+    
+    if (assignedOrphanageId !== undefined) {
+      updates.assignedOrphanageId = assignedOrphanageId;
+    }
+    if (assignedOrphanageName !== undefined) {
+      updates.assignedOrphanageName = assignedOrphanageName;
+    }
+    if (notes !== undefined) {
+      updates.notes = notes;
+    }
+    
+    await updateVolunteer(volunteerId, updates);
   } catch (error) {
     console.error("Error approving volunteer:", error);
     throw error;
@@ -194,10 +212,15 @@ export async function rejectVolunteer(
   notes?: string
 ): Promise<void> {
   try {
-    await updateVolunteer(volunteerId, {
-      status: "rejected",
-      notes,
-    });
+    const updates: Partial<Volunteer> = {
+      status: "rejected" as const,
+    };
+    
+    if (notes !== undefined) {
+      updates.notes = notes;
+    }
+    
+    await updateVolunteer(volunteerId, updates);
   } catch (error) {
     console.error("Error rejecting volunteer:", error);
     throw error;
@@ -209,10 +232,15 @@ export async function suspendVolunteer(
   notes?: string
 ): Promise<void> {
   try {
-    await updateVolunteer(volunteerId, {
-      status: "suspended",
-      notes,
-    });
+    const updates: Partial<Volunteer> = {
+      status: "suspended" as const,
+    };
+    
+    if (notes !== undefined) {
+      updates.notes = notes;
+    }
+    
+    await updateVolunteer(volunteerId, updates);
   } catch (error) {
     console.error("Error suspending volunteer:", error);
     throw error;
