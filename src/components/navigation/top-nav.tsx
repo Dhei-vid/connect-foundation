@@ -9,40 +9,54 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
+import { Badge } from "../ui/badge";
 
-const aboutUsNavItems = [
-  {
-    label: "Founding Story",
-    href: "",
+// Dynamic dropdown configuration
+const dropdownConfig = {
+  "About Us": {
+    badge: "About Us",
+    description: "Learn more about our organization and values.",
+    items: [
+      { label: "Our Story", href: "/about-us" },
+      { label: "Our Team", href: "/about-us#team" },
+    ],
   },
-  {
-    label: "The Team",
-    href: "",
+  Impact: {
+    badge: "Our Impact",
+    description: "See how we're making a difference in children's lives.",
+    items: [
+      { label: "Financial Reports", href: "/report" },
+      { label: "Success Stories", href: "/impact" },
+      { label: "Transparency", href: "/transparency" },
+    ],
   },
-];
-
-const impactNavItems = [
-  {
-    label: "Financials",
-    href: "",
-  },
-];
+};
 
 const navItems = [
   { label: "Home", href: "/" },
-  { label: "About Us", href: "/about-us", content: aboutUsNavItems },
-  { label: "Impact", href: "/impact", content: impactNavItems },
+  { label: "About Us", href: "/about-us", hasDropdown: true },
+  { label: "Impact", href: "/impact", hasDropdown: true },
   { label: "Report", href: "/report" },
   { label: "Volunteer", href: "/volunteer" },
   { label: "Contact", href: "/contact" },
 ];
 
-export function TopNav() {
+export function TopNav({
+  menuStyle,
+  donateStyle,
+}: {
+  menuStyle?: string;
+  donateStyle?: string;
+}) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
+
+  const toggleDropdown = (itemLabel: string) => {
+    setActiveDropdown(activeDropdown === itemLabel ? null : itemLabel);
+  };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -74,6 +88,26 @@ export function TopNav() {
     };
   }, [isMobileMenuOpen]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (activeDropdown) {
+        const target = event.target as Element;
+        if (!target.closest("[data-dropdown]")) {
+          setActiveDropdown(null);
+        }
+      }
+    };
+
+    if (activeDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [activeDropdown]);
+
   // Close menu on escape key
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -103,62 +137,118 @@ export function TopNav() {
           height={50}
         />
 
-        <div className="col-span-2 flex flex-row items-center justify-between rounded-full bg-main-red/70 backdrop-blur-lg py-4 px-12 w-full">
-          {navItems.map((item) => (
-            <div
-              key={item.label}
-              className="relative"
-              onMouseEnter={() => item.content && setActiveDropdown(item.label)}
-              onMouseLeave={() => setActiveDropdown(null)}
-            >
-              <Link href={item.href}>
-                <div
-                  className={cn(
-                    pathname === item.href
-                      ? "text-main-blue font-semibold"
-                      : "text-white/90",
-                    "hover:text-white/50 flex flex-col items-center transition-colors duration-200 transition-all ease-in-out"
-                  )}
-                >
-                  <div className="flex flex-row gap-1 items-center">
-                    <span className="text-sm font-medium">{item.label}</span>
-                    {item?.content && <ChevronDown size={18} />}
+        <div className="relative col-span-2">
+          <div
+            className={cn(
+              menuStyle ? menuStyle : "bg-main-red/70 backdrop-blur-lg",
+              "flex flex-row items-center justify-between rounded-full py-4 px-12 w-full"
+            )}
+          >
+            {navItems.map((item) => (
+              <div key={item.label} className="relative" data-dropdown>
+                {item.hasDropdown ? (
+                  <button
+                    onClick={() => toggleDropdown(item.label)}
+                    className={cn(
+                      pathname === item.href
+                        ? "text-main-blue font-semibold"
+                        : "text-white/90",
+                      "hover:text-white/50 flex flex-col items-center transition-colors duration-200 transition-all ease-in-out cursor-pointer"
+                    )}
+                  >
+                    <div className="flex flex-row gap-1 items-center">
+                      <span className="text-sm font-medium">{item.label}</span>
+                      <ChevronDown
+                        size={18}
+                        className={cn(
+                          "transition-transform duration-200",
+                          activeDropdown === item.label && "rotate-180"
+                        )}
+                      />
+                    </div>
+                  </button>
+                ) : (
+                  <Link href={item.href}>
+                    <div
+                      className={cn(
+                        pathname === item.href
+                          ? "text-main-blue font-semibold"
+                          : "text-white/90",
+                        "hover:text-white/50 flex flex-col items-center transition-colors duration-200 transition-all ease-in-out"
+                      )}
+                    >
+                      <span className="text-sm font-medium">{item.label}</span>
+                    </div>
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Dynamic Dropdown Panel */}
+          {activeDropdown &&
+            dropdownConfig[activeDropdown as keyof typeof dropdownConfig] && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className={cn(
+                  menuStyle ? menuStyle : "bg-main-red/70",
+                  "absolute top-12 w-full rounded-2xl  mt-4 mb-6 z-40"
+                )}
+              >
+                <div className="pt-3 pb-5 px-5">
+                  <div className="grid grid-cols-2 gap-4 mt-4 divide-x-1 divide-white/20">
+                    <div className="space-y-2">
+                      <Badge className="bg-main-blue border-main-blue">
+                        {
+                          dropdownConfig[
+                            activeDropdown as keyof typeof dropdownConfig
+                          ].badge
+                        }
+                      </Badge>
+
+                      <p className="text-white">
+                        {
+                          dropdownConfig[
+                            activeDropdown as keyof typeof dropdownConfig
+                          ].description
+                        }
+                      </p>
+                    </div>
+                    <div className="w-full">
+                      {dropdownConfig[
+                        activeDropdown as keyof typeof dropdownConfig
+                      ].items.map((item) => (
+                        <div
+                          key={item.label}
+                          className="cursor-pointer p-2 w-full hover:bg-main-blue transition-colors duration-200 rounded-sm"
+                        >
+                          <Link
+                            href={item.href}
+                            className="w-full text-white/90 hover:text-white"
+                          >
+                            {item.label}
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </Link>
-
-              {/* Dropdown Content */}
-              {item.content && activeDropdown === item.label && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute top-[100%] left-1/2 transform translate-y-1/4 -translate-x-1/2 bg-main-red/70 backdrop-blur-lg rounded-b-2xl border-0 shadow-lg z-50 min-w-full"
-                >
-                  <ul className="p-4 space-y-2">
-                    {item.content.map((subItem, index) => (
-                      <li key={index}>
-                        <Link
-                          href={subItem.href || "#"}
-                          className="block px-3 py-2 text-white/90 hover:text-white hover:bg-white/10 rounded-md transition-colors duration-200"
-                        >
-                          <span className="text-sm font-medium">
-                            {subItem.label}
-                          </span>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              )}
-            </div>
-          ))}
+              </motion.div>
+            )}
         </div>
 
         <div className="ml-auto">
           <button
             onClick={() => router.push("/donate")}
-            className="cursor-pointer rounded-full bg-main-red/70 py-3 px-8 text-white hover:bg-main-blue transition-colors duration-200"
+            className={cn(
+              donateStyle ? donateStyle : "bg-main-red/70",
+              pathname === "/donate"
+                ? "bg-main-blue hover:bg-main-red"
+                : "hover:bg-main-blue",
+              "cursor-pointer rounded-full py-3 px-8 text-white  transition-colors duration-200"
+            )}
           >
             Donate
           </button>
@@ -173,24 +263,32 @@ export function TopNav() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 rounded-full bg-main-red/70 backdrop-blur-lg py-3 px-6">
               {navItems.slice(0, 4).map((item) => (
-                <div
-                  key={item.label}
-                  className="relative"
-                  onMouseEnter={() =>
-                    item.content && setActiveDropdown(item.label)
-                  }
-                  onMouseLeave={() => setActiveDropdown(null)}
-                >
-                  <Link
-                    href={item.href}
-                    className="flex flex-row items-center gap-1 text-white/90 hover:text-white/50 transition-colors duration-200"
-                  >
-                    <span className="text-xs font-medium">{item.label}</span>
-                    {item?.content && <ChevronDown size={15} />}
-                  </Link>
+                <div key={item.label} className="relative" data-dropdown>
+                  {item.hasDropdown ? (
+                    <button
+                      onClick={() => toggleDropdown(item.label)}
+                      className="flex flex-row items-center gap-1 text-white/90 hover:text-white/50 transition-colors duration-200 cursor-pointer"
+                    >
+                      <span className="text-xs font-medium">{item.label}</span>
+                      <ChevronDown
+                        size={15}
+                        className={cn(
+                          "transition-transform duration-200",
+                          activeDropdown === item.label && "rotate-180"
+                        )}
+                      />
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className="flex flex-row items-center gap-1 text-white/90 hover:text-white/50 transition-colors duration-200"
+                    >
+                      <span className="text-xs font-medium">{item.label}</span>
+                    </Link>
+                  )}
 
-                  {/* Dropdown Content for Tablet */}
-                  {item.content && activeDropdown === item.label && (
+                  {/* Dynamic Dropdown Content for Tablet */}
+                  {item.hasDropdown && activeDropdown === item.label && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -198,7 +296,9 @@ export function TopNav() {
                       className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-main-red/70 backdrop-blur-lg rounded-b-2xl border-0 shadow-lg z-50 min-w-[180px]"
                     >
                       <ul className="p-3 space-y-1">
-                        {item.content.map((subItem, index) => (
+                        {dropdownConfig[
+                          item.label as keyof typeof dropdownConfig
+                        ]?.items.map((subItem, index) => (
                           <li key={index}>
                             <Link
                               href={subItem.href || "#"}
@@ -291,24 +391,43 @@ export function TopNav() {
 
             <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
               {navItems.map((item) => (
-                <div key={item.label}>
-                  <Link
-                    href={item.href}
-                    onClick={closeMobileMenu}
-                    className="block py-2 sm:py-3 px-3 sm:px-4 text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200 active:bg-gray-200"
-                  >
-                    <div className="flex items-center justify-between">
+                <div key={item.label} data-dropdown>
+                  {item.hasDropdown ? (
+                    <button
+                      onClick={() => toggleDropdown(item.label)}
+                      className="block py-2 sm:py-3 px-3 sm:px-4 text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200 active:bg-gray-200 w-full text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm sm:text-base font-medium">
+                          {item.label}
+                        </span>
+                        <ChevronDown
+                          size={16}
+                          className={cn(
+                            "transition-transform duration-200",
+                            activeDropdown === item.label && "rotate-180"
+                          )}
+                        />
+                      </div>
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      onClick={closeMobileMenu}
+                      className="block py-2 sm:py-3 px-3 sm:px-4 text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200 active:bg-gray-200"
+                    >
                       <span className="text-sm sm:text-base font-medium">
                         {item.label}
                       </span>
-                      {item?.content && <ChevronDown size={16} />}
-                    </div>
-                  </Link>
+                    </Link>
+                  )}
 
-                  {/* Mobile Dropdown Content */}
-                  {item.content && (
+                  {/* Dynamic Mobile Dropdown Content */}
+                  {item.hasDropdown && (
                     <div className="ml-4 space-y-1">
-                      {item.content.map((subItem, index) => (
+                      {dropdownConfig[
+                        item.label as keyof typeof dropdownConfig
+                      ]?.items.map((subItem, index) => (
                         <Link
                           key={index}
                           href={subItem.href || "#"}

@@ -45,8 +45,8 @@ const orphanageItems = [
 ];
 
 export function FloatingNav() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const pathname = usePathname();
   const [user] = useAtom(userAtom);
   const [isAuthenticated] = useAtom(isAuthenticatedAtom);
@@ -220,7 +220,9 @@ export function FloatingNav() {
             <AnimatePresence>
               {isExpanded && (
                 <motion.div
-                  className="absolute right-0 top-16 w-48 rounded-lg border border-white/20 bg-white/10 backdrop-blur-sm p-2 shadow-xl"
+                  className={
+                    "absolute right-0 top-16 w-48 rounded-lg border border-white/20 bg-white/10 backdrop-blur-sm p-2 shadow-xl"
+                  }
                   initial={{ scale: 0.95, opacity: 0, y: -10 }}
                   animate={{ scale: 1, opacity: 1, y: 0 }}
                   exit={{ scale: 0.95, opacity: 0, y: -10 }}

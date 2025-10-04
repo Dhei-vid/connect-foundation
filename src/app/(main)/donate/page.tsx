@@ -1,20 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Heart,
-  DollarSign,
   Users,
   Shield,
-  CreditCard,
-  Building2,
   CheckCircle,
   Clock,
-  ArrowRight,
   ArrowDown,
+  Loader2,
 } from "lucide-react";
 import { TopNav } from "@/components/navigation/top-nav";
 import ImpactCard from "@/components/general/impact-card";
@@ -22,7 +19,15 @@ import FAQ from "@/components/general/faq";
 import { impactInfo, faqData } from "@/common/data";
 import MasonryGrid from "@/components/general/masonry-grid";
 
+import { useToast } from "@/hooks/use-toast";
+import {
+  initializeTransaction,
+  generateReference,
+} from "@/payment/transaction";
+import { createDonation } from "@/firebase/donations";
+
 export default function Page() {
+  const { toast } = useToast();
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState("");
   const [donorInfo, setDonorInfo] = useState({
@@ -31,26 +36,169 @@ export default function Page() {
     email: "",
     phone: "",
   });
-  const [paymentMethod, setPaymentMethod] = useState("card");
-  const [isRecurring, setIsRecurring] = useState(false);
-  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [isRecurring, setIsRecurring] = useState<boolean>(false);
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
+  const [isPending, startTransition] = useTransition();
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [showSuccess, setShowSuccess] = useState<boolean>(false);
 
+  // Selecting Amount
   const handleAmountSelect = (amount: number) => {
     setSelectedAmount(amount);
     setCustomAmount("");
+    // Clear amount error when user selects
+    if (formErrors.amount) {
+      setFormErrors((prev) => ({ ...prev, amount: "" }));
+    }
   };
 
+  // Custom amount selection
   const handleCustomAmountChange = (value: string) => {
     setCustomAmount(value);
     setSelectedAmount(null);
+    // Clear amount error when user types
+    if (formErrors.amount) {
+      setFormErrors((prev) => ({ ...prev, amount: "" }));
+    }
+  };
+
+  // Form validation
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+
+    if (!donorInfo.firstName.trim()) {
+      errors.firstName = "First name is required";
+    }
+
+    if (!donorInfo.lastName.trim()) {
+      errors.lastName = "Last name is required";
+    }
+
+    if (!donorInfo.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(donorInfo.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+
+    const amount = selectedAmount || parseFloat(customAmount) || 0;
+    if (amount <= 0) {
+      errors.amount = "Please select or enter a valid donation amount";
+    } else if (amount < 100) {
+      errors.amount = "Minimum donation amount is ₦100";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Initialize payment using Paystack transaction directly
+  const handlePayment = async () => {
+    // Validate form first
+    if (!validateForm()) {
+      toast({
+        title: "Please fix the errors below",
+        description: "Some required fields are missing or invalid.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const amount = selectedAmount || parseFloat(customAmount) || 0;
+    console.log("Starting payment process with amount:", amount);
+    setIsProcessing(true);
+
+    try {
+      // Convert amount to kobo (Paystack expects amount in kobo)
+      const amountInKobo = Math.round(amount * 100);
+      console.log("Amount conversion:", { naira: amount, kobo: amountInKobo });
+
+      // Generate unique reference
+      const reference = await generateReference();
+      console.log("Generated reference:", reference);
+
+      // Create pending donation record
+      const donationData = {
+        donorName: `${donorInfo.firstName} ${donorInfo.lastName}`,
+        donorEmail: donorInfo.email,
+        donorPhone: donorInfo.phone || "",
+        amount: amount,
+        currency: "NGN",
+        message: `Donation from ${donorInfo.firstName} ${donorInfo.lastName}`,
+        anonymous: isAnonymous,
+        isRecurring,
+        status: "pending" as const,
+        transactionReference: reference,
+      };
+
+      console.log("Creating donation record:", donationData);
+      const donationId = await createDonation(donationData);
+
+      // Initialize payment with Paystack
+      const paystackParams = {
+        email: donorInfo.email,
+        amount: amountInKobo.toString(),
+        currency: "NGN",
+        reference: reference,
+        metadata: {
+          donationId,
+          donorName: `${donorInfo.firstName} ${donorInfo.lastName}`,
+          isRecurring,
+          isAnonymous,
+        },
+        callback_url: `${
+          process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000"
+        }/payment/callback`,
+      };
+
+      // Check if environment variables are properly set
+      if (!process.env.NEXT_PUBLIC_PAYSTACK_SECRET_KEY) {
+        throw new Error(
+          "Payment service is not configured. Please check your environment variables. See ENVIRONMENT_SETUP.md for details."
+        );
+      }
+
+      const paystackResponse = await initializeTransaction(paystackParams);
+      console.log("Paystack response:", paystackResponse);
+
+      if (paystackResponse.status && paystackResponse.data) {
+        // Show success message
+        setShowSuccess(true);
+        toast({
+          title: "Payment Initialized",
+          description: "Redirecting to payment page...",
+        });
+
+        // Small delay to show the success message, then redirect
+        setTimeout(() => {
+          window.location.href = paystackResponse.data.authorization_url;
+        }, 2000);
+      } else {
+        throw new Error(
+          paystackResponse.message || "Payment initialization failed"
+        );
+      }
+    } catch (error) {
+      console.error("Payment initialization error:", error);
+      toast({
+        title: "Payment Failed",
+        description:
+          error instanceof Error
+            ? error.message
+            : "There was an error initializing the payment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
     <div className="min-h-screen">
-      <TopNav />
+      <TopNav menuStyle="bg-main-red" donateStyle="bg-main-red" />
 
       {/* Hero section */}
-      <div className="p-4 2xl:p-10">
+      <div className="px-4 2xl:px-10">
         <div
           className={
             "overflow-hidden relative bg-cover bg-no-repeat bg-center h-[40rem] lg:h-[34rem] 2xl:h-[55rem] 3xl:h-[60rem] p-6 2xl:p-8 3xl:p-12 rounded-[3rem] bg-[url('https://images.pexels.com/photos/5789276/pexels-photo-5789276.jpeg')]"
@@ -80,10 +228,10 @@ export default function Page() {
               <div className={"justify-self-end col-span-1"}>
                 <button
                   className={
-                    "ease-in-out transition-all duration-200 group cursor-pointer text-white/70 rounded-full p-3 px-5 bg-main-red/70 hover:bg-main-red/90 flex flex-row items-center gap-1 2xl:gap-3"
+                    "ease-in-out transition-all duration-200 group cursor-pointer text-white rounded-full p-3 px-5 bg-main-red hover:bg-main-red/90 flex flex-row items-center gap-1 2xl:gap-3"
                   }
                 >
-                  <p className={"font-semibold 2xl:text-4xl"}>Start Donating</p>
+                  <p className={"font-semibold 2xl:text-3xl"}>Start Donating</p>
                   <div
                     className={
                       "group-hover:bg-white/10 bg-white/7 p-2 rounded-full"
@@ -98,16 +246,17 @@ export default function Page() {
         </div>
       </div>
 
-      {/* Fund, Fast As Flash Section */}
+      {/* Support Orphanages Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">
           <div className="mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              Fund, Fast As Flash
+              Support Orphanages, Transform Lives
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-4xl">
-              Fundraise at the speed of thought! Elevate your cause in just a
-              minute with our lightning-fast fundraising platform.
+              Make a lasting impact on children&apos;s lives! Support orphanages
+              with essential resources, education, and care through our secure
+              donation platform.
             </p>
           </div>
 
@@ -119,21 +268,22 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Urgent Fundraising Section */}
+      {/* Urgent Orphanage Support Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-800">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              Urgent Fundraising!
+              Urgent Orphanage Support!
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto">
-              Time is of the essence! Join our mission NOW to make an immediate
-              impact. Every second counts!
+              Children in orphanages need your help NOW! Join our mission to
+              provide immediate support and care. Every donation makes a
+              difference!
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* GreenFund Campaign */}
+            {/* Education Support Campaign */}
             <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
               <div className="h-48 bg-gradient-to-br from-green-400 to-green-600 relative">
                 <div className="absolute inset-0 bg-black/20" />
@@ -142,7 +292,7 @@ export default function Page() {
                     <div className="flex items-center space-x-2 text-green-800">
                       <Users className="w-4 h-4" />
                       <span className="text-sm font-medium">
-                        Environmental Action
+                        Education Support
                       </span>
                     </div>
                   </div>
@@ -150,12 +300,12 @@ export default function Page() {
               </div>
               <CardContent className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  GreenFund: Sustain Earth Now
+                  Education Fund: School Supplies
                 </h3>
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between items-center">
                     <span className="text-2xl font-bold text-green-600">
-                      $50,240.210
+                      ₦2,500,000
                     </span>
                     <span className="text-sm text-gray-500">raised</span>
                   </div>
@@ -167,12 +317,12 @@ export default function Page() {
                   </div>
                 </div>
                 <Button className="w-full bg-green-600 hover:bg-green-700">
-                  Donate Now
+                  Support Now
                 </Button>
               </CardContent>
             </Card>
 
-            {/* SeniorHealth Campaign */}
+            {/* Healthcare Support Campaign */}
             <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
               <div className="h-48 bg-gradient-to-br from-blue-400 to-blue-600 relative">
                 <div className="absolute inset-0 bg-black/20" />
@@ -187,12 +337,12 @@ export default function Page() {
               </div>
               <CardContent className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  SeniorHealth: Support Campaign
+                  Health Fund: Medical Care
                 </h3>
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between items-center">
                     <span className="text-2xl font-bold text-blue-600">
-                      $4,240.310
+                      ₦1,200,000
                     </span>
                     <span className="text-sm text-gray-500">raised</span>
                   </div>
@@ -204,12 +354,12 @@ export default function Page() {
                   </div>
                 </div>
                 <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                  Donate Now
+                  Support Now
                 </Button>
               </CardContent>
             </Card>
 
-            {/* DisasterCare Campaign */}
+            {/* Basic Needs Campaign */}
             <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
               <div className="h-48 bg-gradient-to-br from-purple-400 to-purple-600 relative">
                 <div className="absolute inset-0 bg-black/20" />
@@ -217,21 +367,19 @@ export default function Page() {
                   <div className="bg-white/90 backdrop-blur-sm rounded-lg p-3">
                     <div className="flex items-center space-x-2 text-purple-800">
                       <Shield className="w-4 h-4" />
-                      <span className="text-sm font-medium">
-                        Disaster Relief
-                      </span>
+                      <span className="text-sm font-medium">Basic Needs</span>
                     </div>
                   </div>
                 </div>
               </div>
               <CardContent className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  DisasterCare: Urgent Support
+                  Basic Needs: Food & Shelter
                 </h3>
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between items-center">
                     <span className="text-2xl font-bold text-purple-600">
-                      $2,100.210
+                      ₦800,000
                     </span>
                     <span className="text-sm text-gray-500">raised</span>
                   </div>
@@ -243,7 +391,7 @@ export default function Page() {
                   </div>
                 </div>
                 <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                  Donate Now
+                  Support Now
                 </Button>
               </CardContent>
             </Card>
@@ -251,7 +399,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Your Donation Means A Lot Section */}
+      {/* Impact Stories Section */}
       <section className="py-20 px-4 bg-white dark:bg-gray-900">
         <MasonryGrid />
       </section>
@@ -261,65 +409,72 @@ export default function Page() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Make Your Donation
+              Support Orphanages Today
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300">
-              Support children in need with a secure and transparent donation
-              process
+              Help provide essential care, education, and hope to children in
+              orphanages through our secure and transparent donation platform
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="">
             {/* Donation Form */}
             <Card className="p-8 shadow-xl">
               <CardHeader>
                 <CardTitle className="text-2xl text-gray-900 dark:text-white">
-                  Donation Details
+                  Support Orphanage Children
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Amount Selection */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-                    Select Donation Amount
+                    Choose Your Support Amount
                   </label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                    {[25, 50, 100, 250].map((amount) => (
+                    {[50000, 100000, 200000, 300000].map((amount) => (
                       <Button
                         key={amount}
                         type="button"
                         variant={
                           selectedAmount === amount ? "default" : "outline"
                         }
-                        className={`h-12 ${
+                        className={`h-12 transition-all duration-200 ${
                           selectedAmount === amount
-                            ? "bg-green-600 hover:bg-green-700"
-                            : ""
+                            ? "bg-main-red hover:bg-main-blue text-white"
+                            : "hover:border-main-red hover:text-main-red"
                         }`}
                         onClick={() => handleAmountSelect(amount)}
                       >
-                        ${amount}
+                        ₦{amount.toLocaleString()}
                       </Button>
                     ))}
                   </div>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      $
+                      ₦
                     </span>
                     <Input
                       type="number"
-                      placeholder="Enter custom amount"
+                      placeholder="Enter your support amount"
                       value={customAmount}
                       onChange={(e) => handleCustomAmountChange(e.target.value)}
-                      className="pl-8 h-12 text-lg"
+                      className={`pl-8 h-12 text-lg ${
+                        formErrors.amount ? "border-red-500" : ""
+                      }`}
                     />
+                    {formErrors.amount && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {formErrors.amount}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 {/* Donor Information */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Your Information
+                    Supporter Information
                   </h3>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
@@ -330,15 +485,29 @@ export default function Page() {
                         type="text"
                         placeholder="Your first name"
                         value={donorInfo.firstName}
-                        onChange={(e) =>
+                        onChange={(e) => {
                           setDonorInfo((prev) => ({
                             ...prev,
                             firstName: e.target.value,
-                          }))
-                        }
-                        className="w-full"
+                          }));
+                          // Clear error when user types
+                          if (formErrors.firstName) {
+                            setFormErrors((prev) => ({
+                              ...prev,
+                              firstName: "",
+                            }));
+                          }
+                        }}
+                        className={`w-full ${
+                          formErrors.firstName ? "border-red-500" : ""
+                        }`}
                         required
                       />
+                      {formErrors.firstName && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {formErrors.firstName}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -348,15 +517,29 @@ export default function Page() {
                         type="text"
                         placeholder="Your last name"
                         value={donorInfo.lastName}
-                        onChange={(e) =>
+                        onChange={(e) => {
                           setDonorInfo((prev) => ({
                             ...prev,
                             lastName: e.target.value,
-                          }))
-                        }
-                        className="w-full"
+                          }));
+                          // Clear error when user types
+                          if (formErrors.lastName) {
+                            setFormErrors((prev) => ({
+                              ...prev,
+                              lastName: "",
+                            }));
+                          }
+                        }}
+                        className={`w-full ${
+                          formErrors.lastName ? "border-red-500" : ""
+                        }`}
                         required
                       />
+                      {formErrors.lastName && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {formErrors.lastName}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div>
@@ -367,15 +550,26 @@ export default function Page() {
                       type="email"
                       placeholder="your.email@example.com"
                       value={donorInfo.email}
-                      onChange={(e) =>
+                      onChange={(e) => {
                         setDonorInfo((prev) => ({
                           ...prev,
                           email: e.target.value,
-                        }))
-                      }
-                      className="w-full"
+                        }));
+                        // Clear error when user types
+                        if (formErrors.email) {
+                          setFormErrors((prev) => ({ ...prev, email: "" }));
+                        }
+                      }}
+                      className={`w-full ${
+                        formErrors.email ? "border-red-500" : ""
+                      }`}
                       required
                     />
+                    {formErrors.email && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {formErrors.email}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -399,7 +593,7 @@ export default function Page() {
                 {/* Donation Options */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Donation Options
+                    Support Options
                   </h3>
                   <div className="space-y-3">
                     <label className="flex items-center space-x-3">
@@ -410,7 +604,7 @@ export default function Page() {
                         onChange={(e) => setIsRecurring(e.target.checked)}
                       />
                       <span className="text-sm text-gray-700 dark:text-gray-300">
-                        Make this a recurring monthly donation
+                        Make this a recurring monthly support
                       </span>
                     </label>
                     <label className="flex items-center space-x-3">
@@ -421,7 +615,7 @@ export default function Page() {
                         onChange={(e) => setIsAnonymous(e.target.checked)}
                       />
                       <span className="text-sm text-gray-700 dark:text-gray-300">
-                        Make this donation anonymous
+                        Make this support anonymous
                       </span>
                     </label>
                     <label className="flex items-center space-x-3">
@@ -430,189 +624,49 @@ export default function Page() {
                         className="rounded w-4 h-4 text-green-600"
                       />
                       <span className="text-sm text-gray-700 dark:text-gray-300">
-                        Send me updates about this donation
+                        Send me updates about this support
                       </span>
                     </label>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Payment Information */}
-            <Card className="p-8 shadow-xl">
-              <CardHeader>
-                <CardTitle className="text-2xl text-gray-900 dark:text-white">
-                  Payment Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Payment Method Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-                    Payment Method
-                  </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Button
-                      type="button"
-                      variant={paymentMethod === "card" ? "default" : "outline"}
-                      className={`h-12 ${
-                        paymentMethod === "card"
-                          ? "bg-green-600 hover:bg-green-700"
-                          : ""
-                      }`}
-                      onClick={() => setPaymentMethod("card")}
-                    >
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      Credit Card
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={paymentMethod === "bank" ? "default" : "outline"}
-                      className={`h-12 ${
-                        paymentMethod === "bank"
-                          ? "bg-green-600 hover:bg-green-700"
-                          : ""
-                      }`}
-                      onClick={() => setPaymentMethod("bank")}
-                    >
-                      <Building2 className="w-4 h-4 mr-2" />
-                      Bank Transfer
-                    </Button>
-                  </div>
-                </div>
-
-                {paymentMethod === "card" ? (
-                  /* Credit Card Form */
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Card Number *
-                      </label>
-                      <Input
-                        type="text"
-                        placeholder="1234 5678 9012 3456"
-                        className="w-full"
-                        maxLength={19}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Expiry Date *
-                        </label>
-                        <Input
-                          type="text"
-                          placeholder="MM/YY"
-                          className="w-full"
-                          maxLength={5}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          CVV *
-                        </label>
-                        <Input
-                          type="text"
-                          placeholder="123"
-                          className="w-full"
-                          maxLength={4}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Cardholder Name *
-                      </label>
-                      <Input
-                        type="text"
-                        placeholder="John Doe"
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  /* Bank Transfer Form */
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Bank Name *
-                      </label>
-                      <Input
-                        type="text"
-                        placeholder="Enter bank name"
-                        className="w-full"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Account Number *
-                      </label>
-                      <Input
-                        type="text"
-                        placeholder="Enter account number"
-                        className="w-full"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Routing Number *
-                      </label>
-                      <Input
-                        type="text"
-                        placeholder="Enter routing number"
-                        className="w-full"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Account Holder Name *
-                      </label>
-                      <Input
-                        type="text"
-                        placeholder="Account holder name"
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Security Features */}
-                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Shield className="w-5 h-5 text-green-600" />
-                    <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                      Secure Payment
-                    </span>
-                  </div>
-                  <p className="text-xs text-green-700 dark:text-green-300">
-                    Your payment information is encrypted and secure. We never
-                    store your card details.
-                  </p>
-                </div>
-
-                {/* Tax Deduction Info */}
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <CheckCircle className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                      Tax Deductible
-                    </span>
-                  </div>
-                  <p className="text-xs text-blue-700 dark:text-blue-300">
-                    Your donation is tax-deductible. You&apos;ll receive a
-                    receipt for your records.
-                  </p>
-                </div>
 
                 {/* Submit Button */}
                 <Button
-                  type="submit"
-                  className="w-full h-12 text-lg bg-green-600 hover:bg-green-700"
+                  type="button"
+                  className="w-full h-12 text-lg bg-main-red hover:bg-main-blue transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   size="lg"
+                  disabled={isProcessing}
+                  onClick={handlePayment}
                 >
-                  <DollarSign className="w-5 h-5 mr-2" />
-                  Complete Donation
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Processing payment...
+                    </>
+                  ) : (
+                    "Support Orphanages"
+                  )}
                 </Button>
+
+                <div>
+                  <p className={"text-xs font-light"}>
+                    Powered by{" "}
+                    <span className={"text-main-blue font-bold"}>Paystack</span>
+                  </p>
+                </div>
+
+                {/* Success Message */}
+                {showSuccess && (
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center">
+                      <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
+                      <p className="text-green-800 font-medium">
+                        Support initialized successfully! You will be redirected
+                        to complete your payment.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

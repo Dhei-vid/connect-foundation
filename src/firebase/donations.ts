@@ -75,7 +75,9 @@ export async function deleteDonation(donationId: string): Promise<void> {
   }
 }
 
-export async function getDonation(donationId: string): Promise<Donation | null> {
+export async function getDonation(
+  donationId: string
+): Promise<Donation | null> {
   try {
     const docRef = doc(db, "donations", donationId);
     const docSnap = await getDoc(docRef);
@@ -126,7 +128,7 @@ export async function getDonations(filters?: {
 
     // Handle targetIssueId filtering - only add if it's a single string to avoid index issues
     if (filters?.targetIssueId) {
-      if (typeof filters.targetIssueId === 'string') {
+      if (typeof filters.targetIssueId === "string") {
         constraints.push(where("targetIssueId", "==", filters.targetIssueId));
       }
       // For arrays, we'll filter client-side
@@ -156,17 +158,23 @@ export async function getDonations(filters?: {
 
     // Apply client-side filtering for arrays of targetIssueId
     if (filters?.targetIssueId && Array.isArray(filters.targetIssueId)) {
-      donations = donations.filter(donation => 
-        donation.targetIssueId && filters.targetIssueId!.includes(donation.targetIssueId)
+      donations = donations.filter(
+        (donation) =>
+          donation.targetIssueId &&
+          filters.targetIssueId!.includes(donation.targetIssueId)
       );
     }
 
     // Apply client-side date filtering if provided
     if (filters?.startDate) {
-      donations = donations.filter(donation => donation.createdAt >= filters.startDate!);
+      donations = donations.filter(
+        (donation) => donation.createdAt >= filters.startDate!
+      );
     }
     if (filters?.endDate) {
-      donations = donations.filter(donation => donation.createdAt <= filters.endDate!);
+      donations = donations.filter(
+        (donation) => donation.createdAt <= filters.endDate!
+      );
     }
 
     // Sort by creation date if we filtered by targetIssueId
@@ -193,23 +201,34 @@ export async function getFailedDonations(): Promise<Donation[]> {
   return getDonations({ status: "failed" });
 }
 
-export async function getDonationsByDonor(donorId: string): Promise<Donation[]> {
+export async function getDonationsByDonor(
+  donorId: string
+): Promise<Donation[]> {
   return getDonations({ donorId });
 }
 
-export async function getDonationsByEmail(donorEmail: string): Promise<Donation[]> {
+export async function getDonationsByEmail(
+  donorEmail: string
+): Promise<Donation[]> {
   return getDonations({ donorEmail });
 }
 
-export async function getDonationsByIssue(issueId: string): Promise<Donation[]> {
+export async function getDonationsByIssue(
+  issueId: string
+): Promise<Donation[]> {
   return getDonations({ targetIssueId: issueId });
 }
 
-export async function getDonationsByDateRange(startDate: Date, endDate: Date): Promise<Donation[]> {
+export async function getDonationsByDateRange(
+  startDate: Date,
+  endDate: Date
+): Promise<Donation[]> {
   return getDonations({ startDate, endDate });
 }
 
-export async function getRecentDonations(limitCount: number = 10): Promise<Donation[]> {
+export async function getRecentDonations(
+  limitCount: number = 10
+): Promise<Donation[]> {
   return getDonations({ limitCount });
 }
 
@@ -235,21 +254,32 @@ export async function getDonationStats(filters?: {
 }> {
   try {
     const donations = await getDonations(filters);
-    
-    const completedDonations = donations.filter(d => d.status === "completed");
-    const pendingDonations = donations.filter(d => d.status === "pending");
-    const failedDonations = donations.filter(d => d.status === "failed");
-    const anonymousDonations = donations.filter(d => d.anonymous);
-    const targetedDonations = donations.filter(d => d.targetIssueId);
-    const generalDonations = donations.filter(d => !d.targetIssueId);
 
-    const totalAmount = donations.reduce((sum, donation) => sum + donation.amount, 0);
-    const completedAmount = completedDonations.reduce((sum, donation) => sum + donation.amount, 0);
+    const completedDonations = donations.filter(
+      (d) => d.status === "completed"
+    );
+    const pendingDonations = donations.filter((d) => d.status === "pending");
+    const failedDonations = donations.filter((d) => d.status === "failed");
+    const anonymousDonations = donations.filter((d) => d.anonymous);
+    const targetedDonations = donations.filter((d) => d.targetIssueId);
+    const generalDonations = donations.filter((d) => !d.targetIssueId);
+
+    const totalAmount = donations.reduce(
+      (sum, donation) => sum + donation.amount,
+      0
+    );
+    const completedAmount = completedDonations.reduce(
+      (sum, donation) => sum + donation.amount,
+      0
+    );
 
     return {
       totalDonations: donations.length,
       totalAmount: completedAmount,
-      averageAmount: completedDonations.length > 0 ? completedAmount / completedDonations.length : 0,
+      averageAmount:
+        completedDonations.length > 0
+          ? completedAmount / completedDonations.length
+          : 0,
       completedDonations: completedDonations.length,
       pendingDonations: pendingDonations.length,
       failedDonations: failedDonations.length,
@@ -263,7 +293,9 @@ export async function getDonationStats(filters?: {
   }
 }
 
-export async function getDonationStatsByTimeframe(timeframe: "day" | "week" | "month" | "year"): Promise<{
+export async function getDonationStatsByTimeframe(
+  timeframe: "day" | "week" | "month" | "year"
+): Promise<{
   donations: Donation[];
   totalAmount: number;
   count: number;
@@ -290,8 +322,13 @@ export async function getDonationStatsByTimeframe(timeframe: "day" | "week" | "m
     }
 
     const donations = await getDonationsByDateRange(startDate, now);
-    const completedDonations = donations.filter(d => d.status === "completed");
-    const totalAmount = completedDonations.reduce((sum, donation) => sum + donation.amount, 0);
+    const completedDonations = donations.filter(
+      (d) => d.status === "completed"
+    );
+    const totalAmount = completedDonations.reduce(
+      (sum, donation) => sum + donation.amount,
+      0
+    );
 
     return {
       donations: completedDonations,
@@ -304,25 +341,30 @@ export async function getDonationStatsByTimeframe(timeframe: "day" | "week" | "m
   }
 }
 
-export async function getTopDonors(limitCount: number = 10): Promise<Array<{
-  donorEmail: string;
-  donorName: string;
-  totalAmount: number;
-  donationCount: number;
-  lastDonationDate: Date;
-}>> {
+export async function getTopDonors(limitCount: number = 10): Promise<
+  Array<{
+    donorEmail: string;
+    donorName: string;
+    totalAmount: number;
+    donationCount: number;
+    lastDonationDate: Date;
+  }>
+> {
   try {
     const completedDonations = await getCompletedDonations();
-    
-    const donorMap = new Map<string, {
-      donorEmail: string;
-      donorName: string;
-      totalAmount: number;
-      donationCount: number;
-      lastDonationDate: Date;
-    }>();
 
-    completedDonations.forEach(donation => {
+    const donorMap = new Map<
+      string,
+      {
+        donorEmail: string;
+        donorName: string;
+        totalAmount: number;
+        donationCount: number;
+        lastDonationDate: Date;
+      }
+    >();
+
+    completedDonations.forEach((donation) => {
       const key = donation.donorEmail;
       if (!donorMap.has(key)) {
         donorMap.set(key, {
@@ -358,11 +400,13 @@ export async function getTopDonors(limitCount: number = 10): Promise<Array<{
 export async function searchDonations(searchTerm: string): Promise<Donation[]> {
   try {
     const allDonations = await getDonations();
-    
-    return allDonations.filter(donation =>
-      donation.donorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      donation.donorEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (donation.message && donation.message.toLowerCase().includes(searchTerm.toLowerCase()))
+
+    return allDonations.filter(
+      (donation) =>
+        donation.donorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        donation.donorEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (donation.message &&
+          donation.message.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   } catch (error) {
     console.error("Error searching donations:", error);
@@ -370,12 +414,15 @@ export async function searchDonations(searchTerm: string): Promise<Donation[]> {
   }
 }
 
-export async function getDonationsByAmountRange(minAmount: number, maxAmount: number): Promise<Donation[]> {
+export async function getDonationsByAmountRange(
+  minAmount: number,
+  maxAmount: number
+): Promise<Donation[]> {
   try {
     const allDonations = await getDonations();
-    
-    return allDonations.filter(donation =>
-      donation.amount >= minAmount && donation.amount <= maxAmount
+
+    return allDonations.filter(
+      (donation) => donation.amount >= minAmount && donation.amount <= maxAmount
     );
   } catch (error) {
     console.error("Error getting donations by amount range:", error);
@@ -392,7 +439,9 @@ export async function updateMultipleDonationStatus(
   status: Donation["status"]
 ): Promise<void> {
   try {
-    const updatePromises = donationIds.map(id => updateDonationStatus(id, status));
+    const updatePromises = donationIds.map((id) =>
+      updateDonationStatus(id, status)
+    );
     await Promise.all(updatePromises);
   } catch (error) {
     console.error("Error updating multiple donation statuses:", error);
@@ -400,9 +449,11 @@ export async function updateMultipleDonationStatus(
   }
 }
 
-export async function deleteMultipleDonations(donationIds: string[]): Promise<void> {
+export async function deleteMultipleDonations(
+  donationIds: string[]
+): Promise<void> {
   try {
-    const deletePromises = donationIds.map(id => deleteDonation(id));
+    const deletePromises = donationIds.map((id) => deleteDonation(id));
     await Promise.all(deletePromises);
   } catch (error) {
     console.error("Error deleting multiple donations:", error);
