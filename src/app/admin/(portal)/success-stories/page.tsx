@@ -1,17 +1,23 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
+  Heart,
   Search,
+  Plus,
   Eye,
+  Edit,
+  Trash2,
   Building2,
   Users,
   DollarSign,
+  Calendar,
   Image as ImageIcon,
   CheckCircle,
   XCircle,
   Filter,
-  Target,
+  ArrowRight,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,15 +26,25 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SelectField } from "@/components/ui/form-field";
 import { SelectItem } from "@/components/ui/select";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import {
+  getSuccessStories,
+  getSuccessStoriesByOrphanage,
+  getSuccessStoryStats,
+  deleteSuccessStory,
+} from "@/firebase/success-stories";
 import { getOrphanages } from "@/firebase/orphanages";
 import { getIssues } from "@/firebase/issues";
 import { toast } from "sonner";
 import { formatFirebaseDate } from "@/lib/date-utils";
-import type { Orphanage, Issue } from "@/common/types";
+import type { SuccessStory, Orphanage, Issue } from "@/common/types";
+import LoadingSpinner from "@/components/general/spinner";
 
 export default function SuccessStoriesPage() {
-  const [successStories, setSuccessStories] = useState<Issue[]>([]);
+  const router = useRouter();
+  const [successStories, setSuccessStories] = useState<SuccessStory[]>([]);
   const [orphanages, setOrphanages] = useState<Orphanage[]>([]);
+  const [issues, setIssues] = useState<Issue[]>([]);
   const [stats, setStats] = useState({
     total: 0,
     totalBeneficiaries: 0,
@@ -38,7 +54,7 @@ export default function SuccessStoriesPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterOrphanage, setFilterOrphanage] = useState("all");
-  const [selectedStory, setSelectedStory] = useState<Issue | null>(null);
+  const [selectedStory, setSelectedStory] = useState<SuccessStory | null>(null);
   const [viewMode, setViewMode] = useState<"all" | "by-orphanage">("all");
 
   useEffect(() => {
@@ -48,37 +64,17 @@ export default function SuccessStoriesPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [issuesData, orphanagesData] = await Promise.all([
-        getIssues({ status: "resolved" }),
-        getOrphanages(),
-      ]);
-      
-      // Filter issues that have been fully funded (raisedAmount >= estimatedCost)
-      const fullyFundedIssues = issuesData.filter(issue => issue.raisedAmount >= issue.estimatedCost);
-      
-      setSuccessStories(fullyFundedIssues);
+      const [storiesData, orphanagesData, issuesData, statsData] =
+        await Promise.all([
+          getSuccessStories(),
+          getOrphanages(),
+          getIssues(),
+          getSuccessStoryStats(),
+        ]);
+      setSuccessStories(storiesData);
       setOrphanages(orphanagesData);
-      
-      // Calculate stats
-      const totalBeneficiaries = fullyFundedIssues.reduce((sum, issue) => {
-        // Estimate beneficiaries based on orphanage children count
-        const orphanage = orphanagesData.find(o => o.id === issue.orphanageId);
-        return sum + (orphanage?.childrenCount || 0);
-      }, 0);
-      
-      const totalCost = fullyFundedIssues.reduce((sum, issue) => sum + issue.raisedAmount, 0);
-      
-      const byOrphanage = fullyFundedIssues.reduce((acc, issue) => {
-        acc[issue.orphanageId] = (acc[issue.orphanageId] || 0) + 1;
-        return acc;
-      }, {} as { [orphanageId: string]: number });
-      
-      setStats({
-        total: fullyFundedIssues.length,
-        totalBeneficiaries,
-        totalCost,
-        byOrphanage,
-      });
+      setIssues(issuesData);
+      setStats(statsData);
     } catch (error) {
       console.error("Error loading data:", error);
       toast.error("Failed to load success stories");
@@ -87,15 +83,24 @@ export default function SuccessStoriesPage() {
     }
   };
 
-  const handleViewStory = (story: Issue) => {
-    setSelectedStory(story);
+  const handleDeleteStory = async (storyId: string) => {
+    try {
+      await deleteSuccessStory(storyId);
+      await loadData();
+      setSelectedStory(null);
+      toast.success("Success story deleted successfully");
+    } catch (error) {
+      console.error("Error deleting success story:", error);
+      toast.error("Failed to delete success story");
+    }
   };
 
   const filteredStories = successStories.filter((story) => {
     const matchesSearch =
       story.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       story.orphanageName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      story.description.toLowerCase().includes(searchTerm.toLowerCase());
+      story.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      story.impact.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesOrphanage =
       filterOrphanage === "all" || story.orphanageId === filterOrphanage;
@@ -108,8 +113,9 @@ export default function SuccessStoriesPage() {
     return orphanage?.name || "Unknown Orphanage";
   };
 
-  const getFundingProgress = (raised: number, estimated: number) => {
-    return Math.round((raised / estimated) * 100);
+  const getIssueTitle = (issueId: string) => {
+    const issue = issues.find((i) => i.id === issueId);
+    return issue?.title || "Unknown Issue";
   };
 
   if (loading) {
@@ -191,12 +197,14 @@ export default function SuccessStoriesPage() {
             Success Stories
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            View fully funded orphanage requests that have been successfully resolved
+            Track and manage success stories from resolved issues
           </p>
         </div>
         <div className="flex gap-2">
           <Button
-            onClick={() => setViewMode(viewMode === "all" ? "by-orphanage" : "all")}
+            onClick={() =>
+              setViewMode(viewMode === "all" ? "by-orphanage" : "all")
+            }
             variant="outline"
           >
             <Filter className="w-4 h-4 mr-2" />
@@ -209,34 +217,37 @@ export default function SuccessStoriesPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Success Stories</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Total Stories</CardTitle>
+            <Heart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-muted-foreground">Fully funded requests</p>
           </CardContent>
         </Card>
 
         <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Children Helped</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Beneficiaries
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalBeneficiaries}</div>
-            <p className="text-xs text-muted-foreground">Estimated beneficiaries</p>
           </CardContent>
         </Card>
 
         <Card className="py-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Raised</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Investment
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${stats.totalCost.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Successfully funded</p>
+            <div className="text-2xl font-bold">
+              ${stats.totalCost.toLocaleString()}
+            </div>
           </CardContent>
         </Card>
 
@@ -246,8 +257,9 @@ export default function SuccessStoriesPage() {
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{Object.keys(stats.byOrphanage).length}</div>
-            <p className="text-xs text-muted-foreground">With success stories</p>
+            <div className="text-2xl font-bold">
+              {Object.keys(stats.byOrphanage).length}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -294,7 +306,7 @@ export default function SuccessStoriesPage() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
                     <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                      <CheckCircle className="w-6 h-6 text-green-600" />
+                      <Heart className="w-6 h-6 text-green-600" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg">{story.title}</h3>
@@ -305,7 +317,7 @@ export default function SuccessStoriesPage() {
                     </div>
                   </div>
                   <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                    Fully Funded
+                    Completed
                   </Badge>
                 </div>
 
@@ -313,32 +325,25 @@ export default function SuccessStoriesPage() {
                   <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                     {story.description}
                   </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                    <strong>Impact:</strong> {story.impact}
+                  </div>
                   <div className="text-sm text-gray-500">
-                    <strong>Category:</strong> {story.category.charAt(0).toUpperCase() + story.category.slice(1)}
-                  </div>
-                </div>
-
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Funding Progress:</span>
-                    <span className="font-medium">{getFundingProgress(story.raisedAmount, story.estimatedCost)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-green-600 h-2 rounded-full" 
-                      style={{ width: `${Math.min(getFundingProgress(story.raisedAmount, story.estimatedCost), 100)}%` }}
-                    ></div>
+                    <strong>Related Issue:</strong>{" "}
+                    {getIssueTitle(story.issueId)}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 text-sm mb-4">
                   <div>
-                    <span className="text-gray-500">Raised:</span>
-                    <div className="font-medium">${story.raisedAmount.toLocaleString()}</div>
+                    <span className="text-gray-500">Beneficiaries:</span>
+                    <div className="font-medium">{story.beneficiaries}</div>
                   </div>
                   <div>
-                    <span className="text-gray-500">Target:</span>
-                    <div className="font-medium">${story.estimatedCost.toLocaleString()}</div>
+                    <span className="text-gray-500">Cost:</span>
+                    <div className="font-medium">
+                      ${story.cost.toLocaleString()}
+                    </div>
                   </div>
                 </div>
 
@@ -347,11 +352,24 @@ export default function SuccessStoriesPage() {
                     size="sm"
                     variant="outline"
                     className="flex-1"
-                    onClick={() => handleViewStory(story)}
+                    onClick={() => setSelectedStory(story)}
                   >
                     <Eye className="w-4 h-4 mr-2" />
                     View Details
                   </Button>
+                  <Button size="sm" variant="outline">
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                  <ConfirmationDialog
+                    title={story.title}
+                    description={`Are you sure you want to delete "${story.title}"? This action cannot be undone.`}
+                    variant="destructive"
+                    onConfirm={() => handleDeleteStory(story.id)}
+                  >
+                    <Button size="sm" variant="destructive">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </ConfirmationDialog>
                 </div>
               </CardContent>
             </Card>
@@ -366,92 +384,79 @@ export default function SuccessStoriesPage() {
               }
               acc[story.orphanageId].push(story);
               return acc;
-            }, {} as { [key: string]: Issue[] })
-          ).map(([orphanageId, stories]) => {
-            const orphanage = orphanages.find(o => o.id === orphanageId);
-            const totalRaised = stories.reduce((sum, story) => sum + story.raisedAmount, 0);
-            const totalTarget = stories.reduce((sum, story) => sum + story.estimatedCost, 0);
-            
-            return (
-              <Card key={orphanageId} className="py-4">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building2 className="w-5 h-5" />
-                    {getOrphanageName(orphanageId)}
-                    <Badge className="ml-2">
-                      {stories.length} {stories.length === 1 ? "Success Story" : "Success Stories"}
-                    </Badge>
-                  </CardTitle>
-                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                    <div className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
-                      {orphanage?.childrenCount || 0} children
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="w-4 h-4" />
-                      ${totalRaised.toLocaleString()} raised
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Target className="w-4 h-4" />
-                      {Math.round((totalRaised / totalTarget) * 100)}% funded
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {stories.map((story) => (
-                      <Card key={story.id} className="hover:shadow-lg transition-shadow">
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between mb-3">
-                            <h4 className="font-semibold text-sm">{story.title}</h4>
-                            <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs">
-                              Fully Funded
-                            </Badge>
-                          </div>
-                          <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">
-                            {story.description}
-                          </div>
-                          <div className="space-y-2 mb-3">
-                            <div className="flex justify-between text-xs">
-                              <span className="text-gray-500">Progress:</span>
-                              <span className="font-medium">{getFundingProgress(story.raisedAmount, story.estimatedCost)}%</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                              <div 
-                                className="bg-green-600 h-1.5 rounded-full" 
-                                style={{ width: `${Math.min(getFundingProgress(story.raisedAmount, story.estimatedCost), 100)}%` }}
-                              ></div>
+            }, {} as { [key: string]: SuccessStory[] })
+          ).map(([orphanageId, stories]) => (
+            <Card key={orphanageId} className="py-4">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="w-5 h-5" />
+                  {getOrphanageName(orphanageId)}
+                  <Badge className="ml-2">
+                    {stories.length}{" "}
+                    {stories.length === 1 ? "Story" : "Stories"}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {stories.map((story) => (
+                    <Card
+                      key={story.id}
+                      className="hover:shadow-lg transition-shadow"
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <h4 className="font-semibold text-sm">
+                            {story.title}
+                          </h4>
+                          <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs">
+                            Completed
+                          </Badge>
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">
+                          {story.description}
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                          <div>
+                            <span className="text-gray-500">
+                              Beneficiaries:
+                            </span>
+                            <div className="font-medium">
+                              {story.beneficiaries}
                             </div>
                           </div>
-                          <div className="grid grid-cols-2 gap-2 text-xs mb-3">
-                            <div>
-                              <span className="text-gray-500">Raised:</span>
-                              <div className="font-medium">${story.raisedAmount.toLocaleString()}</div>
-                            </div>
-                            <div>
-                              <span className="text-gray-500">Target:</span>
-                              <div className="font-medium">${story.estimatedCost.toLocaleString()}</div>
+                          <div>
+                            <span className="text-gray-500">Cost:</span>
+                            <div className="font-medium">
+                              ${story.cost.toLocaleString()}
                             </div>
                           </div>
-                          <div className="flex gap-1">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="flex-1 text-xs"
-                              onClick={() => handleViewStory(story)}
-                            >
-                              <Eye className="w-3 h-3 mr-1" />
-                              View
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                        </div>
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1 text-xs"
+                            onClick={() => setSelectedStory(story)}
+                          >
+                            <Eye className="w-3 h-3 mr-1" />
+                            View
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-xs"
+                          >
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
 
@@ -465,7 +470,7 @@ export default function SuccessStoriesPage() {
                   <CardTitle className="flex items-center gap-2">
                     {selectedStory.title}
                     <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                      Fully Funded
+                      Completed
                     </Badge>
                   </CardTitle>
                   <div className="flex items-center text-sm text-gray-500 mt-2">
@@ -490,36 +495,42 @@ export default function SuccessStoriesPage() {
                 </p>
               </div>
 
+              <div>
+                <h3 className="font-semibold mb-2">Impact</h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {selectedStory.impact}
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">Related Issue</h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {getIssueTitle(selectedStory.issueId)}
+                </p>
+              </div>
+
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-2">Funding Details</h3>
+                  <h3 className="font-semibold mb-2">Statistics</h3>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span>Category:</span>
-                      <span className="font-medium capitalize">{selectedStory.category}</span>
+                      <span>Beneficiaries:</span>
+                      <span className="font-medium">
+                        {selectedStory.beneficiaries}
+                      </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Priority:</span>
-                      <span className="font-medium capitalize">{selectedStory.priority}</span>
+                      <span>Total Cost:</span>
+                      <span className="font-medium">
+                        ${selectedStory.cost.toLocaleString()}
+                      </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Target Amount:</span>
-                      <span className="font-medium">${selectedStory.estimatedCost.toLocaleString()}</span>
+                      <span>Completed:</span>
+                      <span className="font-medium">
+                        {formatFirebaseDate(selectedStory.completedAt)}
+                      </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Amount Raised:</span>
-                      <span className="font-medium text-green-600">${selectedStory.raisedAmount.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Funding Progress:</span>
-                      <span className="font-medium">{getFundingProgress(selectedStory.raisedAmount, selectedStory.estimatedCost)}%</span>
-                    </div>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3 mt-3">
-                    <div 
-                      className="bg-green-600 h-3 rounded-full" 
-                      style={{ width: `${Math.min(getFundingProgress(selectedStory.raisedAmount, selectedStory.estimatedCost), 100)}%` }}
-                    ></div>
                   </div>
                 </div>
 
@@ -538,22 +549,6 @@ export default function SuccessStoriesPage() {
                         {formatFirebaseDate(selectedStory.updatedAt)}
                       </span>
                     </div>
-                    {selectedStory.resolvedAt && (
-                      <div className="flex justify-between">
-                        <span>Resolved:</span>
-                        <span className="font-medium">
-                          {formatFirebaseDate(selectedStory.resolvedAt)}
-                        </span>
-                      </div>
-                    )}
-                    {selectedStory.deadline && (
-                      <div className="flex justify-between">
-                        <span>Deadline:</span>
-                        <span className="font-medium">
-                          {formatFirebaseDate(selectedStory.deadline)}
-                        </span>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -575,6 +570,24 @@ export default function SuccessStoriesPage() {
               )}
 
               <div className="flex gap-2 pt-4">
+                <Button variant="outline" className="flex-1">
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Story
+                </Button>
+                <ConfirmationDialog
+                  title="Delete Success Story"
+                  description={`Are you sure you want to delete "${selectedStory.title}"? This action cannot be undone.`}
+                  onConfirm={() => {
+                    handleDeleteStory(selectedStory.id);
+                    setSelectedStory(null);
+                  }}
+                  variant="destructive"
+                >
+                  <Button variant="destructive" className="flex-1">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete Story
+                  </Button>
+                </ConfirmationDialog>
                 <Button
                   variant="outline"
                   onClick={() => setSelectedStory(null)}

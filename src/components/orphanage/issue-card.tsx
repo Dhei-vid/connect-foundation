@@ -29,7 +29,6 @@ interface IssueCardProps {
 }
 
 export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps) {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const getPriorityColor = (priority: Issue["priority"]) => {
@@ -75,7 +74,6 @@ export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps)
       toast.error("Error deleting request");
     } finally {
       setIsDeleting(false);
-      setShowDeleteDialog(false);
     }
   };
 
@@ -107,13 +105,23 @@ export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps)
                   <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setShowDeleteDialog(true)}
-                  className="text-red-600 focus:text-red-600"
+                <ConfirmationDialog
+                  title="Delete Request"
+                  description={`Are you sure you want to delete "${issue.title}"? This action cannot be undone.`}
+                  confirmText="Delete"
+                  cancelText="Cancel"
+                  onConfirm={handleDelete}
+                  variant="destructive"
+                  loading={isDeleting}
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete
-                </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={(e) => e.preventDefault()}
+                    className="text-red-600 focus:text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </ConfirmationDialog>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -175,17 +183,6 @@ export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps)
         </CardContent>
       </Card>
 
-      {/* Delete Confirmation Dialog */}
-      <ConfirmationDialog
-        isOpen={showDeleteDialog}
-        onClose={() => setShowDeleteDialog(false)}
-        onConfirm={handleDelete}
-        title="Delete Request"
-        description={`Are you sure you want to delete "${issue.title}"? This action cannot be undone.`}
-        confirmText="Delete"
-        cancelText="Cancel"
-        isLoading={isDeleting}
-      />
     </>
   );
 }

@@ -60,9 +60,7 @@ export function ConfirmationDialog({
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        {children}
-      </AlertDialogTrigger>
+      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
@@ -107,7 +105,9 @@ export function DeleteConfirmation({
     <ConfirmationDialog
       title={`Delete ${itemType.charAt(0).toUpperCase() + itemType.slice(1)}`}
       description={`Are you sure you want to delete "${itemName}"? This action cannot be undone. This will permanently remove the ${itemType} from the system.`}
-      confirmText={`Delete ${itemType.charAt(0).toUpperCase() + itemType.slice(1)}`}
+      confirmText={`Delete ${
+        itemType.charAt(0).toUpperCase() + itemType.slice(1)
+      }`}
       cancelText="Cancel"
       onConfirm={onConfirm}
       variant="destructive"
