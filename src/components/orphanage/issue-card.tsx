@@ -64,7 +64,7 @@ export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps)
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const { deleteIssue } = await import("@/firebase/impacts");
+      const { deleteIssue } = await import("@/firebase/issues");
       await deleteIssue(issue.id);
       toast.success("Request deleted successfully!");
       onDelete(issue.id);

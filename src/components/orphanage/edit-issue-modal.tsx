@@ -60,7 +60,7 @@ export function EditIssueModal({ issue, isOpen, onClose, onUpdate }: EditIssueMo
 
     try {
       setIsSubmitting(true);
-      const { updateIssue } = await import("@/firebase/impacts");
+      const { updateIssue } = await import("@/firebase/issues");
       
       const updateData = {
         title: formData.title,

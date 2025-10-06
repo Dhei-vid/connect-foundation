@@ -56,7 +56,7 @@ export default function OrphanageRequestPage() {
 
       try {
         setIsDataLoading(true);
-        const { getIssues } = await import("@/firebase/impacts");
+        const { getIssues } = await import("@/firebase/issues");
         const orphanageIssues = await getIssues({ orphanageId: user.uid });
         setIssues(orphanageIssues);
       } catch (error) {
@@ -87,7 +87,7 @@ export default function OrphanageRequestPage() {
 
     try {
       setIsSubmitting(true);
-      const { createIssue } = await import("@/firebase/impacts");
+      const { createIssue } = await import("@/firebase/issues");
 
       const issueData = {
         orphanageId: user.uid,
@@ -106,7 +106,7 @@ export default function OrphanageRequestPage() {
       await createIssue(issueData);
 
       // Refresh issues list
-      const { getIssues } = await import("@/firebase/impacts");
+      const { getIssues } = await import("@/firebase/issues");
       const updatedIssues = await getIssues({ orphanageId: user.uid });
       setIssues(updatedIssues);
 
@@ -143,7 +143,7 @@ export default function OrphanageRequestPage() {
     if (!user?.uid) return;
 
     try {
-      const { getIssues } = await import("@/firebase/impacts");
+      const { getIssues } = await import("@/firebase/issues");
       const updatedIssues = await getIssues({ orphanageId: user.uid });
       setIssues(updatedIssues);
     } catch (error) {

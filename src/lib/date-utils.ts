@@ -1,4 +1,4 @@
-import { format, formatDistanceToNow, parseISO } from 'date-fns';
+import { format, formatDistanceToNow, parseISO } from "date-fns";
 
 /**
  * Formats a Firebase timestamp or Date object to a readable date string
@@ -8,32 +8,32 @@ import { format, formatDistanceToNow, parseISO } from 'date-fns';
  */
 export function formatFirebaseDate(
   date: Date | string | { toDate?: () => Date } | null | undefined,
-  formatString: string = 'MMM dd, yyyy'
+  formatString: string = "MMM dd, yyyy"
 ): string {
-  if (!date) return 'N/A';
+  if (!date) return "N/A";
 
   let dateObj: Date;
 
   // Handle Firebase timestamp objects
-  if (typeof date === 'object' && date !== null && 'toDate' in date) {
-    dateObj = date.toDate();
+  if (typeof date === "object" && date !== null && "toDate" in date) {
+    dateObj = typeof date.toDate === "function" ? date.toDate() : new Date();
   }
   // Handle Date objects
   else if (date instanceof Date) {
     dateObj = date;
   }
   // Handle ISO strings
-  else if (typeof date === 'string') {
+  else if (typeof date === "string") {
     dateObj = parseISO(date);
   }
   // Handle null/undefined
   else {
-    return 'N/A';
+    return "N/A";
   }
 
   // Check if date is valid
   if (isNaN(dateObj.getTime())) {
-    return 'N/A';
+    return "N/A";
   }
 
   return format(dateObj, formatString);
@@ -47,30 +47,30 @@ export function formatFirebaseDate(
 export function formatFirebaseDateRelative(
   date: Date | string | { toDate?: () => Date } | null | undefined
 ): string {
-  if (!date) return 'N/A';
+  if (!date) return "N/A";
 
   let dateObj: Date;
 
   // Handle Firebase timestamp objects
-  if (typeof date === 'object' && date !== null && 'toDate' in date) {
-    dateObj = date.toDate();
+  if (typeof date === "object" && date !== null && "toDate" in date) {
+    dateObj = typeof date.toDate === "function" ? date.toDate() : new Date();
   }
   // Handle Date objects
   else if (date instanceof Date) {
     dateObj = date;
   }
   // Handle ISO strings
-  else if (typeof date === 'string') {
+  else if (typeof date === "string") {
     dateObj = parseISO(date);
   }
   // Handle null/undefined
   else {
-    return 'N/A';
+    return "N/A";
   }
 
   // Check if date is valid
   if (isNaN(dateObj.getTime())) {
-    return 'N/A';
+    return "N/A";
   }
 
   return formatDistanceToNow(dateObj, { addSuffix: true });
@@ -84,7 +84,7 @@ export function formatFirebaseDateRelative(
 export function formatFirebaseDateTime(
   date: Date | string | { toDate?: () => Date } | null | undefined
 ): string {
-  return formatFirebaseDate(date, 'MMM dd, yyyy \'at\' h:mm a');
+  return formatFirebaseDate(date, "MMM dd, yyyy 'at' h:mm a");
 }
 
 /**
@@ -95,7 +95,7 @@ export function formatFirebaseDateTime(
 export function formatFirebaseDateShort(
   date: Date | string | { toDate?: () => Date } | null | undefined
 ): string {
-  return formatFirebaseDate(date, 'MM/dd/yyyy');
+  return formatFirebaseDate(date, "MM/dd/yyyy");
 }
 
 /**
@@ -106,5 +106,5 @@ export function formatFirebaseDateShort(
 export function formatFirebaseDateLong(
   date: Date | string | { toDate?: () => Date } | null | undefined
 ): string {
-  return formatFirebaseDate(date, 'MMMM dd, yyyy');
+  return formatFirebaseDate(date, "MMMM dd, yyyy");
 }

@@ -348,24 +348,3 @@ export async function searchVolunteers(
   }
 }
 
-export async function getVolunteersBySkills(
-  skills: string[]
-): Promise<Volunteer[]> {
-  try {
-    const allVolunteers = await getVolunteers();
-
-    return allVolunteers.filter((volunteer) =>
-      skills.some((skill) => volunteer.skills.includes(skill))
-    );
-  } catch (error) {
-    console.error("Error getting volunteers by skills:", error);
-    throw error;
-  }
-}
-
-export async function getVolunteersByLocation(
-  city?: string,
-  state?: string
-): Promise<Volunteer[]> {
-  return getVolunteers({ city, state });
-}

@@ -49,7 +49,7 @@ export default function OrphanageDashboard() {
         setOrphanageData(orphanage);
 
         // Load issues for this orphanage
-        const { getIssues } = await import("@/firebase/impacts");
+        const { getIssues } = await import("@/firebase/issues");
         const orphanageIssues = await getIssues({ orphanageId: user.uid });
         setIssues(orphanageIssues);
 

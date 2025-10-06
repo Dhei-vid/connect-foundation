@@ -1,41 +1,33 @@
-import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  where,
-  limit,
-  Timestamp,
-} from "firebase/firestore";
-import { db } from "@/config/firebase";
 import { getDonationStats, getDonationsByDateRange } from "./donations";
-import { getIssues } from "./impacts";
+import { getIssues } from "./issues";
 import { getVolunteers } from "./volunteers";
-import { getContactInquiries } from "./user";
-import { getOrphanageProfile } from "./orphanages";
-import type { Orphanage } from "@/common/types";
+import { getContactInquiries } from "./enquiries";
+import { getOrphanages } from "./orphanages";
+import type {
+  Orphanage,
+  Issue,
+  Volunteer,
+  ContactInquiry,
+  Donation,
+} from "@/common/types";
 
-// Helper function to get all orphanages
-async function getOrphanages(): Promise<Orphanage[]> {
-  try {
-    const orphanagesRef = collection(db, "orphanages");
-    const q = query(orphanagesRef, orderBy("createdAt", "desc"));
-    const querySnapshot = await getDocs(q);
-
-    return querySnapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt?.toDate?.(),
-        updatedAt: data.updatedAt?.toDate?.(),
-      } as Orphanage;
-    });
-  } catch (error) {
-    console.error("Error getting orphanages:", error);
-    throw error;
-  }
-}
+// Type definitions for export filters
+type ExportFilters = {
+  startDate?: Date;
+  endDate?: Date;
+  status?: string;
+  priority?: string;
+  category?: string;
+  orphanageId?: string;
+  email?: string;
+  limitCount?: number;
+  assignedOrphanageId?: string;
+  skills?: string[];
+  availability?: "weekdays" | "weekends" | "both" | "flexible";
+  experience?: "none" | "beginner" | "intermediate" | "advanced";
+  city?: string;
+  state?: string;
+};
 
 // --------------------
 // DASHBOARD ANALYTICS
@@ -391,10 +383,11 @@ export async function getGrowthMetrics(): Promise<{
 export async function exportData(
   collection: string,
   format: "json" | "csv",
-  filters?: Record<string, unknown>
+  filters?: ExportFilters
 ): Promise<{ data: string; filename: string }> {
   try {
-    let data: unknown[] = [];
+    let data: (Donation | Orphanage | Issue | Volunteer | ContactInquiry)[] =
+      [];
     let filename = "";
 
     switch (collection) {
@@ -414,11 +407,35 @@ export async function exportData(
         filename = `issues_${new Date().toISOString().split("T")[0]}`;
         break;
       case "volunteers":
-        data = await getVolunteers(filters);
+        data = await getVolunteers(
+          filters
+            ? {
+                ...filters,
+                status: filters.status as
+                  | "pending"
+                  | "approved"
+                  | "rejected"
+                  | "suspended"
+                  | undefined,
+              }
+            : undefined
+        );
         filename = `volunteers_${new Date().toISOString().split("T")[0]}`;
         break;
       case "inquiries":
-        data = await getContactInquiries(filters);
+        data = await getContactInquiries(
+          filters
+            ? {
+                ...filters,
+                status: filters.status as
+                  | "closed"
+                  | "new"
+                  | "read"
+                  | "replied"
+                  | undefined,
+              }
+            : undefined
+        );
         filename = `inquiries_${new Date().toISOString().split("T")[0]}`;
         break;
       default:
@@ -447,21 +464,25 @@ export async function exportData(
 // HELPER FUNCTIONS
 // --------------------
 
-function convertToCSV(data: unknown[]): string {
+function convertToCSV(
+  data: (Donation | Orphanage | Issue | Volunteer | ContactInquiry)[]
+): string {
   if (data.length === 0) return "";
 
-  const headers = Object.keys(data[0]);
+  const firstRow = data[0] as unknown as Record<string, unknown>;
+  const headers = Object.keys(firstRow);
   const csvRows = [headers.join(",")];
 
   for (const row of data) {
+    const rowData = row as unknown as Record<string, unknown>;
     const values = headers.map((header) => {
-      const value = row[header];
+      const value = rowData[header];
       if (value === null || value === undefined) return "";
       if (typeof value === "object")
         return `"${JSON.stringify(value).replace(/"/g, '""')}"`;
       if (typeof value === "string" && value.includes(","))
         return `"${value.replace(/"/g, '""')}"`;
-      return value;
+      return String(value);
     });
     csvRows.push(values.join(","));
   }

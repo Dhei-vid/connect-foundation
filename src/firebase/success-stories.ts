@@ -134,59 +134,7 @@ export async function getSuccessStories(filters?: {
   }
 }
 
-// Get success stories grouped by orphanage
-export async function getSuccessStoriesByOrphanage(): Promise<{
-  [orphanageId: string]: {
-    orphanageName: string;
-    successStories: SuccessStory[];
-    totalBeneficiaries: number;
-    totalCost: number;
-  };
-}> {
-  try {
-    const allSuccessStories = await getSuccessStories();
-    
-    const grouped = allSuccessStories.reduce((acc, story) => {
-      if (!acc[story.orphanageId]) {
-        acc[story.orphanageId] = {
-          orphanageName: story.orphanageName,
-          successStories: [],
-          totalBeneficiaries: 0,
-          totalCost: 0,
-        };
-      }
-      
-      acc[story.orphanageId].successStories.push(story);
-      acc[story.orphanageId].totalBeneficiaries += story.beneficiaries;
-      acc[story.orphanageId].totalCost += story.cost;
-      
-      return acc;
-    }, {} as { [orphanageId: string]: { orphanageName: string; successStories: SuccessStory[]; totalBeneficiaries: number; totalCost: number; } });
 
-    return grouped;
-  } catch (error) {
-    console.error("Error getting success stories by orphanage:", error);
-    throw error;
-  }
-}
-
-// Search success stories by title, description, or orphanage name
-export async function searchSuccessStories(searchTerm: string): Promise<SuccessStory[]> {
-  try {
-    const allSuccessStories = await getSuccessStories();
-
-    return allSuccessStories.filter(
-      (story) =>
-        story.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        story.orphanageName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        story.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        story.impact.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  } catch (error) {
-    console.error("Error searching success stories:", error);
-    throw error;
-  }
-}
 
 // Get statistics on success stories
 export async function getSuccessStoryStats(): Promise<{
@@ -215,25 +163,6 @@ export async function getSuccessStoryStats(): Promise<{
   }
 }
 
-// Get success stories for a specific issue
-export async function getSuccessStoriesForIssue(issueId: string): Promise<SuccessStory[]> {
-  try {
-    return await getSuccessStories({ issueId });
-  } catch (error) {
-    console.error("Error getting success stories for issue:", error);
-    throw error;
-  }
-}
-
-// Get success stories for a specific orphanage
-export async function getSuccessStoriesForOrphanage(orphanageId: string): Promise<SuccessStory[]> {
-  try {
-    return await getSuccessStories({ orphanageId });
-  } catch (error) {
-    console.error("Error getting success stories for orphanage:", error);
-    throw error;
-  }
-}
 
 // --------------------
 // SUCCESS STORIES FROM FUNDED ISSUES

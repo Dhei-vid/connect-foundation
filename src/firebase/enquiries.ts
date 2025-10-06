@@ -132,28 +132,6 @@ export async function getNewContactInquiries(): Promise<ContactInquiry[]> {
   return getContactInquiries({ status: "new" });
 }
 
-export async function getContactInquiryStats(): Promise<{
-  total: number;
-  new: number;
-  read: number;
-  replied: number;
-  closed: number;
-}> {
-  try {
-    const allInquiries = await getContactInquiries();
-
-    return {
-      total: allInquiries.length,
-      new: allInquiries.filter((i) => i.status === "new").length,
-      read: allInquiries.filter((i) => i.status === "read").length,
-      replied: allInquiries.filter((i) => i.status === "replied").length,
-      closed: allInquiries.filter((i) => i.status === "closed").length,
-    };
-  } catch (error) {
-    console.error("Error getting contact inquiry stats:", error);
-    throw error;
-  }
-}
 
 // --------------------
 // BULK OPERATIONS

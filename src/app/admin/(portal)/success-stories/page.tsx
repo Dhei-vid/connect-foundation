@@ -1,23 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import {
   Heart,
   Search,
-  Plus,
   Eye,
   Edit,
   Trash2,
   Building2,
   Users,
   DollarSign,
-  Calendar,
   Image as ImageIcon,
-  CheckCircle,
   XCircle,
   Filter,
-  ArrowRight,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,7 +24,6 @@ import { SelectItem } from "@/components/ui/select";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import {
   getSuccessStories,
-  getSuccessStoriesByOrphanage,
   getSuccessStoryStats,
   deleteSuccessStory,
 } from "@/firebase/success-stories";
@@ -38,10 +32,8 @@ import { getIssues } from "@/firebase/issues";
 import { toast } from "sonner";
 import { formatFirebaseDate } from "@/lib/date-utils";
 import type { SuccessStory, Orphanage, Issue } from "@/common/types";
-import LoadingSpinner from "@/components/general/spinner";
 
 export default function SuccessStoriesPage() {
-  const router = useRouter();
   const [successStories, setSuccessStories] = useState<SuccessStory[]>([]);
   const [orphanages, setOrphanages] = useState<Orphanage[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);

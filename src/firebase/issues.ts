@@ -167,22 +167,6 @@ export async function updateIssueStatus(
   }
 }
 
-// Search issues by title, description, or orphanage name
-export async function searchIssues(searchTerm: string): Promise<Issue[]> {
-  try {
-    const allIssues = await getIssues();
-
-    return allIssues.filter(
-      (issue) =>
-        issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        issue.orphanageName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        issue.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  } catch (error) {
-    console.error("Error searching issues:", error);
-    throw error;
-  }
-}
 
 // Get statistics on issues
 export async function getIssueStats(): Promise<{
