@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(amount);
-}
+// export function formatCurrency(amount: number): string {
+//   return new Intl.NumberFormat("en-US", {
+//     style: "currency",
+//     currency: "USD",
+//   }).format(amount);
+// }
 
 export function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("en-US", {
@@ -30,4 +30,17 @@ export const extractErrorMessage = (error: any): string => {
     error?.message ||
     "An unexpected error occurred"
   );
+};
+
+export const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
+
+export const formatNumber = (num: number) => {
+  return new Intl.NumberFormat("en-NG").format(num);
 };

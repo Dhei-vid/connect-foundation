@@ -33,7 +33,7 @@ const dropdownConfig = {
 
 const navItems = [
   { label: "Home", href: "/" },
-  { label: "About Us", href: "/about-us", hasDropdown: true },
+  { label: "About Us", href: "/about-us", hasDropdown: false },
   { label: "Impact", href: "/impact", hasDropdown: true },
   { label: "Volunteer", href: "/volunteer" },
   { label: "Contact", href: "/contact" },
@@ -91,7 +91,8 @@ export function TopNav({
     const handleClickOutside = (event: MouseEvent) => {
       if (activeDropdown) {
         const target = event.target as Element;
-        if (!target.closest("[data-dropdown]")) {
+        // Don't close if clicking on a link inside the dropdown
+        if (!target.closest("[data-dropdown]") && !target.closest("a")) {
           setActiveDropdown(null);
         }
       }
@@ -225,6 +226,10 @@ export function TopNav({
                           <Link
                             href={item.href}
                             className="w-full text-white/90 hover:text-white"
+                            onClick={() => {
+                              // Small delay to ensure navigation completes
+                              setTimeout(() => setActiveDropdown(null), 100);
+                            }}
                           >
                             {item.label}
                           </Link>
@@ -301,6 +306,10 @@ export function TopNav({
                             <Link
                               href={subItem.href || "#"}
                               className="block px-2 py-1 text-white/90 hover:text-white hover:bg-white/10 rounded-md transition-colors duration-200"
+                              onClick={() => {
+                                // Small delay to ensure navigation completes
+                                setTimeout(() => setActiveDropdown(null), 100);
+                              }}
                             >
                               <span className="text-xs font-medium">
                                 {subItem.label}
@@ -429,7 +438,11 @@ export function TopNav({
                         <Link
                           key={index}
                           href={subItem.href || "#"}
-                          onClick={closeMobileMenu}
+                          onClick={() => {
+                            closeMobileMenu();
+                            // Small delay to ensure navigation completes
+                            setTimeout(() => setActiveDropdown(null), 100);
+                          }}
                           className="block py-1 px-3 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
                         >
                           <span className="text-sm font-medium">
