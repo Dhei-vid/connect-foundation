@@ -15,7 +15,7 @@ export function FeaturesSection() {
 
       <div className="z-10 w-full lg:max-w-7xl mx-auto">
         {/* About US Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 md:gap-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-20 md:gap-4">
           {/* Images */}
           <div className="relative">
             <Image
@@ -28,7 +28,7 @@ export function FeaturesSection() {
               height={700}
             />
 
-            <div className="top-[-20%] right-0 md:right-20 absolute bg-white rounded-[2rem] p-1">
+            <div className="top-[-20%] right-0 md:right-10 lg:right-20 absolute bg-white rounded-[2rem] p-1">
               <Image
                 className={
                   "rounded-[2rem] object-cover object-center w-32 h-32 lg:w-52 lg:h-52"
@@ -42,14 +42,14 @@ export function FeaturesSection() {
               />
             </div>
 
-            <div className="absolute right-0 top-[80%] md:top-[50%] bg-white p-1 rounded-[2rem]">
+            <div className="absolute right-0 top-[80%] lg:top-[50%] bg-white p-1 rounded-[2rem]">
               <div className="space-y-3 bg-main-red rounded-[2rem] px-4 py-4 lg:py-6 w-[15rem] lg:w-[20rem]">
                 <p className="text-grey font-bold text-lg 2xl:text-3xl">
                   150 Grants Awarded Across 5 Countries
                 </p>
                 <Link
                   className="underline italic font-semibold text-main-blue/90 hover:text-main-blue/70"
-                  href={"/about"}
+                  href={"/donate"}
                 >
                   Become a donor
                 </Link>
@@ -78,7 +78,7 @@ export function FeaturesSection() {
               </p>
             </div>
 
-            <div className="space-y-6 lg:ml-15">
+            <div className="space-y-6 m-0 lg:ml-10 xl:ml-15">
               <p>
                 Loads of text here about our mission, vision, and the impact we
                 aim to create in the lives of children in need. Loads of text

@@ -127,7 +127,7 @@ export function TopNav({
   return (
     <nav className="mx-auto p-3 sm:p-4 md:p-5 w-full 2xl:w-[70%] 3xl:w-[50%]">
       {/* Desktop Navigation - Hidden on mobile and tablet */}
-      <div className="hidden xl:grid grid-cols-4 items-center justify-center">
+      <div className="hidden md:grid grid-cols-4 items-center justify-center">
         <Image
           className={"rounded-2xl"}
           src="/logo.png"
@@ -156,7 +156,9 @@ export function TopNav({
                     )}
                   >
                     <div className="flex flex-row gap-1 items-center">
-                      <span className="text-sm font-medium">{item.label}</span>
+                      <span className="text-xs lg:text-sm font-medium">
+                        {item.label}
+                      </span>
                       <ChevronDown
                         size={18}
                         className={cn(
@@ -176,7 +178,9 @@ export function TopNav({
                         "hover:text-white/50 flex flex-col items-center transition-colors duration-200 transition-all ease-in-out"
                       )}
                     >
-                      <span className="text-sm font-medium">{item.label}</span>
+                      <span className="text-xs lg:text-sm font-medium">
+                        {item.label}
+                      </span>
                     </div>
                   </Link>
                 )}
@@ -250,87 +254,11 @@ export function TopNav({
               pathname === "/donate"
                 ? "bg-main-blue hover:bg-main-red"
                 : "hover:bg-main-blue",
-              "cursor-pointer rounded-full py-3 px-8 text-white  transition-colors duration-200"
+              "cursor-pointer rounded-full py-3 px-8 text-white text-xs lg:text-sm transition-colors duration-200"
             )}
           >
             Donate
           </button>
-        </div>
-      </div>
-
-      {/* Tablet Navigation - Hidden on mobile and desktop */}
-      <div className="hidden md:block xl:hidden">
-        <div className="flex items-center justify-between">
-          <Image src="/logo.png" alt="Logo" width={55} height={55} />
-
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 rounded-full bg-main-red/70 backdrop-blur-lg py-3 px-6">
-              {navItems.slice(0, 4).map((item) => (
-                <div key={item.label} className="relative" data-dropdown>
-                  {item.hasDropdown ? (
-                    <button
-                      onClick={() => toggleDropdown(item.label)}
-                      className="flex flex-row items-center gap-1 text-white/90 hover:text-white/50 transition-colors duration-200 cursor-pointer"
-                    >
-                      <span className="text-xs font-medium">{item.label}</span>
-                      <ChevronDown
-                        size={15}
-                        className={cn(
-                          "transition-transform duration-200",
-                          activeDropdown === item.label && "rotate-180"
-                        )}
-                      />
-                    </button>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      className="flex flex-row items-center gap-1 text-white/90 hover:text-white/50 transition-colors duration-200"
-                    >
-                      <span className="text-xs font-medium">{item.label}</span>
-                    </Link>
-                  )}
-
-                  {/* Dynamic Dropdown Content for Tablet */}
-                  {item.hasDropdown && activeDropdown === item.label && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-main-red/70 backdrop-blur-lg rounded-b-2xl border-0 shadow-lg z-50 min-w-[180px]"
-                    >
-                      <ul className="p-3 space-y-1">
-                        {dropdownConfig[
-                          item.label as keyof typeof dropdownConfig
-                        ]?.items.map((subItem, index) => (
-                          <li key={index}>
-                            <Link
-                              href={subItem.href || "#"}
-                              className="block px-2 py-1 text-white/90 hover:text-white hover:bg-white/10 rounded-md transition-colors duration-200"
-                              onClick={() => {
-                                // Small delay to ensure navigation completes
-                                setTimeout(() => setActiveDropdown(null), 100);
-                              }}
-                            >
-                              <span className="text-xs font-medium">
-                                {subItem.label}
-                              </span>
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </motion.div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <Button
-              className="transition-all ease-in-out duration-200 rounded-full bg-main-red/70 backdrop-blur-lg text-white hover:bg-main-blue px-6 py-2 transition-colors duration-200"
-              onClick={() => router.push("/donate")}
-            >
-              Donate
-            </Button>
-          </div>
         </div>
       </div>
 
