@@ -346,7 +346,7 @@ export default function Page() {
             {/* Section Header */}
             <div
               className={cn(
-                paddingStyle,
+                "px-5 py-10 2xl:py-20 lg:px-8 2xl:px-54",
                 "z-40 sticky top-0 bg-gray-50 hover:bg-main-blue flex flex-row justify-between text-main-blue hover:text-gray-50 cursor-pointer group border border-main-blue/50 transition-all ease-in-out duration-300 shadow-sm hover:shadow-md"
               )}
               onClick={() => toggleYearExpansion(year)}
