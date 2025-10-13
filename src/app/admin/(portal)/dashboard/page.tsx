@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import {
   Users,
+  HandCoins,
   DollarSign,
   AlertTriangle,
   TrendingUp,
@@ -22,6 +23,9 @@ import { getRecentDonations } from "@/firebase/donations";
 import { getNewContactInquiries } from "@/firebase/enquiries";
 import { getPendingVolunteers } from "@/firebase/volunteers";
 import type { Donation, Volunteer, ContactInquiry } from "@/common/types";
+import { formatCurrency } from "@/common/helpers";
+import { cn } from "@/lib/utils";
+import { getStatusVariant } from "@/common/helpers";
 
 interface DashboardStats {
   donations: {
@@ -59,8 +63,6 @@ export default function AdminDashboardPage() {
   const [timeframe, setTimeframe] = useState<
     "week" | "month" | "quarter" | "year"
   >("month");
-
-  console.log("STATS ", stats);
 
   useEffect(() => {
     loadDashboardData();
@@ -148,7 +150,10 @@ export default function AdminDashboardPage() {
             <CardContent>
               <div className="space-y-3">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div
+                    key={i}
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                  >
                     <div className="flex items-center space-x-3">
                       <Skeleton className="w-10 h-10 rounded-full" />
                       <div>
@@ -188,7 +193,10 @@ export default function AdminDashboardPage() {
               <CardContent>
                 <div className="space-y-3">
                   {[...Array(3)].map((_, j) => (
-                    <div key={j} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <div
+                      key={j}
+                      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                    >
                       <div className="flex items-center space-x-3">
                         <Skeleton className="w-10 h-10 rounded-full" />
                         <div>
@@ -351,7 +359,7 @@ export default function AdminDashboardPage() {
         <Card className="lg:col-span-2 py-4">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <DollarSign className="w-5 h-5 mr-2" />
+              <HandCoins className="w-5 h-5 mr-2" />
               Recent Donations
             </CardTitle>
           </CardHeader>
@@ -452,7 +460,10 @@ function RecentDonationsList() {
     return (
       <div className="space-y-3">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <div
+            key={i}
+            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+          >
             <div className="flex items-center space-x-3">
               <Skeleton className="w-10 h-10 rounded-full" />
               <div>
@@ -483,9 +494,6 @@ function RecentDonationsList() {
             className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
           >
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-green-600" />
-              </div>
               <div>
                 <p className="font-medium">
                   {donation.anonymous ? "Anonymous" : donation.donorName}
@@ -496,10 +504,11 @@ function RecentDonationsList() {
               </div>
             </div>
             <div className="text-right">
-              <p className="font-semibold">
-                ${donation.amount.toLocaleString()}
-              </p>
-              <Badge variant="secondary" className="text-xs">
+              <p className="font-semibold">{formatCurrency(donation.amount)}</p>
+              <Badge
+                variant={getStatusVariant(donation.status)}
+                className={cn("text-xs")}
+              >
                 {donation.status}
               </Badge>
             </div>
@@ -537,7 +546,10 @@ function PendingVolunteersList() {
     return (
       <div className="space-y-3">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <div
+            key={i}
+            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+          >
             <div className="flex items-center space-x-3">
               <Skeleton className="w-10 h-10 rounded-full" />
               <div>
@@ -620,7 +632,10 @@ function NewInquiriesList() {
     return (
       <div className="space-y-3">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <div
+            key={i}
+            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+          >
             <div className="flex items-center space-x-3">
               <Skeleton className="w-10 h-10 rounded-full" />
               <div>

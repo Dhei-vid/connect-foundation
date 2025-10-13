@@ -10,7 +10,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   DollarSign,
   Calendar,
@@ -24,12 +33,13 @@ import type { Issue } from "@/common/types";
 interface IssueCardProps {
   issue: Issue;
   onEdit: (issue: Issue) => void;
-  onDelete: (issueId: string) => void;
+  onDelete: (issueId: string) => Promise<void>;
   onUpdate: () => void;
 }
 
 export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const getPriorityColor = (priority: Issue["priority"]) => {
     switch (priority) {
@@ -64,11 +74,9 @@ export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps)
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const { deleteIssue } = await import("@/firebase/issues");
-      await deleteIssue(issue.id);
-      toast.success("Request deleted successfully!");
-      onDelete(issue.id);
-      onUpdate();
+      // Call parent's onDelete which handles Firebase deletion
+      await onDelete(issue.id);
+      setShowDeleteDialog(false);
     } catch (error) {
       console.error("Error deleting issue:", error);
       toast.error("Error deleting request");
@@ -105,23 +113,13 @@ export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps)
                   <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </DropdownMenuItem>
-                <ConfirmationDialog
-                  title="Delete Request"
-                  description={`Are you sure you want to delete "${issue.title}"? This action cannot be undone.`}
-                  confirmText="Delete"
-                  cancelText="Cancel"
-                  onConfirm={handleDelete}
-                  variant="destructive"
-                  loading={isDeleting}
+                <DropdownMenuItem 
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="text-red-600 focus:text-red-600"
                 >
-                  <DropdownMenuItem 
-                    onClick={(e) => e.preventDefault()}
-                    className="text-red-600 focus:text-red-600"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
-                  </DropdownMenuItem>
-                </ConfirmationDialog>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -156,7 +154,7 @@ export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps)
           </div>
 
           {/* Progress Bar */}
-          <div className="space-y-2">
+          <div className="space-y-2 mb-4">
             <div className="flex justify-between text-sm">
               <span className="text-gray-600 dark:text-gray-400">
                 Progress
@@ -180,9 +178,53 @@ export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps)
               ></div>
             </div>
           </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex-1"
+              onClick={() => onEdit(issue)}
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => setShowDeleteDialog(true)}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Request</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete &quot;{issue.title}&quot;? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

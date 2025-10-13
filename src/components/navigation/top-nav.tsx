@@ -25,8 +25,9 @@ const dropdownConfig = {
     badge: "Our Impact",
     description: "See how we're making a difference in children's lives.",
     items: [
+      { label: "Impact Overview", href: "/impact" },
+      { label: "Success Stories", href: "/success-stories" },
       { label: "Financial Reports", href: "/report" },
-      { label: "Success Stories", href: "/impact" },
     ],
   },
 };
@@ -143,49 +144,59 @@ export function TopNav({
               "flex flex-row items-center justify-between rounded-full py-4 px-12 w-full"
             )}
           >
-            {navItems.map((item) => (
-              <div key={item.label} className="relative" data-dropdown>
-                {item.hasDropdown ? (
-                  <button
-                    onClick={() => toggleDropdown(item.label)}
-                    className={cn(
-                      pathname === item.href
-                        ? "text-main-blue font-semibold"
-                        : "text-white/90",
-                      "hover:text-white/50 flex flex-col items-center transition-colors duration-200 transition-all ease-in-out cursor-pointer"
-                    )}
-                  >
-                    <div className="flex flex-row gap-1 items-center">
-                      <span className="text-xs lg:text-sm font-medium">
-                        {item.label}
-                      </span>
-                      <ChevronDown
-                        size={18}
-                        className={cn(
-                          "transition-transform duration-200",
-                          activeDropdown === item.label && "rotate-180"
-                        )}
-                      />
-                    </div>
-                  </button>
-                ) : (
-                  <Link href={item.href}>
-                    <div
+            {navItems.map((item) => {
+              // Check if any dropdown item is active
+              const isDropdownItemActive = item.hasDropdown && 
+                dropdownConfig[item.label as keyof typeof dropdownConfig]?.items.some(
+                  (subItem) => pathname === subItem.href || 
+                              (subItem.href !== "/" && pathname.startsWith(subItem.href))
+                );
+              const isActive = pathname === item.href || isDropdownItemActive;
+
+              return (
+                <div key={item.label} className="relative" data-dropdown>
+                  {item.hasDropdown ? (
+                    <button
+                      onClick={() => toggleDropdown(item.label)}
                       className={cn(
-                        pathname === item.href
+                        isActive
                           ? "text-main-blue font-semibold"
                           : "text-white/90",
-                        "hover:text-white/50 flex flex-col items-center transition-colors duration-200 transition-all ease-in-out"
+                        "hover:text-white/50 flex flex-col items-center transition-colors duration-200 transition-all ease-in-out cursor-pointer"
                       )}
                     >
-                      <span className="text-xs lg:text-sm font-medium">
-                        {item.label}
-                      </span>
-                    </div>
-                  </Link>
-                )}
-              </div>
-            ))}
+                      <div className="flex flex-row gap-1 items-center">
+                        <span className="text-xs lg:text-sm font-medium">
+                          {item.label}
+                        </span>
+                        <ChevronDown
+                          size={18}
+                          className={cn(
+                            "transition-transform duration-200",
+                            activeDropdown === item.label && "rotate-180"
+                          )}
+                        />
+                      </div>
+                    </button>
+                    ) : (
+                    <Link href={item.href}>
+                      <div
+                        className={cn(
+                          isActive
+                            ? "text-main-blue font-semibold"
+                            : "text-white/90",
+                          "hover:text-white/50 flex flex-col items-center transition-colors duration-200 transition-all ease-in-out"
+                        )}
+                      >
+                        <span className="text-xs lg:text-sm font-medium">
+                          {item.label}
+                        </span>
+                      </div>
+                    </Link>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
           {/* Dynamic Dropdown Panel */}
@@ -222,23 +233,37 @@ export function TopNav({
                     <div className="w-full">
                       {dropdownConfig[
                         activeDropdown as keyof typeof dropdownConfig
-                      ].items.map((item) => (
-                        <div
-                          key={item.label}
-                          className="cursor-pointer p-2 w-full hover:bg-main-blue transition-colors duration-200 rounded-sm"
-                        >
-                          <Link
-                            href={item.href}
-                            className="w-full text-white/90 hover:text-white"
-                            onClick={() => {
-                              // Small delay to ensure navigation completes
-                              setTimeout(() => setActiveDropdown(null), 100);
-                            }}
+                      ].items.map((item) => {
+                        const isActive = pathname === item.href || 
+                                        (item.href !== "/" && pathname.startsWith(item.href));
+                        return (
+                          <div
+                            key={item.label}
+                            className={cn(
+                              "cursor-pointer p-2 w-full transition-colors duration-200 rounded-sm",
+                              isActive 
+                                ? "bg-main-blue" 
+                                : "hover:bg-main-blue"
+                            )}
                           >
-                            {item.label}
-                          </Link>
-                        </div>
-                      ))}
+                            <Link
+                              href={item.href}
+                              className={cn(
+                                "w-full block",
+                                isActive 
+                                  ? "text-white font-semibold" 
+                                  : "text-white/90 hover:text-white"
+                              )}
+                              onClick={() => {
+                                // Small delay to ensure navigation completes
+                                setTimeout(() => setActiveDropdown(null), 100);
+                              }}
+                            >
+                              {item.label}
+                            </Link>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -358,26 +383,35 @@ export function TopNav({
                   )}
 
                   {/* Dynamic Mobile Dropdown Content */}
-                  {item.hasDropdown && (
+                  {item.hasDropdown && activeDropdown === item.label && (
                     <div className="ml-4 space-y-1">
                       {dropdownConfig[
                         item.label as keyof typeof dropdownConfig
-                      ]?.items.map((subItem, index) => (
-                        <Link
-                          key={index}
-                          href={subItem.href || "#"}
-                          onClick={() => {
-                            closeMobileMenu();
-                            // Small delay to ensure navigation completes
-                            setTimeout(() => setActiveDropdown(null), 100);
-                          }}
-                          className="block py-1 px-3 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                        >
-                          <span className="text-sm font-medium">
-                            {subItem.label}
-                          </span>
-                        </Link>
-                      ))}
+                      ]?.items.map((subItem, index) => {
+                        const isActive = pathname === subItem.href || 
+                                        (subItem.href !== "/" && pathname.startsWith(subItem.href));
+                        return (
+                          <Link
+                            key={index}
+                            href={subItem.href || "#"}
+                            onClick={() => {
+                              closeMobileMenu();
+                              // Small delay to ensure navigation completes
+                              setTimeout(() => setActiveDropdown(null), 100);
+                            }}
+                            className={cn(
+                              "block py-1 px-3 rounded-lg transition-colors duration-200",
+                              isActive
+                                ? "bg-main-blue text-white font-semibold"
+                                : "text-gray-600 hover:bg-gray-100"
+                            )}
+                          >
+                            <span className="text-sm font-medium">
+                              {subItem.label}
+                            </span>
+                          </Link>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

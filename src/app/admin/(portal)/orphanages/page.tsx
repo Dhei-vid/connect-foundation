@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   Building2,
   Search,
@@ -14,6 +15,7 @@ import {
   Globe,
   RefreshCw,
   AlertCircle,
+  Users,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -299,77 +301,113 @@ export default function OrphanagesPage() {
           {filteredOrphanages.map((orphanage) => (
             <Card
               key={orphanage.id}
-              className="hover:shadow-lg transition-shadow"
+              className="hover:shadow-lg transition-all duration-300 overflow-hidden group"
             >
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                      <Building2 className="w-6 h-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg">
-                        {orphanage.name}
-                      </h3>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        {orphanage.city}, {orphanage.state}
-                      </div>
-                    </div>
-                  </div>
+              {/* Image Section */}
+              <div className="relative h-48 bg-gray-100 dark:bg-gray-800">
+                <Image
+                  src={
+                    orphanage.coverImageURL || 
+                    orphanage.logoURL || 
+                    "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&auto=format&fit=crop&q=80"
+                  }
+                  alt={orphanage.name}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                
+                {/* Status Badge Overlay */}
+                <div className="absolute top-3 right-3">
                   <Badge
                     className={
                       orphanage.verified
-                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                        ? "bg-green-500 text-white border-0 shadow-lg"
+                        : "bg-yellow-500 text-white border-0 shadow-lg"
                     }
                   >
-                    {orphanage.verified ? "Verified" : "Pending"}
+                    {orphanage.verified ? (
+                      <>
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Verified
+                      </>
+                    ) : (
+                      <>
+                        <AlertCircle className="w-3 h-3 mr-1" />
+                        Pending
+                      </>
+                    )}
                   </Badge>
                 </div>
 
-                <div className="space-y-3 mb-4">
-                  <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                {/* Children Count Badge */}
+                {orphanage.childrenCount > 0 && (
+                  <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-white/95 dark:bg-gray-900/95 rounded-full px-3 py-1.5 shadow-md">
+                    <Users className="w-4 h-4 text-blue-600" />
+                    <span className="text-xs font-bold text-gray-900 dark:text-white">
+                      {orphanage.childrenCount} children
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <CardContent className="p-6">
+                {/* Header */}
+                <div className="mb-4">
+                  <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2 line-clamp-1">
+                    {orphanage.name}
+                  </h3>
+                  <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                    <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+                    <span className="line-clamp-1">{orphanage.city}, {orphanage.state}</span>
+                  </div>
+                </div>
+
+                {/* Info */}
+                <div className="space-y-2 mb-4">
+                  <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 min-h-[2.5rem]">
                     {orphanage.description || "No description provided"}
                   </div>
-                  <div className="flex items-center text-sm">
-                    <Mail className="w-4 h-4 mr-2 text-gray-500" />
-                    {orphanage.contactEmail}
+                  
+                  <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                    <Mail className="w-3 h-3 mr-1.5 flex-shrink-0" />
+                    <span className="line-clamp-1">{orphanage.contactEmail}</span>
                   </div>
+                  
                   {orphanage.contactPhone && (
-                    <div className="flex items-center text-sm">
-                      <Phone className="w-4 h-4 mr-2 text-gray-500" />
-                      {orphanage.contactPhone}
-                    </div>
-                  )}
-                  {orphanage.website && (
-                    <div className="flex items-center text-sm">
-                      <Globe className="w-4 h-4 mr-2 text-gray-500" />
-                      {orphanage.website}
+                    <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                      <Phone className="w-3 h-3 mr-1.5 flex-shrink-0" />
+                      <span>{orphanage.contactPhone}</span>
                     </div>
                   )}
                 </div>
 
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() =>
-                      router.push(`/admin/orphanages/${orphanage.id}`)
-                    }
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    View Details
-                  </Button>
+                {/* Actions */}
+                <div className="space-y-2">
                   {!orphanage.verified && (
-                    <>
-                      <Button
-                        size="sm"
-                        onClick={() => handleVerify(orphanage.id)}
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                      </Button>
+                    <Button
+                      size="sm"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white"
+                      onClick={() => handleVerify(orphanage.id)}
+                    >
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Verify Orphanage
+                    </Button>
+                  )}
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() =>
+                        router.push(`/admin/orphanages/${orphanage.id}`)
+                      }
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Details
+                    </Button>
+                    
+                    {!orphanage.verified && (
                       <Button
                         size="sm"
                         variant="destructive"
@@ -377,8 +415,8 @@ export default function OrphanagesPage() {
                       >
                         <XCircle className="w-4 h-4" />
                       </Button>
-                    </>
-                  )}
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>

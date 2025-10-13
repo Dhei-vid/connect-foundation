@@ -135,8 +135,20 @@ export default function OrphanageRequestPage() {
     setShowEditModal(true);
   };
 
-  const handleDeleteIssue = (issueId: string) => {
-    setIssues((prev) => prev.filter((issue) => issue.id !== issueId));
+  const handleDeleteIssue = async (issueId: string) => {
+    try {
+      // Delete from Firebase
+      const { deleteIssue } = await import("@/firebase/issues");
+      await deleteIssue(issueId);
+      
+      // Update local state
+      setIssues((prev) => prev.filter((issue) => issue.id !== issueId));
+      
+      toast.success("Request deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting issue:", error);
+      toast.error("Failed to delete request");
+    }
   };
 
   const handleUpdateIssues = async () => {
@@ -148,6 +160,7 @@ export default function OrphanageRequestPage() {
       setIssues(updatedIssues);
     } catch (error) {
       console.error("Error refreshing issues:", error);
+      toast.error("Failed to refresh issues");
     }
   };
 

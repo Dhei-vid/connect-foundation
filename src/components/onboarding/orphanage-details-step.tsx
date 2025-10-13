@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 import { Button } from "@/components/ui/button";
-import { MapPin, Mail, Phone, Globe, FileText } from "lucide-react";
+import { MapPin, Mail, Phone, Globe } from "lucide-react";
 import type { Orphanage } from "@/common/types";
 
 interface OrphanageDetailsStepProps {
@@ -22,11 +23,11 @@ export default function OrphanageDetailsStep({
   onUpdate,
   onNext,
   onPrev,
-  isFirstStep,
-  isLastStep,
-  onComplete,
-  isLoading,
-}: OrphanageDetailsStepProps) {
+}: // isFirstStep,
+// isLastStep,
+// onComplete,
+// isLoading,
+OrphanageDetailsStepProps) {
   const [formData, setFormData] = useState({
     name: data.name || "",
     description: data.description || "",
@@ -141,14 +142,11 @@ export default function OrphanageDetailsStep({
           <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
             Description *
           </label>
-          <textarea
+          <Textarea
             name="description"
             value={formData.description}
             onChange={handleInputChange}
             placeholder="Describe your orphanage's mission, activities, and the children you serve"
-            className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white ${
-              errors.description ? "border-red-500" : ""
-            }`}
             rows={4}
             required
           />

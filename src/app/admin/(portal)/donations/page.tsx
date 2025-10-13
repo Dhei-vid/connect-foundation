@@ -20,8 +20,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { getDonations, getDonationStats, updateDonationStatus, getRecentDonations } from "@/firebase/donations";
+import {
+  getDonations,
+  getDonationStats,
+  updateDonationStatus,
+  getRecentDonations,
+} from "@/firebase/donations";
 import type { Donation } from "@/common/types";
+import { SelectField } from "@/components/ui/form-field";
+import { SelectItem } from "@/components/ui/select";
 
 // Loading and error states
 interface LoadingState {
@@ -65,7 +72,9 @@ export default function DonationsPage() {
   const [filterTimeframe, setFilterTimeframe] = useState<
     "all" | "today" | "week" | "month" | "year"
   >("all");
-  const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
+  const [selectedDonation, setSelectedDonation] = useState<Donation | null>(
+    null
+  );
 
   // Load data on component mount
   useEffect(() => {
@@ -75,18 +84,18 @@ export default function DonationsPage() {
   const loadData = async () => {
     try {
       setError(null);
-      
+
       // Load donations, stats, and recent donations in parallel
       const [donationsData, statsData, recentData] = await Promise.all([
         getDonations(),
         getDonationStats(),
-        getRecentDonations(10)
+        getRecentDonations(10),
       ]);
 
       setDonations(donationsData);
       setStats(statsData);
       setRecentDonations(recentData);
-      
+
       setLoading({
         donations: false,
         stats: false,
@@ -107,7 +116,8 @@ export default function DonationsPage() {
     const matchesSearch =
       donation.donorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       donation.donorEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (donation.message && donation.message.toLowerCase().includes(searchTerm.toLowerCase()));
+      (donation.message &&
+        donation.message.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesStatus =
       filterStatus === "all" || donation.status === filterStatus;
@@ -138,23 +148,26 @@ export default function DonationsPage() {
     return matchesSearch && matchesStatus && matchesTimeframe;
   });
 
-  const handleStatusUpdate = async (donationId: string, newStatus: Donation["status"]) => {
+  const handleStatusUpdate = async (
+    donationId: string,
+    newStatus: Donation["status"]
+  ) => {
     try {
       await updateDonationStatus(donationId, newStatus);
-      
+
       // Update local state
-      setDonations(prev => 
-        prev.map(donation => 
-          donation.id === donationId 
+      setDonations((prev) =>
+        prev.map((donation) =>
+          donation.id === donationId
             ? { ...donation, status: newStatus }
             : donation
         )
       );
-      
+
       // Reload stats to reflect changes
       const updatedStats = await getDonationStats();
       setStats(updatedStats);
-      
+
       console.log("Donation status updated successfully");
     } catch (err) {
       console.error("Error updating donation status:", err);
@@ -192,19 +205,23 @@ export default function DonationsPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button 
-            onClick={handleRefresh} 
+          <Button
+            onClick={handleRefresh}
             variant="outline"
             disabled={loading.donations || loading.stats}
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${(loading.donations || loading.stats) ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`w-4 h-4 mr-2 ${
+                loading.donations || loading.stats ? "animate-spin" : ""
+              }`}
+            />
             Refresh
           </Button>
-        <Button onClick={handleExport}>
-          <Download className="w-4 h-4 mr-2" />
-          Export Data
-        </Button>
-      </div>
+          <Button onClick={handleExport}>
+            <Download className="w-4 h-4 mr-2" />
+            Export Data
+          </Button>
+        </div>
       </div>
 
       {/* Error Message */}
@@ -212,10 +229,10 @@ export default function DonationsPage() {
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center">
           <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
           <span className="text-red-800">{error}</span>
-          <Button 
-            onClick={() => setError(null)} 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            onClick={() => setError(null)}
+            variant="ghost"
+            size="sm"
             className="ml-auto"
           >
             <XCircle className="w-4 h-4" />
@@ -329,7 +346,10 @@ export default function DonationsPage() {
           {loading.recent ? (
             <div className="space-y-3">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div
+                  key={i}
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                >
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
                     <div>
@@ -345,36 +365,36 @@ export default function DonationsPage() {
               ))}
             </div>
           ) : (
-          <div className="space-y-3">
-            {recentDonations.slice(0, 5).map((donation) => (
-              <div
-                key={donation.id}
-                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                    <User className="w-5 h-5 text-blue-600" />
+            <div className="space-y-3">
+              {recentDonations.slice(0, 5).map((donation) => (
+                <div
+                  key={donation.id}
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                      <User className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium">
+                        {donation.anonymous ? "Anonymous" : donation.donorName}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {donation.createdAt.toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">
-                      {donation.anonymous ? "Anonymous" : donation.donorName}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {donation.createdAt.toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold">
+                  <div className="text-right">
+                    <p className="font-semibold">
                       ₦{donation.amount.toLocaleString()}
-                  </p>
-                  <Badge className={statusColors[donation.status]}>
-                    {donation.status}
-                  </Badge>
+                    </p>
+                    <Badge className={statusColors[donation.status]}>
+                      {donation.status}
+                    </Badge>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
@@ -395,27 +415,67 @@ export default function DonationsPage() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <select
+              <SelectField
+                label=""
                 value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value as any)}
-                className="px-3 py-2 border rounded-lg text-sm"
+                onValueChange={(value) => setFilterStatus(value as any)}
               >
-                <option value="all">All Status</option>
-                <option value="completed">Completed</option>
-                <option value="pending">Pending</option>
-                <option value="failed">Failed</option>
-              </select>
-              <select
+                {[
+                  {
+                    label: "All Status",
+                    value: "all",
+                  },
+                  {
+                    label: "Completed",
+                    value: "completed",
+                  },
+                  {
+                    label: "Pending",
+                    value: "pending",
+                  },
+                  {
+                    label: "Failed",
+                    value: "failed",
+                  },
+                ].map((item, index) => (
+                  <SelectItem key={index} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectField>
+
+              <SelectField
+                label=""
                 value={filterTimeframe}
-                onChange={(e) => setFilterTimeframe(e.target.value as any)}
-                className="px-3 py-2 border rounded-lg text-sm"
+                onValueChange={(value) => setFilterTimeframe(value as any)}
               >
-                <option value="all">All Time</option>
-                <option value="today">Today</option>
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-                <option value="year">This Year</option>
-              </select>
+                {[
+                  {
+                    label: "All Time",
+                    value: "all",
+                  },
+                  {
+                    label: "Today",
+                    value: "today",
+                  },
+                  {
+                    label: "This Week",
+                    value: "week",
+                  },
+                  {
+                    label: "This Month",
+                    value: "month",
+                  },
+                  {
+                    label: "This Year",
+                    value: "year",
+                  },
+                ].map((item, index) => (
+                  <SelectItem key={index} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectField>
             </div>
           </div>
         </CardContent>
@@ -430,7 +490,10 @@ export default function DonationsPage() {
           {loading.donations ? (
             <div className="space-y-3">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="flex items-center justify-between p-4 border-b">
+                <div
+                  key={i}
+                  className="flex items-center justify-between p-4 border-b"
+                >
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
                     <div>
@@ -446,106 +509,111 @@ export default function DonationsPage() {
               ))}
             </div>
           ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-4">Donor</th>
-                  <th className="text-left py-3 px-4">Amount</th>
-                  <th className="text-left py-3 px-4">Status</th>
-                  <th className="text-left py-3 px-4">Date</th>
-                  <th className="text-left py-3 px-4">Target</th>
-                  <th className="text-left py-3 px-4">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4">Donor</th>
+                    <th className="text-left py-3 px-4">Amount</th>
+                    <th className="text-left py-3 px-4">Status</th>
+                    <th className="text-left py-3 px-4">Date</th>
+                    <th className="text-left py-3 px-4">Target</th>
+                    <th className="text-left py-3 px-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {filteredDonations.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="text-center py-8 text-gray-500">
+                      <td
+                        colSpan={6}
+                        className="text-center py-8 text-gray-500"
+                      >
                         No donations found
                       </td>
                     </tr>
                   ) : (
                     filteredDonations.map((donation) => (
-                  <tr
-                    key={donation.id}
-                    className="border-b hover:bg-gray-50 dark:hover:bg-gray-800"
-                  >
-                    <td className="py-3 px-4">
-                      <div>
-                        <div className="font-medium">
-                          {donation.anonymous
-                            ? "Anonymous"
-                            : donation.donorName}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {donation.donorEmail}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="font-semibold">
+                      <tr
+                        key={donation.id}
+                        className="border-b hover:bg-gray-50 dark:hover:bg-gray-800"
+                      >
+                        <td className="py-3 px-4">
+                          <div>
+                            <div className="font-medium">
+                              {donation.anonymous
+                                ? "Anonymous"
+                                : donation.donorName}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {donation.donorEmail}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="font-semibold">
                             ₦{donation.amount.toLocaleString()}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {donation.currency}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <Badge className={statusColors[donation.status]}>
-                        {donation.status}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4">
-                      {donation.createdAt.toLocaleDateString()}
-                    </td>
-                    <td className="py-3 px-4">
-                      {donation.targetIssueId ? (
-                        <span className="text-sm text-blue-600">
-                          Issue #{donation.targetIssueId}
-                        </span>
-                      ) : (
-                        <span className="text-sm text-gray-500">General</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setSelectedDonation(donation)}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        {donation.status === "pending" && (
-                          <Button
-                            size="sm"
-                            onClick={() =>
-                              handleStatusUpdate(donation.id, "completed")
-                            }
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                          </Button>
-                        )}
-                        {donation.status === "pending" && (
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() =>
-                              handleStatusUpdate(donation.id, "failed")
-                            }
-                          >
-                            <XCircle className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {donation.currency}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <Badge className={statusColors[donation.status]}>
+                            {donation.status}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4">
+                          {donation.createdAt.toLocaleDateString()}
+                        </td>
+                        <td className="py-3 px-4">
+                          {donation.targetIssueId ? (
+                            <span className="text-sm text-blue-600">
+                              Issue #{donation.targetIssueId}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-500">
+                              General
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedDonation(donation)}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            {donation.status === "pending" && (
+                              <Button
+                                size="sm"
+                                onClick={() =>
+                                  handleStatusUpdate(donation.id, "completed")
+                                }
+                              >
+                                <CheckCircle className="w-4 h-4" />
+                              </Button>
+                            )}
+                            {donation.status === "pending" && (
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() =>
+                                  handleStatusUpdate(donation.id, "failed")
+                                }
+                              >
+                                <XCircle className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
                     ))
                   )}
-              </tbody>
-            </table>
-          </div>
+                </tbody>
+              </table>
+            </div>
           )}
         </CardContent>
       </Card>

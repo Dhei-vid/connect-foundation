@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/components/providers";
 import LoadingSpinner from "@/components/general/spinner";
@@ -18,6 +18,13 @@ export default function AdminPortalLayout({
 
   console.log("User:", user);
 
+  // Redirect to signin if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push("/admin/signin");
+    }
+  }, [isLoading, isAuthenticated, router]);
+
   // If loading, show loading state
   if (isLoading) {
     return (
@@ -30,9 +37,16 @@ export default function AdminPortalLayout({
     );
   }
 
+  // Show loading while redirecting
   if (!isAuthenticated) {
-    router.push("/admin/signin");
-    return null;
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Redirecting...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

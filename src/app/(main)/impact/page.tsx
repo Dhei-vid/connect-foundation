@@ -20,6 +20,7 @@ import HeroLayout from "@/components/general/hero-layout";
 import { heroLayoutStyle } from "@/common/style";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { getMockSuccessStories } from "@/common/mock-data";
 
 export default function Page() {
   const router = useRouter();
@@ -182,40 +183,16 @@ export default function Page() {
             Success Stories
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Hope Children's Home",
-                location: "Nairobi, Kenya",
-                achievement: "New school building completed",
-                children: 120,
-                image:
-                  "https://images.unsplash.com/photo-1603998382124-c9835bf50409?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzV8fGhhcHB5JTIwYmxhY2slMjBjaGlsZHJlbnxlbnwwfHwwfHx8MA%3D%3D",
-                description:
-                  "Built a modern school facility serving 120 children, providing quality education and a safe learning environment.",
-              },
-              {
-                title: "Bright Future Orphanage",
-                location: "Mumbai, India",
-                achievement: "Medical clinic established",
-                children: 85,
-                image:
-                  "https://images.unsplash.com/photo-1603998382124-c9835bf50409?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzV8fGhhcHB5JTIwYmxhY2slMjBjaGlsZHJlbnxlbnwwfHwwfHx8MA%3D%3D",
-                description:
-                  "Established a fully-equipped medical clinic providing healthcare to 85 children and the local community.",
-              },
-              {
-                title: "Sunshine House",
-                location: "Lima, Peru",
-                achievement: "Clean water system installed",
-                children: 60,
-                image:
-                  "https://images.unsplash.com/photo-1603998382124-c9835bf50409?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzV8fGhhcHB5JTIwYmxhY2slMjBjaGlsZHJlbnxlbnwwfHwwfHx8MA%3D%3D",
-                description:
-                  "Installed a clean water system ensuring safe drinking water for 60 children and staff.",
-              },
-            ].map((story, index) => (
-              <StoriesCard key={index} {...story} />
+            {getMockSuccessStories({ limitCount: 3 }).map((story) => (
+              <StoriesCard key={story.id} story={story} />
             ))}
+          </div>
+          <div className="text-center mt-12">
+            <Link href="/success-stories">
+              <Button size="lg" className="bg-main-blue hover:bg-main-blue/90 text-white">
+                View All Success Stories
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

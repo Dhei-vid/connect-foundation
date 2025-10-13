@@ -30,6 +30,7 @@ export interface Orphanage {
   website?: string;
   logoURL?: string;
   coverImageURL?: string;
+  images: string[]; // Multiple images of the orphanage, children, facilities
   childrenCount: number;
   staffCount: number;
   foundedYear: number;

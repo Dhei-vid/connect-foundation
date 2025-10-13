@@ -79,24 +79,24 @@ export default function PortalNavbar({ user, onMenuClick }: PortalNavbarProps) {
     updateTheme(newDarkMode);
   };
 
-  const dropDownItems = [
-    {
-      title: "Profile",
-      Icon: UserIcon,
-      action: () => {
-        setNavigationLoading("Profile");
-        router.push("/portal/profile");
-      },
-    },
-    {
-      title: "Settings",
-      Icon: Settings,
-      action: () => {
-        setNavigationLoading("Settings");
-        router.push("/portal/settings");
-      },
-    },
-  ];
+  // const dropDownItems = [
+  //   {
+  //     title: "Profile",
+  //     Icon: UserIcon,
+  //     action: () => {
+  //       setNavigationLoading("Profile");
+  //       router.push("/portal/profile");
+  //     },
+  //   },
+  //   {
+  //     title: "Settings",
+  //     Icon: Settings,
+  //     action: () => {
+  //       setNavigationLoading("Settings");
+  //       router.push("/portal/settings");
+  //     },
+  //   },
+  // ];
 
   const handleLogout = async () => {
     try {
@@ -207,7 +207,7 @@ export default function PortalNavbar({ user, onMenuClick }: PortalNavbarProps) {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {user!.role === "ADMIN" &&
+              {/* {user!.role === "ADMIN" &&
                 dropDownItems.map(({ title, action, Icon }, index) => (
                   <DropdownMenuItem
                     className={"cursor-pointer"}
@@ -227,7 +227,7 @@ export default function PortalNavbar({ user, onMenuClick }: PortalNavbarProps) {
                       </>
                     )}
                   </DropdownMenuItem>
-                ))}
+                ))} */}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className={"cursor-pointer"}

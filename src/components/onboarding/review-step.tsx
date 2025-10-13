@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -10,6 +11,7 @@ import {
   FileText,
   CreditCard,
   CheckCircle,
+  Image as ImageIcon,
 } from "lucide-react";
 import type { Orphanage } from "@/common/types";
 
@@ -289,6 +291,83 @@ export default function ReviewStep({
                   </div>
                 )}
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Images */}
+        {(data.logoURL || data.coverImageURL || (data.images && data.images.length > 0)) && (
+          <Card className={"py-4"}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ImageIcon className="w-5 h-5" />
+                Images
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Logo */}
+              {data.logoURL && (
+                <div>
+                  <span className="text-sm font-medium text-gray-500 block mb-2">
+                    Logo:
+                  </span>
+                  <div className="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 relative">
+                    <Image
+                      src={data.logoURL || ""}
+                      alt="Organization Logo"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Cover Image */}
+              {data.coverImageURL && (
+                <div>
+                  <span className="text-sm font-medium text-gray-500 block mb-2">
+                    Cover Image:
+                  </span>
+                  <div className="w-full aspect-[3/1] rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 relative">
+                    <Image
+                      src={data.coverImageURL || ""}
+                      alt="Cover Image"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Gallery */}
+              {data.images && data.images.length > 0 && (
+                <div>
+                  <span className="text-sm font-medium text-gray-500 block mb-2">
+                    Photo Gallery ({data.images.length} {data.images.length === 1 ? 'image' : 'images'}):
+                  </span>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {data.images.map((image, index) => (
+                      <div
+                        key={index}
+                        className="aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 relative"
+                      >
+                        <Image
+                          src={image}
+                          alt={`Gallery ${index + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {!data.logoURL && !data.coverImageURL && (!data.images || data.images.length === 0) && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                  No images uploaded. You can add images later from your settings.
+                </p>
+              )}
             </CardContent>
           </Card>
         )}

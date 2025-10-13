@@ -44,3 +44,21 @@ export const formatCurrency = (amount: number) => {
 export const formatNumber = (num: number) => {
   return new Intl.NumberFormat("en-NG").format(num);
 };
+
+export const getStatusVariant = (
+  status: "completed" | "pending" | "failed"
+) => {
+  switch (status) {
+    case "completed":
+      return "success";
+
+    case "pending":
+      return "pending";
+
+    case "failed":
+      return "destructive";
+
+    default:
+      return "secondary";
+  }
+};

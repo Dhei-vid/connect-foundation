@@ -2,6 +2,7 @@ import { HeroSection } from "@/components/landing/hero-section";
 import { FeaturesSection } from "@/components/landing/features-section";
 import { VolunteerSection } from "@/components/landing/volunteer-section";
 import { StoriesSection } from "@/components/landing/stories";
+import { OrphanagesNeedHelpSection } from "@/components/landing/orphanages-need-help";
 import { Footer } from "@/components/landing/footer";
 
 // import { HowItWorks } from "@/components/landing/how-it-works";
@@ -22,6 +23,8 @@ export default function Home() {
       <FeaturesSection />
 
       <StoriesSection />
+
+      <OrphanagesNeedHelpSection />
 
       <VolunteerSection />
 

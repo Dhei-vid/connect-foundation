@@ -1,5 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { Heart, Users, Globe, Shield, Star, ChevronRight } from "lucide-react";
+import {
+  Heart,
+  Users,
+  Globe,
+  Shield,
+  Star,
+  ChevronRight,
+  Earth,
+  ArrowUpFromDot,
+  HeartHandshake,
+} from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -57,11 +67,11 @@ export default function Page() {
                 <div className="flex items-center gap-2 mb-2">
                   <Heart size={18} className="text-main-red" />
                   <span className="text-sm font-medium text-main-red italic">
-                    Our Mission
+                    Our History
                   </span>
                 </div>
                 <h2 className="text-4xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">
-                  Bridging Orphanages and Donors
+                  The Beginning
                 </h2>
                 <p className="text-base text-gray-600 dark:text-gray-300 max-w-4xl mx-auto">
                   To provide orphanages with a platform to share their needs and
@@ -69,48 +79,51 @@ export default function Page() {
                 </p>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-                  We believe every child deserves access to basic necessities,
-                  education, and care. Our platform ensures transparency and
-                  accountability, allowing donors to see exactly how their
-                  contributions are making a difference in real-time.
+                  Connect Orphanage Foundation (COF) was born out of a heartfelt
+                  desire to nurture, uplift and protect vulnerable members of
+                  our society &quot;orphans&quot;. Too many children grow up
+                  without the love, care and resources they deserve. Our
+                  foundation exists to change that narrative.
                 </p>
                 <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-                  A world where no orphanage struggles alone, and every donor
-                  can see the direct impact of their generosity through
-                  transparent, accountable giving.
+                  Our vision is to see a society where every orphan is not only
+                  cared for but also empowered to thrive. We believe that every
+                  child regardless of their background or loss deserves a future
+                  filled with opportunity, love and belonging.
+                </p>
+                <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+                  Our mission is to connect with orpahanges and communities
+                  providing practical, emotional, educational support to
+                  children they serve. We are committed to partnering with
+                  caregivers, volunteers, donors and institutions to build a
+                  compassionate ecosystem that uplifts orphan and helps them
+                  reach their fill potential.
+                </p>
+                <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+                  Our short-term goals include providing essential items to
+                  selected orphanages, launching awareness campaigns,
+                  establishing foundational partnerships and mobilizing a
+                  network of volunteers and medical assistance.
+                </p>
+                <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+                  Our long-term goals include building a structured support
+                  system, funding scholarships and vocational programs,
+                  establishing safe spaces and expanding worldwide.
+                </p>
+                <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+                  We invite you to join us in nuturing orphans with love and
+                  dignity whether you are an individual, business owner, or
+                  community group, your support can help us create lasting
+                  change. Together we can connect hearts to those who need it
+                  the most.
                 </p>
               </div>
-
-              {/* Legacy Section - Matching home page pattern */}
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-2xl p-6 dark:border-green-800">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Star className="w-6 h-6 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                      A Legacy of Global Impact
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300">
-                      Supporting education, healing, and cultural programs
-                      across generations and continents.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                size="lg"
-                className="text-lg px-8 py-3 bg-main-blue rounded-full"
-              >
-                Learn More &gt;
-              </Button>
             </div>
 
             {/* Right Images - Matching home page image pattern */}
-            <div className="relative">
+            <div className="relative space-y-5">
               {/* Top Right Image */}
               <div className="relative mb-6">
                 <Image
@@ -148,6 +161,30 @@ export default function Page() {
                 </div>
               </div>
 
+              {/* Legacy Section - Matching home page pattern */}
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-2xl p-6 dark:border-green-800">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Star className="w-6 h-6 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                      A Legacy of Global Impact
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      Let&apos;s build a future where no child feels forgotten.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                size="lg"
+                className="text-lg px-8 py-3 bg-main-blue rounded-full"
+              >
+                Learn More &gt;
+              </Button>
+
               {/* Decorative Element - Matching home page */}
               <div className="absolute -top-4 -left-4 w-32 h-32 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-full opacity-20 blur-2xl"></div>
             </div>
@@ -173,32 +210,53 @@ export default function Page() {
             {
               title: "Compassion",
               description:
-                "We approach every interaction with empathy and understanding, recognizing the unique challenges each orphanage faces.",
+                "We serve with genuine care and empathy ensuring every child feels seen, heard and loved.",
               icon: Heart,
               color: "from-pink-500 to-rose-500",
             },
             {
-              title: "Transparency",
+              title: "Dignity",
               description:
-                "We believe in complete openness about how funds are used, ensuring donors can trust their contributions make a real impact.",
+                "We upload the inherent worth of every orphaned child treating them with the respect they deserve.",
               icon: Shield,
               color: "from-blue-500 to-cyan-500",
             },
             {
-              title: "Global Community",
+              title: "Accountability",
               description:
-                "We foster connections across borders, bringing together people from different cultures and backgrounds united by a common goal.",
+                "We act with integrity, transparency and responsibility in all our relationships and uses of resources.",
               icon: Globe,
               color: "from-green-500 to-emerald-500",
             },
+            {
+              title: "Connections",
+              description:
+                "We belive in building strong, supportive relationships with children, caregivers, donors and the wider community.",
+              icon: Earth,
+              color: "from-green-500 to-emerald-500",
+            },
+            {
+              title: "Empowerment",
+              description:
+                "We create opportunities for orphans to thrive not just survive by supporting their education, wellbeing and self confidence.",
+              icon: ArrowUpFromDot,
+              color: "from-green-500 to-emerald-500",
+            },
+            {
+              title: "Service",
+              description:
+                "We are committed to self-less service rooted in sincerity, faith and love for humaity.",
+              icon: HeartHandshake,
+              color: "bg-main-blue",
+            },
           ].map((value, index) => (
             <div className="relative" key={index}>
-              <div className="overflow-hidden hover:shadow-xl transition-all duration-300 bg-white rounded-2xl p-6">
+              <div className="h-[18rem] overflow-hidden hover:shadow-xl transition-all duration-300 bg-white rounded-2xl p-6">
                 <div className="text-center">
                   <div
-                    className={`w-20 h-20 rounded-3xl bg-gradient-to-r ${value.color} p-5 mx-auto mb-4`}
+                    className={`w-20 h-20 rounded-3xl bg-main-blue p-5 mx-auto mb-4`}
                   >
-                    <value.icon className="w-full h-full text-white" />
+                    <value.icon className="w-full h-full text-main-red/90" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
                     {value.title}

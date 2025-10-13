@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/components/providers";
 import LoadingSpinner from "@/components/general/spinner";
@@ -16,6 +16,15 @@ export default function OrphanagePortalLayout({
   const { isAuthenticated, user, isLoading } = useAuthContext();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Redirect to signin if not authenticated, or to onboarding if not completed
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push("/orphanage/signin");
+    } else if (!isLoading && isAuthenticated && user && !user.onboardingCompleted) {
+      router.push("/orphanage/onboarding");
+    }
+  }, [isLoading, isAuthenticated, user, router]);
+
   // If loading, show loading state
   if (isLoading) {
     return (
@@ -28,8 +37,28 @@ export default function OrphanagePortalLayout({
     );
   }
 
+  // Show loading while redirecting
   if (!isAuthenticated) {
-    router.push("/orphanage/signin");
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Redirecting to sign in...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading while redirecting to onboarding
+  if (user && !user.onboardingCompleted) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Redirecting to onboarding...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

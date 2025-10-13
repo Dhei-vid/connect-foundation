@@ -64,38 +64,51 @@ export function FeaturesSection() {
                 <Heart size={18} className="text-main-red" />
                 <p className={"font-semibold italic text-main-red"}>About Us</p>
               </div>
-              <p className="font-bold text-2xl 2xl:text-5xl">
-                Give Time, Change Lives Volunteer Opportunities
-              </p>
+              <p className="font-bold text-2xl 2xl:text-5xl">Connect</p>
             </div>
 
             <div>
               <p>
-                Loads of text here about our mission, vision, and the impact we
-                aim to create in the lives of children in need. Loads of text
-                here about our mission, vision, and the impact we aim to create
-                in the lives of children in need.
+                Connect Orphanage Foundation (COF) was founded out of deep
+                personal conviction that no child should be left behind simply
+                because they lost their parents. In many parts of our community
+                and beyond, orphans face silent struggles, lack of food,
+                shelter, education, emotional support and most importantly the
+                feeling of being forgotten.
               </p>
             </div>
 
-            <div className="space-y-6 m-0 lg:ml-10 xl:ml-15">
+            <div className="space-y-6 m-0 lg:ml-10 xl:ml-10">
               <p>
-                Loads of text here about our mission, vision, and the impact we
-                aim to create in the lives of children in need. Loads of text
-                here about our mission, vision, and the impact we aim to create
-                in the lives of children in need.
+                As an organization who has always believed in compassion,
+                service and meaningful impact, we found ourselves drawn to the
+                needs of orphaned children. The more we visited orphanages and
+                listened to their stories the more we realized how much could be
+                done if we were simply willing to connect hearts to the
+                children, resources to the need, and communities to
+                responsibilities.
               </p>
               <div>
-                <div>
-                  <div className="flex flex-row items-center gap-1">
+                <div className="space-y-3">
+                  {/* <div className="flex flex-row items-center gap-1">
                     <HeartHandshake size={20} className="text-main-red" />
                     <p className={"font-bold text-xl 2xl:text-2xl"}>
                       A legacy of Indigenous Environment
                     </p>
-                  </div>
+                  </div> */}
                   <p className={""}>
-                    Supporting culture, healing, and education across
-                    generations.
+                    We exist not just to give handouts, but to build long
+                    lasting relationships with orphanages, caretakers and the
+                    children themselves. We aim to address their needs
+                    holistically supporting their physical wellbeing, emotional
+                    healing, spiritual growth, and educational advancement.
+                  </p>
+                  <p className={""}>
+                    This foundation is a response to real need, it is also a
+                    call to communities, and partners to act with love
+                    consistency and dignity. Our &quot;connects&quot; speaks to
+                    our core belief. When we connect with compassion, we can
+                    change lives forever.
                   </p>
                 </div>
               </div>

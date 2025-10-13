@@ -118,7 +118,7 @@ export default function AdminSignInPage() {
               Can&apos;t login?{" "}
               <Link
                 href="/admin/signup"
-                className="text-blue-600 hover:underline"
+                className="text-main-red hover:underline"
               >
                 Contact system administrator
               </Link>

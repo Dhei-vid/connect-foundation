@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/components/providers";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import {
   CheckCircle,
   ArrowRight,
   ArrowLeft,
+  Image as ImageIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { extractErrorMessage } from "@/common/helpers";
@@ -28,6 +29,7 @@ import ContactPersonStep from "@/components/onboarding/contact-person-step";
 import OrphanageDetailsStep from "@/components/onboarding/orphanage-details-step";
 import StatisticsStep from "@/components/onboarding/statistics-step";
 import LegalFinancialStep from "@/components/onboarding/legal-financial-step";
+import ImagesStep from "@/components/onboarding/images-step";
 import ReviewStep from "@/components/onboarding/review-step";
 
 const steps = [
@@ -45,7 +47,13 @@ const steps = [
     icon: CreditCard,
     component: LegalFinancialStep,
   },
-  { id: 5, title: "Review", icon: CheckCircle, component: ReviewStep },
+  {
+    id: 5,
+    title: "Images",
+    icon: ImageIcon,
+    component: ImagesStep,
+  },
+  { id: 6, title: "Review", icon: CheckCircle, component: ReviewStep },
 ];
 
 export default function OnboardingPage() {
@@ -102,9 +110,9 @@ export default function OnboardingPage() {
     }
   }, [user?.uid]);
 
-  const updateFormData = (data: Partial<Orphanage>) => {
+  const updateFormData = useCallback((data: Partial<Orphanage>) => {
     setFormData((prev) => ({ ...prev, ...data }));
-  };
+  }, []);
 
   const nextStep = () => {
     if (currentStep < steps.length) {

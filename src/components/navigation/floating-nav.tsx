@@ -27,6 +27,7 @@ const navItems = [
   { icon: Home, label: "Home", href: "/" },
   { icon: Users, label: "About Us", href: "/about-us" },
   { icon: Heart, label: "Impact", href: "/impact" },
+  { icon: Heart, label: "Success Stories", href: "/success-stories" },
   { icon: MessageCircle, label: "Contact", href: "/contact" },
   { icon: DollarSign, label: "Donate", href: "/donate" },
   { icon: BarChart3, label: "Transparency", href: "/transparency" },
