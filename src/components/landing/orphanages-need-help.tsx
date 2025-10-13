@@ -64,6 +64,7 @@ const mockOrphanageIssues = [
 
 interface OrphanageWithIssue extends Orphanage {
   currentIssue: {
+    orphanageId: string;
     title: string;
     category:
       | "medical"
@@ -97,24 +98,31 @@ export function OrphanagesNeedHelpSection() {
       await new Promise((resolve) => setTimeout(resolve, 600));
 
       // Combine orphanages with their issues
-      const orphanagesWithIssues = mockOrphanages
-        .map((orphanage) => {
-          const issue = mockOrphanageIssues.find(
-            (i) => i.orphanageId === orphanage.id
-          );
-          if (!issue) return null;
-
-          return {
+      const orphanagesWithIssues: OrphanageWithIssue[] = [];
+      
+      for (const orphanage of mockOrphanages) {
+        const issue = mockOrphanageIssues.find(
+          (i) => i.orphanageId === orphanage.id
+        );
+        
+        if (issue) {
+          orphanagesWithIssues.push({
             ...orphanage,
             currentIssue: {
-              ...issue,
+              orphanageId: issue.orphanageId,
+              title: issue.title,
+              category: issue.category,
+              priority: issue.priority,
+              estimatedCost: issue.estimatedCost,
+              raisedAmount: issue.raisedAmount,
+              description: issue.description,
               percentageRaised: Math.round(
                 (issue.raisedAmount / issue.estimatedCost) * 100
               ),
             },
-          };
-        })
-        .filter((o): o is OrphanageWithIssue => o !== null);
+          });
+        }
+      }
 
       setOrphanages(orphanagesWithIssues);
     } catch (error) {
