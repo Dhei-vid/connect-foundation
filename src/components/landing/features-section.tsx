@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
-import { Heart, HeartHandshake } from "lucide-react";
+import { Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -45,7 +45,7 @@ export function FeaturesSection() {
             <div className="absolute right-0 top-[80%] lg:top-[50%] bg-white p-1 rounded-[2rem]">
               <div className="space-y-3 bg-main-red rounded-[2rem] px-4 py-4 lg:py-6 w-[15rem] lg:w-[20rem]">
                 <p className="text-grey font-bold text-lg 2xl:text-3xl">
-                  150 Grants Awarded Across 5 Countries
+                  A single act of kindness can go a long way.
                 </p>
                 <Link
                   className="underline italic font-semibold text-main-blue/90 hover:text-main-blue/70"

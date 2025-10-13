@@ -13,6 +13,7 @@ import {
   X,
   User,
   LogOut,
+  HandHeart,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,6 +29,7 @@ const navItems = [
   { icon: Users, label: "About Us", href: "/about-us" },
   { icon: Heart, label: "Impact", href: "/impact" },
   { icon: Heart, label: "Success Stories", href: "/success-stories" },
+  { icon: HandHeart, label: "Help", href: "/help" },
   { icon: MessageCircle, label: "Contact", href: "/contact" },
   { icon: DollarSign, label: "Donate", href: "/donate" },
   { icon: BarChart3, label: "Transparency", href: "/transparency" },

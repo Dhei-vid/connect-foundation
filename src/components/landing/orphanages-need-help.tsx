@@ -65,7 +65,13 @@ const mockOrphanageIssues = [
 interface OrphanageWithIssue extends Orphanage {
   currentIssue: {
     title: string;
-    category: "medical" | "education" | "food" | "shelter" | "clothing" | "other";
+    category:
+      | "medical"
+      | "education"
+      | "food"
+      | "shelter"
+      | "clothing"
+      | "other";
     priority: "low" | "medium" | "high" | "urgent";
     estimatedCost: number;
     raisedAmount: number;
@@ -140,12 +146,14 @@ export function OrphanagesNeedHelpSection() {
             <Heart className="w-6 h-6 text-main-red" />
             <p className="text-main-red italic font-medium">Urgent Needs</p>
           </div>
-          <h2 className={cn(headerStyle, "text-main-blue dark:text-white mb-4")}>
+          <h2
+            className={cn(headerStyle, "text-main-blue dark:text-white mb-4")}
+          >
             Orphanages That Need Your Help
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            These orphanages have urgent needs. Your donation can make an immediate
-            difference in the lives of children.
+            These orphanages have urgent needs. Your donation can make an
+            immediate difference in the lives of children.
           </p>
         </div>
 
@@ -300,4 +308,3 @@ export function OrphanagesNeedHelpSection() {
     </section>
   );
 }
-

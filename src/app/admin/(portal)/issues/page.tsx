@@ -21,7 +21,7 @@ import { getIssues, getIssueStats, updateIssueStatus } from "@/firebase/issues";
 import { toast } from "sonner";
 import type { Issue } from "@/common/types";
 import { priorityColors, categoryColors, statusColors } from "@/common/style";
-import LoadingSpinner from "@/components/general/spinner";
+import { formatCurrency } from "@/common/helpers";
 import { SelectField } from "@/components/ui/form-field";
 import { SelectItem } from "@/components/ui/select";
 
@@ -354,7 +354,10 @@ export default function IssuesPage() {
       {/* Issues List */}
       <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
         {filteredIssues.map((issue) => (
-          <Card key={issue.id} className="hover:shadow-lg transition-shadow h-full flex flex-col">
+          <Card
+            key={issue.id}
+            className="hover:shadow-lg transition-shadow h-full flex flex-col"
+          >
             <CardContent className="p-6 flex flex-col flex-1">
               <div className="flex items-start justify-between flex-1">
                 <div className="flex-1 flex flex-col">
@@ -387,13 +390,13 @@ export default function IssuesPage() {
                     <div>
                       <span className="text-gray-500">Estimated Cost:</span>
                       <div className="font-medium">
-                        ${issue.estimatedCost.toLocaleString()}
+                        {formatCurrency(issue.estimatedCost)}
                       </div>
                     </div>
                     <div>
                       <span className="text-gray-500">Raised:</span>
                       <div className="font-medium">
-                        ${issue.raisedAmount.toLocaleString()}
+                        {formatCurrency(issue.raisedAmount)}
                       </div>
                     </div>
                     <div>

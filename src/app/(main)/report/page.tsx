@@ -36,6 +36,7 @@ import {
   ChevronDown,
   Database,
   Sparkles,
+  NotebookPen,
 } from "lucide-react";
 import Image from "next/image";
 import {
@@ -54,6 +55,36 @@ interface FinancialSummary {
   value: number;
   label: string;
   icon: LucideIcon;
+}
+
+interface LiveData {
+  [year: string]: {
+    totalRevenue: number;
+    totalExpenses: number;
+    netIncome: number;
+    donations: number;
+    grants: number;
+    programExpenses: number;
+    administrativeExpenses: number;
+    fundraisingExpenses: number;
+    monthlyData: Array<{
+      month: string;
+      revenue: number;
+      expenses: number;
+      donations: number;
+    }>;
+    programBreakdown: Array<{
+      name: string;
+      value: number;
+      color: string;
+    }>;
+    impactMetrics: {
+      childrenHelped: number;
+      orphanagesSupported: number;
+      volunteers: number;
+      projectsCompleted: number;
+    };
+  };
 }
 
 // Mock financial data grouped by years
@@ -189,7 +220,7 @@ const financialData = {
   },
 };
 
-const years = Object.keys(financialData).sort((a, b) => Number(b) - Number(a));
+// const years = Object.keys(financialData).sort((a, b) => Number(b) - Number(a));
 
 // Chart configurations with main blue color scheme
 const chartConfig = {
@@ -209,7 +240,9 @@ export default function Page() {
   );
   const [useMockData, setUseMockData] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [liveFinancialData, setLiveFinancialData] = useState<any>(null);
+  const [liveFinancialData, setLiveFinancialData] = useState<LiveData | null>(
+    null
+  );
 
   useEffect(() => {
     if (!useMockData) {
@@ -223,7 +256,7 @@ export default function Page() {
 
       // Get all financial records
       const records = await getFinancialRecords();
-      const stats = await getFinancialStats();
+      // const stats = await getFinancialStats();
 
       // Group by year
       const recordsByYear: { [year: string]: FinancialRecord[] } = {};
@@ -236,7 +269,8 @@ export default function Page() {
       });
 
       // Convert to the format needed for display
-      const liveData: any = {};
+
+      const liveData: LiveData = {};
       Object.keys(recordsByYear).forEach((year) => {
         const yearRecords = recordsByYear[year];
         const income = yearRecords
@@ -510,6 +544,22 @@ export default function Page() {
           </div>
         </section>
       )}
+
+      <div className="text-center mb-12">
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <NotebookPen className="w-6 h-6 text-main-red" />
+          <p className="text-main-red italic font-medium">Financial Records</p>
+        </div>
+        <h2 className={cn(headerStyle, "text-main-blue dark:text-white mb-4")}>
+          Our Commitment to Accountability
+        </h2>
+        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-6xl mx-auto">
+          We are dedicated to building a foundation of trust, integrity and
+          results. Every donation, program and outreach will be documented and
+          shared with our stakeholders to reflect our commitment to making a
+          real difference in the lives of orphans.
+        </p>
+      </div>
 
       {/* Grouping financial reports */}
       {!loading && (
@@ -881,7 +931,14 @@ export default function Page() {
                                       </td>
                                     </tr>
                                     {yearData.programBreakdown.map(
-                                      (program, index) => (
+                                      (
+                                        program: {
+                                          name: string;
+                                          value: number;
+                                          color: string;
+                                        },
+                                        index: number
+                                      ) => (
                                         <tr
                                           key={index}
                                           className="hover:bg-gray-50 dark:hover:bg-gray-800/50"
@@ -975,7 +1032,14 @@ export default function Page() {
                                       dataKey="value"
                                     >
                                       {yearData.programBreakdown.map(
-                                        (entry, index) => (
+                                        (
+                                          entry: {
+                                            name: string;
+                                            value: number;
+                                            color: string;
+                                          },
+                                          index: number
+                                        ) => (
                                           <Cell
                                             key={`cell-${index}`}
                                             fill={entry.color}

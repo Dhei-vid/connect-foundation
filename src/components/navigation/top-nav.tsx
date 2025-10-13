@@ -36,6 +36,7 @@ const navItems = [
   { label: "Home", href: "/" },
   { label: "About Us", href: "/about-us", hasDropdown: false },
   { label: "Impact", href: "/impact", hasDropdown: true },
+  { label: "Help", href: "/help" },
   { label: "Volunteer", href: "/volunteer" },
   { label: "Contact", href: "/contact" },
 ];
