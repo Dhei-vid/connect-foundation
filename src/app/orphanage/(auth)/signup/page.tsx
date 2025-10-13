@@ -101,6 +101,7 @@ export default function OrphanageSignUpPage() {
         contactPersonEmail: formData.contactPersonEmail,
         contactPersonPhone: formData.contactPersonPhone,
         contactPersonPosition: formData.contactPersonPosition,
+        images: [], // Default value for images
       };
 
       // Create orphanage profile
