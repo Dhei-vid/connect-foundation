@@ -14,6 +14,7 @@ import {
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import type { SuccessStory } from "@/common/types";
+import { formatCurrency } from "@/common/helpers";
 
 interface IStoriesCard {
   story: SuccessStory;
@@ -22,14 +23,6 @@ interface IStoriesCard {
 
 const StoriesCard: FC<IStoriesCard> = ({ story, onClick }) => {
   const router = useRouter();
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {

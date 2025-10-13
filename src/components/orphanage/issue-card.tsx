@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Issue } from "@/common/types";
+import { formatCurrency } from "@/common/helpers";
 
 interface IssueCardProps {
   issue: Issue;
@@ -134,14 +135,14 @@ export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps)
               <DollarSign className="h-4 w-4 text-gray-400" />
               <span className="text-sm font-medium">Raised:</span>
               <span className="text-sm">
-                ₦{issue.raisedAmount.toLocaleString()}
+                {formatCurrency(issue.raisedAmount)}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-gray-400" />
               <span className="text-sm font-medium">Needed:</span>
               <span className="text-sm">
-                ₦{issue.estimatedCost.toLocaleString()}
+                {formatCurrency(issue.estimatedCost)}
               </span>
             </div>
             <div className="flex items-center gap-2">

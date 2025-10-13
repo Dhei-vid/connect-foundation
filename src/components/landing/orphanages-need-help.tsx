@@ -20,6 +20,7 @@ import { headerStyle, paddingStyle, categoryColors } from "@/common/style";
 import { Skeleton } from "@/components/ui/skeleton";
 import { mockOrphanages } from "@/common/mock-data";
 import type { Orphanage } from "@/common/types";
+import { formatCurrency } from "@/common/helpers";
 
 // Mock issues data for orphanages
 const mockOrphanageIssues = [
@@ -115,14 +116,6 @@ export function OrphanagesNeedHelpSection() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-      minimumFractionDigits: 0,
-    }).format(amount);
   };
 
   const getPriorityColor = (priority: string) => {

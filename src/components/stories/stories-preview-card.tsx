@@ -8,6 +8,7 @@ import { CheckCircle, Users, MapPin, Calendar, ArrowRight } from "lucide-react";
 import { Button } from "../ui/button";
 import type { SuccessStory } from "@/common/types";
 import { useRouter } from "next/navigation";
+import { formatCurrency } from "@/common/helpers";
 
 interface StoriesPreviewCardProps {
   story: SuccessStory;
@@ -16,14 +17,6 @@ interface StoriesPreviewCardProps {
 
 const StoriesPreviewCard: FC<StoriesPreviewCardProps> = ({ story, index = 0 }) => {
   const router = useRouter();
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {

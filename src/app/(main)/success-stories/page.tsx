@@ -33,6 +33,7 @@ import {
   getMockOrphanageById,
 } from "@/common/mock-data";
 import StoriesCard from "@/components/stories/stories-card";
+import { formatCurrency } from "@/common/helpers";
 
 interface SuccessStoryWithOrphanage extends SuccessStory {
   orphanage?: Orphanage | null;
@@ -100,14 +101,6 @@ export default function SuccessStoriesPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-      minimumFractionDigits: 0,
-    }).format(amount);
   };
 
   const formatDate = (date: Date) => {

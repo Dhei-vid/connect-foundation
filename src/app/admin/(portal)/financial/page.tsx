@@ -48,6 +48,7 @@ import {
   updateFinancialRecord,
 } from "@/firebase/financials";
 import type { FinancialRecord } from "@/common/types";
+import { formatCurrency } from "@/common/helpers";
 
 // Mock data - in real app, this would come from your database
 const mockFinancialRecords = [
@@ -234,7 +235,7 @@ export default function FinancialPage() {
         
         if (amount > availableFunds) {
           toast.error(
-            `Insufficient funds! Available: $${availableFunds.toLocaleString()}. Requested: $${amount.toLocaleString()}`,
+            `Insufficient funds! Available: ${formatCurrency(availableFunds)}. Requested: ${formatCurrency(amount)}`,
             {
               duration: 5000,
               description: "The expense amount exceeds the available balance from donations. Please reduce the amount or wait for more donations.",
@@ -449,7 +450,7 @@ export default function FinancialPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              ${totalIncome.toLocaleString()}
+              {formatCurrency(totalIncome)}
             </div>
             <p className="text-xs text-muted-foreground">
               This {selectedPeriod}
@@ -466,7 +467,7 @@ export default function FinancialPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
-              ${totalExpenses.toLocaleString()}
+              {formatCurrency(totalExpenses)}
             </div>
             <p className="text-xs text-muted-foreground">
               This {selectedPeriod}
@@ -485,7 +486,7 @@ export default function FinancialPage() {
                 netIncome >= 0 ? "text-green-600" : "text-red-600"
               }`}
             >
-              ${netIncome.toLocaleString()}
+              {formatCurrency(netIncome)}
             </div>
             <p className="text-xs text-muted-foreground">
               {netIncome >= 0 ? "Surplus" : "Deficit"}
@@ -532,7 +533,7 @@ export default function FinancialPage() {
                 TOTAL INCOME
               </h3>
               <div className="text-3xl font-bold text-green-600 mb-2">
-                ${totalIncome.toLocaleString()}
+                {formatCurrency(totalIncome)}
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
                 From donations & grants
@@ -571,7 +572,7 @@ export default function FinancialPage() {
                 TOTAL EXPENSES
               </h3>
               <div className="text-3xl font-bold text-red-600 mb-2">
-                ${totalExpenses.toLocaleString()}
+                {formatCurrency(totalExpenses)}
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
                 Invested in programs
@@ -600,7 +601,7 @@ export default function FinancialPage() {
                   netIncome >= 0 ? "text-green-600" : "text-red-600"
                 }`}
               >
-                ${Math.abs(netIncome).toLocaleString()}
+                {formatCurrency(Math.abs(netIncome))}
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {netIncome >= 0
@@ -693,7 +694,7 @@ export default function FinancialPage() {
                             {percentage.toFixed(1)}%
                           </span>
                           <span className="text-sm font-bold text-green-600 min-w-[100px] text-right">
-                            ${item.amount.toLocaleString()}
+                            {formatCurrency(item.amount)}
                           </span>
                         </div>
                       </div>
@@ -742,7 +743,7 @@ export default function FinancialPage() {
                             {percentage.toFixed(1)}%
                           </span>
                           <span className="text-sm font-bold text-red-600 min-w-[100px] text-right">
-                            ${item.amount.toLocaleString()}
+                            {formatCurrency(item.amount)}
                           </span>
                         </div>
                       </div>
@@ -828,8 +829,7 @@ export default function FinancialPage() {
                             : "text-red-600"
                         }`}
                       >
-                        {record.type === "income" ? "+" : "-"}$
-                        {record.amount.toLocaleString()}
+                        {record.type === "income" ? "+" : "-"}{formatCurrency(record.amount).replace(/^₦/, "")}
                       </span>
                     </td>
                     <td className="py-3 px-4">
@@ -923,8 +923,7 @@ export default function FinancialPage() {
                             : "text-red-600"
                         }`}
                       >
-                        {selectedRecord.type === "income" ? "+" : "-"}$
-                        {selectedRecord.amount.toLocaleString()}
+                        {formatCurrency(selectedRecord.amount)}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
@@ -1011,7 +1010,7 @@ export default function FinancialPage() {
                 </span>
               </div>
               <div className="text-2xl font-bold text-blue-600">
-                ${(totalIncome - totalExpenses).toLocaleString()}
+                {formatCurrency(totalIncome - totalExpenses)}
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                 Expenses cannot exceed this amount
