@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { MultiImageUpload } from "@/components/ui/multi-image-upload";
 import { SingleImageUpload } from "@/components/ui/single-image-upload";
 import { Image as ImageIcon, Building2, Check, Info } from "lucide-react";
@@ -24,10 +23,14 @@ export function OrphanageImageManager({
   disabled = false,
 }: OrphanageImageManagerProps) {
   const [logoURL, setLogoURL] = useState<string | undefined>(orphanage.logoURL);
-  const [coverImageURL, setCoverImageURL] = useState<string | undefined>(orphanage.coverImageURL);
+  const [coverImageURL, setCoverImageURL] = useState<string | undefined>(
+    orphanage.coverImageURL
+  );
   const [images, setImages] = useState<string[]>(orphanage.images || []);
   const [logoSource, setLogoSource] = useState<"upload" | "gallery">("upload");
-  const [coverSource, setCoverSource] = useState<"upload" | "gallery">("upload");
+  const [coverSource, setCoverSource] = useState<"upload" | "gallery">(
+    "upload"
+  );
   const [selectedLogoIndex, setSelectedLogoIndex] = useState<number>(-1);
   const [selectedCoverIndex, setSelectedCoverIndex] = useState<number>(-1);
 
@@ -51,12 +54,20 @@ export function OrphanageImageManager({
 
   const handleImagesChange = (newImages: string[]) => {
     setImages(newImages);
-    
+
     // Reset gallery selections if the selected image was removed
-    if (logoSource === "gallery" && selectedLogoIndex >= 0 && !newImages.includes(images[selectedLogoIndex])) {
+    if (
+      logoSource === "gallery" &&
+      selectedLogoIndex >= 0 &&
+      !newImages.includes(images[selectedLogoIndex])
+    ) {
       setSelectedLogoIndex(-1);
     }
-    if (coverSource === "gallery" && selectedCoverIndex >= 0 && !newImages.includes(images[selectedCoverIndex])) {
+    if (
+      coverSource === "gallery" &&
+      selectedCoverIndex >= 0 &&
+      !newImages.includes(images[selectedCoverIndex])
+    ) {
       setSelectedCoverIndex(-1);
     }
   };
@@ -88,13 +99,15 @@ export function OrphanageImageManager({
   };
 
   const handleSave = () => {
-    const finalLogoURL = logoSource === "gallery" && selectedLogoIndex >= 0 
-      ? images[selectedLogoIndex] 
-      : logoURL;
-    
-    const finalCoverURL = coverSource === "gallery" && selectedCoverIndex >= 0 
-      ? images[selectedCoverIndex] 
-      : coverImageURL;
+    const finalLogoURL =
+      logoSource === "gallery" && selectedLogoIndex >= 0
+        ? images[selectedLogoIndex]
+        : logoURL;
+
+    const finalCoverURL =
+      coverSource === "gallery" && selectedCoverIndex >= 0
+        ? images[selectedCoverIndex]
+        : coverImageURL;
 
     onUpdate({
       logoURL: finalLogoURL,
@@ -119,8 +132,12 @@ export function OrphanageImageManager({
     logoURL !== orphanage.logoURL ||
     coverImageURL !== orphanage.coverImageURL ||
     JSON.stringify(images) !== JSON.stringify(orphanage.images || []) ||
-    (logoSource === "gallery" && selectedLogoIndex >= 0 && images[selectedLogoIndex] !== orphanage.logoURL) ||
-    (coverSource === "gallery" && selectedCoverIndex >= 0 && images[selectedCoverIndex] !== orphanage.coverImageURL);
+    (logoSource === "gallery" &&
+      selectedLogoIndex >= 0 &&
+      images[selectedLogoIndex] !== orphanage.logoURL) ||
+    (coverSource === "gallery" &&
+      selectedCoverIndex >= 0 &&
+      images[selectedCoverIndex] !== orphanage.coverImageURL);
 
   return (
     <div className="space-y-6">
@@ -138,7 +155,7 @@ export function OrphanageImageManager({
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Upload logo (square, 400x400px)
             </p>
-            
+
             <div className="flex justify-center">
               <div className="w-40 h-40 rounded-full overflow-hidden">
                 <SingleImageUpload
@@ -173,7 +190,7 @@ export function OrphanageImageManager({
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Upload cover (landscape, 1200x400px)
             </p>
-            
+
             <SingleImageUpload
               value={coverSource === "upload" ? coverImageURL : undefined}
               onChange={handleCoverUpload}
@@ -204,7 +221,8 @@ export function OrphanageImageManager({
         <CardContent>
           <div className="space-y-4">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Upload photos of your orphanage, facilities, and activities. You can also select images from here to use as logo or cover.
+              Upload photos of your orphanage, facilities, and activities. You
+              can also select images from here to use as logo or cover.
             </p>
             <MultiImageUpload
               value={images}
@@ -233,7 +251,8 @@ export function OrphanageImageManager({
               <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
                 <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
                 <p className="text-sm text-amber-800 dark:text-amber-200">
-                  Already uploaded to gallery? Click an image below to use it as your logo instead.
+                  Already uploaded to gallery? Click an image below to use it as
+                  your logo instead.
                 </p>
               </div>
 
@@ -286,7 +305,7 @@ export function OrphanageImageManager({
                       Logo Selected from Gallery
                     </p>
                     <p className="text-xs text-blue-700 dark:text-blue-300">
-                      This image will be used as your organization's logo
+                      This image will be used as your organization&apos;s logo
                     </p>
                   </div>
                 </div>
@@ -310,7 +329,8 @@ export function OrphanageImageManager({
               <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
                 <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
                 <p className="text-sm text-amber-800 dark:text-amber-200">
-                  Already uploaded to gallery? Click an image below to use it as your cover instead.
+                  Already uploaded to gallery? Click an image below to use it as
+                  your cover instead.
                 </p>
               </div>
 

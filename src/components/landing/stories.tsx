@@ -25,10 +25,10 @@ export const StoriesSection = () => {
   const fetchStories = async () => {
     try {
       setLoading(true);
-      
+
       // Simulate API delay for realistic UX
-      await new Promise(resolve => setTimeout(resolve, 600));
-      
+      await new Promise((resolve) => setTimeout(resolve, 600));
+
       // Fetch only the latest 3 success stories for the homepage using mock data
       const fetchedStories = getMockSuccessStories({ limitCount: 3 });
       setStories(fetchedStories);
@@ -47,11 +47,17 @@ export const StoriesSection = () => {
           <Heart size={18} className="text-main-red" />
           <p className="text-main-red italic">Success Stories</p>
         </div>
-        <p className={cn(headerStyle, "text-main-blue dark:text-white text-center")}>
+        <p
+          className={cn(
+            headerStyle,
+            "text-main-blue dark:text-white text-center"
+          )}
+        >
           Stories of Hope & Transformation
         </p>
         <p className="text-gray-600 dark:text-gray-400 text-center max-w-2xl">
-          Discover how your support has changed lives and brought hope to orphanages across Nigeria
+          Discover how your support has changed lives and brought hope to
+          orphanages across Nigeria
         </p>
       </div>
 
@@ -77,7 +83,7 @@ export const StoriesSection = () => {
             Success Stories Coming Soon
           </h3>
           <p className="text-gray-500 dark:text-gray-400 mb-6">
-            We're working on documenting the amazing impact of your support
+            We&apos;re working on documenting the amazing impact of your support
           </p>
           <Button
             onClick={() => router.push("/donate")}
