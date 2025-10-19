@@ -14,6 +14,8 @@ import {
   NotebookPen,
   ShieldAlert,
   Sparkles,
+  BookOpen,
+  Calendar,
   // Settings,
   HelpCircle,
   HandHelping,
@@ -49,6 +51,18 @@ const navigationItems: NavItem[] = [
     name: "Success Stories",
     href: "/admin/success-stories",
     lucideIcon: Sparkles,
+    roles: ["ADMIN"],
+  },
+  {
+    name: "Blog",
+    href: "/admin/blog",
+    lucideIcon: BookOpen,
+    roles: ["ADMIN"],
+  },
+  {
+    name: "Events",
+    href: "/admin/event",
+    lucideIcon: Calendar,
     roles: ["ADMIN"],
   },
   {
@@ -138,7 +152,7 @@ export default function PortalSidebar({ user, onClose }: PortalSidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto scrollbar-width bg-background">
+      <nav className="flex-1 bg-background">
         <div className="p-4 space-y-1">
           {filteredNavItems.map((item) => (
             <Link

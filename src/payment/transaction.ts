@@ -1,13 +1,23 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import https from "https";
-import { extractErrorMessage } from "@/common/helpers";
+import { extractErrorMessage, type UnknownError } from "@/common/helpers";
 
 // Environment variable validation
 const PAYSTACK_SECRET_KEY = process.env.NEXT_PUBLIC_PAYSTACK_SECRET_KEY;
 const PAYSTACK_HOSTNAME =
   process.env.NEXT_PUBLIC_PAYSTACK_HOSTNAME || "https://api.paystack.co";
+
+// Paystack metadata type
+export interface PaystackMetadata {
+  custom_fields?: Array<{
+    display_name: string;
+    variable_name: string;
+    value: string;
+  }>;
+  referrer?: string;
+  [key: string]: unknown;
+}
 
 // Types for Paystack API
 export interface PaystackInitParams {
@@ -15,7 +25,7 @@ export interface PaystackInitParams {
   amount: string; // Paystack expects amount in kobo (so 500000 = ₦5000)
   currency?: string;
   reference?: string;
-  metadata?: Record<string, any>;
+  metadata?: PaystackMetadata;
   callback_url?: string;
 }
 
@@ -27,6 +37,68 @@ export interface PaystackInitResponse {
     access_code: string;
     reference: string;
   };
+}
+
+// Paystack authorization data
+export interface PaystackAuthorization {
+  authorization_code: string;
+  bin: string;
+  last4: string;
+  exp_month: string;
+  exp_year: string;
+  channel: string;
+  card_type: string;
+  bank: string;
+  country_code: string;
+  brand: string;
+  reusable: boolean;
+  signature: string;
+  account_name?: string;
+}
+
+// Paystack customer data
+export interface PaystackCustomer {
+  id: number;
+  first_name?: string;
+  last_name?: string;
+  email: string;
+  customer_code: string;
+  phone?: string;
+  metadata?: PaystackMetadata;
+  risk_action: string;
+  international_format_phone?: string;
+}
+
+// Paystack log data
+export interface PaystackLog {
+  time_spent: number;
+  attempts: number;
+  authentication?: string;
+  errors: number;
+  success: boolean;
+  mobile: boolean;
+  input: unknown[];
+  channel?: string;
+  history: Array<{
+    type: string;
+    message: string;
+    time: number;
+  }>;
+}
+
+// Paystack fees breakdown
+export interface PaystackFeesBreakdown {
+  charge_amount: number;
+  paystack_amount: number;
+  net_amount: number;
+  fee_type: string;
+  fee_on: string;
+  fee_category: string;
+  gateway: string;
+  amount: number;
+  fee_plan: string;
+  customer: string;
+  merchant: string;
 }
 
 export interface PaystackVerifyResponse {
@@ -45,21 +117,21 @@ export interface PaystackVerifyResponse {
     channel: string;
     currency: string;
     ip_address: string;
-    metadata: any;
-    log: any;
+    metadata: PaystackMetadata;
+    log: PaystackLog;
     fees: number;
-    fees_split: any;
-    authorization: any;
-    customer: any;
-    plan: any;
-    split: any;
-    order_id: any;
+    fees_split: Record<string, unknown>;
+    authorization: PaystackAuthorization;
+    customer: PaystackCustomer;
+    plan?: Record<string, unknown>;
+    split?: Record<string, unknown>;
+    order_id?: string;
     paidAt: string;
     createdAt: string;
     requested_amount: number;
-    pos_transaction_data: any;
-    source: any;
-    fees_breakdown: any;
+    pos_transaction_data?: Record<string, unknown>;
+    source?: Record<string, unknown>;
+    fees_breakdown: PaystackFeesBreakdown[];
   };
 }
 
@@ -67,7 +139,7 @@ export interface PaystackVerifyResponse {
 function makePaystackRequest<T>(
   path: string,
   method: "GET" | "POST" = "POST",
-  data?: any
+  data?: PaystackInitParams | Record<string, unknown>
 ): Promise<T> {
   return new Promise((resolve, reject) => {
     const postData = data ? JSON.stringify(data) : "";
@@ -142,7 +214,7 @@ export async function initializeTransaction(
 
     return response;
   } catch (error) {
-    const errorMessage = extractErrorMessage(error);
+    const errorMessage = extractErrorMessage(error as UnknownError);
     console.error("Paystack initialization error:", errorMessage);
     throw new Error(`Payment initialization failed: ${errorMessage}`);
   }
@@ -158,7 +230,7 @@ export async function verifyTransaction(
       "GET"
     );
   } catch (error) {
-    const errorMessage = extractErrorMessage(error);
+    const errorMessage = extractErrorMessage(error as UnknownError);
     console.error("Paystack verification error:", errorMessage);
     throw new Error(`Payment verification failed: ${errorMessage}`);
   }

@@ -28,6 +28,8 @@ const dropdownConfig = {
       { label: "Impact Overview", href: "/impact" },
       { label: "Success Stories", href: "/success-stories" },
       { label: "Financial Reports", href: "/report" },
+      { label: "Blog", href: "/blog" },
+      { label: "Events", href: "/events" },
     ],
   },
 };

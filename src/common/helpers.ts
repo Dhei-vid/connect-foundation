@@ -1,10 +1,22 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// export function formatCurrency(amount: number): string {
-//   return new Intl.NumberFormat("en-US", {
-//     style: "currency",
-//     currency: "USD",
-//   }).format(amount);
-// }
+// Error interface for better type safety
+interface ErrorWithResponse {
+  response?: {
+    data?: {
+      message?: string;
+      error?: string;
+    };
+  };
+  message?: string;
+}
+
+// Generic error type that can be any error-like object
+export type UnknownError =
+  | Error
+  | ErrorWithResponse
+  | Record<string, unknown>
+  | string
+  | null
+  | undefined;
 
 export function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("en-US", {
@@ -23,15 +35,49 @@ export function truncateText(text: string, maxLength: number): string {
   return text.substr(0, maxLength) + "...";
 }
 
-export const extractErrorMessage = (error: any): string => {
-  return (
-    error?.response?.data?.message ||
-    error?.response?.data?.error || // sometimes APIs use "error"
-    error?.message ||
-    "An unexpected error occurred"
-  );
+/**
+ * Get Error Message
+ * @param error
+ * @returns
+ */
+export const extractErrorMessage = (error: UnknownError): string => {
+  if (typeof error === "string") {
+    return error;
+  }
+
+  if (error && typeof error === "object") {
+    // Check for API error response structure
+    if (
+      "response" in error &&
+      error.response &&
+      typeof error.response === "object"
+    ) {
+      const response = error.response as {
+        data?: { message?: string; error?: string };
+      };
+      if (response.data) {
+        return (
+          response.data.message ||
+          response.data.error ||
+          "An API error occurred"
+        );
+      }
+    }
+
+    // Check for standard Error object
+    if ("message" in error && typeof error.message === "string") {
+      return error.message;
+    }
+  }
+
+  return "An unexpected error occurred";
 };
 
+/**
+ * Format Currency in Naira
+ * @param amount
+ * @returns
+ */
 export const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("en-NG", {
     style: "currency",
@@ -41,10 +87,20 @@ export const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
+/**
+ * Format number
+ * @param num
+ * @returns
+ */
 export const formatNumber = (num: number) => {
   return new Intl.NumberFormat("en-NG").format(num);
 };
 
+/**
+ * Get Status Variant
+ * @param status
+ * @returns
+ */
 export const getStatusVariant = (
   status: "completed" | "pending" | "failed"
 ) => {
@@ -60,5 +116,50 @@ export const getStatusVariant = (
 
     default:
       return "secondary";
+  }
+};
+
+/**
+ * Returns responsive Tailwind CSS classes for headings (H1–H4)
+ * based on the given heading level.
+ *
+ * This function ensures consistent typography hierarchy and
+ * fluid scaling across screen sizes.
+ *
+ * **Heading hierarchy**
+ * - Level 1 → Largest, for page titles
+ * - Level 2 → Section titles
+ * - Level 3 → Subsection titles
+ * - Level 4 → Small headings or labels
+ *
+ * **Responsive scaling**
+ * Each level increases font size as screen width grows:
+ * - `sm:` → small screens
+ * - `lg:` → large screens
+ * - `2xl:` → extra large screens
+ *
+ * @param {number} level - Heading level (1–4)
+ * @returns {string} Tailwind CSS class string for responsive text sizes
+ *
+ * @example
+ * ```tsx
+ * <h1 className={getHeaderStyle(1)}>Dashboard Overview</h1>
+ * <h2 className={getHeaderStyle(2)}>Recent Activity</h2>
+ * <h3 className={getHeaderStyle(3)}>User Statistics</h3>
+ * <h4 className={getHeaderStyle(4)}>Notes</h4>
+ * ```
+ */
+export const getHeaderStyle = (level: number): string => {
+  switch (level) {
+    case 1:
+      return "text-2xl sm:text-3xl lg:text-4xl 2xl:text-5xl font-bold";
+    case 2:
+      return "text-xl sm:text-2xl lg:text-3xl 2xl:text-4xl font-semibold";
+    case 3:
+      return "text-lg sm:text-xl lg:text-2xl 2xl:text-3xl font-medium";
+    case 4:
+      return "text-base sm:text-lg lg:text-xl 2xl:text-2xl font-medium";
+    default:
+      return "text-base sm:text-lg lg:text-xl 2xl:text-2xl"; // fallback
   }
 };

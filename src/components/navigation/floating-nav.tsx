@@ -14,6 +14,8 @@ import {
   User,
   LogOut,
   HandHeart,
+  BookOpen,
+  Calendar,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,11 +30,11 @@ const navItems = [
   { icon: Home, label: "Home", href: "/" },
   { icon: Users, label: "About Us", href: "/about-us" },
   { icon: Heart, label: "Impact", href: "/impact" },
-  { icon: Heart, label: "Success Stories", href: "/success-stories" },
+  { icon: BookOpen, label: "Blog", href: "/blog" },
+  { icon: Calendar, label: "Events", href: "/events" },
   { icon: HandHeart, label: "Help", href: "/help" },
   { icon: MessageCircle, label: "Contact", href: "/contact" },
   { icon: DollarSign, label: "Donate", href: "/donate" },
-  { icon: BarChart3, label: "Transparency", href: "/transparency" },
 ];
 
 const adminItems = [

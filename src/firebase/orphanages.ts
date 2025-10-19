@@ -1,4 +1,4 @@
-import { doc, updateDoc, getDoc, collection, getDocs, query, orderBy } from "firebase/firestore";
+import { doc, updateDoc, getDoc, collection, getDocs, query, orderBy, deleteDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import type { Orphanage } from "@/common/types";
 
@@ -106,4 +106,25 @@ export async function updateOrphanage(
   orphanageData: Partial<Orphanage>
 ): Promise<void> {
   return updateOrphanageProfile(orphanageId, orphanageData);
+}
+
+/**
+ * Delete an orphanage
+ * @param orphanageId - The ID of the orphanage to delete
+ */
+export async function deleteOrphanage(orphanageId: string): Promise<void> {
+  try {
+    const orphanageRef = doc(db, "orphanages", orphanageId);
+    
+    // Check if orphanage exists before deleting
+    const orphanageDoc = await getDoc(orphanageRef);
+    if (!orphanageDoc.exists()) {
+      throw new Error("Orphanage not found");
+    }
+    
+    await deleteDoc(orphanageRef);
+  } catch (error) {
+    console.error("Error deleting orphanage:", error);
+    throw error;
+  }
 }

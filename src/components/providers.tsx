@@ -26,7 +26,7 @@ interface AuthContextType {
     role: "ADMIN" | "ORPHANAGE"
   ) => Promise<User>;
   signOut: () => Promise<void>;
-  requireAuth: () => void;
+  requireAuth: (requiredRole?: "ADMIN" | "ORPHANAGE") => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -95,9 +95,24 @@ function AppProviders({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const requireAuth = (): void => {
+  const requireAuth = (requiredRole?: "ADMIN" | "ORPHANAGE"): void => {
     if (!isLoading && !isAuthenticated) {
-      router.push("/admin/signin");
+      // Redirect based on required role or default to admin
+      if (requiredRole === "ORPHANAGE") {
+        router.push("/orphanage/signin");
+      } else {
+        router.push("/admin/signin");
+      }
+    } else if (!isLoading && isAuthenticated && requiredRole) {
+      // Check if user has the required role
+      if (requiredRole !== userRole) {
+        // Redirect to appropriate dashboard based on user role
+        if (userRole === "ADMIN") {
+          router.push("/admin");
+        } else if (userRole === "ORPHANAGE") {
+          router.push("/orphanage/dashboard");
+        }
+      }
     }
   };
 

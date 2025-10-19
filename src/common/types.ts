@@ -165,6 +165,134 @@ export interface VolunteerOpportunity {
   updatedAt: Date;
 }
 
+// Content Block Types
+export interface ContentBlock {
+  id: string;
+  type: "heading" | "paragraph" | "image" | "quote" | "embed" | "list" | "code";
+  order: number;
+}
+
+export interface HeadingBlock extends ContentBlock {
+  type: "heading";
+  level: 1 | 2 | 3 | 4;
+  text: string;
+}
+
+export interface ParagraphBlock extends ContentBlock {
+  type: "paragraph";
+  text: string;
+}
+
+export interface ImageBlock extends ContentBlock {
+  type: "image";
+  image: string;
+  caption?: string;
+  alt?: string;
+}
+
+export interface QuoteBlock extends ContentBlock {
+  type: "quote";
+  text: string;
+  cite?: string;
+}
+
+export interface EmbedBlock extends ContentBlock {
+  type: "embed";
+  provider: "youtube" | "vimeo" | "other";
+  src: string;
+  title?: string;
+}
+
+export interface ListBlock extends ContentBlock {
+  type: "list";
+  items: string[];
+  ordered: boolean;
+}
+
+export interface CodeBlock extends ContentBlock {
+  type: "code";
+  code: string;
+  language?: string;
+}
+
+// Author Interface
+export interface Author {
+  name: string;
+  role?: string;
+  email?: string;
+  bio?: string;
+  avatar?: string;
+  socialLinks?: {
+    twitter?: string;
+    linkedin?: string;
+    website?: string;
+  };
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: ContentBlock[]; // Changed from string to ContentBlock array
+  featuredImage?: string;
+  author: Author; // Updated to use Author interface
+  categories: string[];
+  tags: string[];
+  published: boolean;
+  featured: boolean;
+  readingTime: number; // in minutes
+  views: number;
+  likes: number;
+  publishedAt: Date | string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Event {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  content?: string;
+  featuredImage?: string;
+  startDate: Date;
+  endDate: Date;
+  location: {
+    name: string;
+    address: string;
+    city: string;
+    state: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  };
+  organizer: {
+    name: string;
+    email: string;
+    phone?: string;
+  };
+  category: "fundraising" | "volunteer" | "awareness" | "community" | "other";
+  type: "online" | "physical" | "hybrid";
+  maxAttendees?: number;
+  currentAttendees: number;
+  registrationRequired: boolean;
+  registrationDeadline?: Date;
+  registrationUrl?: string;
+  cost: {
+    amount: number;
+    currency: string;
+    free: boolean;
+  };
+  status: "upcoming" | "ongoing" | "completed" | "cancelled";
+  featured: boolean;
+  published: boolean;
+  views: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface Theme {
   mode: "light" | "dark";
   primary: string;

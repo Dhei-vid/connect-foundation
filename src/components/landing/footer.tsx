@@ -33,6 +33,8 @@ const footerLinks = {
   ],
   resources: [
     { name: "Impact Reports", href: "/impact" },
+    { name: "Blog", href: "/blog" },
+    { name: "Events", href: "/events" },
     { name: "Transparency", href: "/transparency" },
     { name: "FAQ", href: "/contact" },
   ],
