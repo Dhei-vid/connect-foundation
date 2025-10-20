@@ -28,6 +28,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { getBlogPostById, updateBlogPost } from "@/firebase/blog";
 import type { BlogPost } from "@/common/types";
+import { Spinner } from "@/components/ui/spinner";
 
 const CATEGORIES = [
   "Impact",
@@ -365,7 +366,7 @@ export default function EditBlogPostPage() {
           >
             {saving ? (
               <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                <Spinner className="w-4 h-4 mr-2" />
                 Saving...
               </>
             ) : (

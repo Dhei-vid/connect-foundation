@@ -2,15 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Calendar,
-  Save,
-  Eye,
-  ArrowLeft,
-  MapPin,
-  User,
-  Users,
-} from "lucide-react";
+import { Calendar, Save, Eye, MapPin, User, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/form-field";
@@ -255,10 +247,13 @@ export default function CreateEventPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+            Create Event
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            Create a new event to engage with your community
+          </p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -282,15 +277,6 @@ export default function CreateEventPage() {
             )}
           </Button>
         </div>
-      </div>
-
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-          Create Event
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
-          Create a new event to engage with your community
-        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">

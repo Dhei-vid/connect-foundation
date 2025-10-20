@@ -6,7 +6,7 @@ import { useAuthContext } from "@/components/providers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Plus } from "lucide-react";
+import { AlertCircle, Plus, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import type { Issue } from "@/common/types";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -37,7 +37,7 @@ export default function OrphanageRequestPage() {
     category: "medical" as Issue["category"],
     priority: "medium" as Issue["priority"],
     estimatedCost: "",
-    deadline: undefined as string | Date | undefined,
+    deadline: undefined as string | Date | null | undefined,
   });
 
   useEffect(() => {
@@ -100,7 +100,7 @@ export default function OrphanageRequestPage() {
         images: [],
         estimatedCost: parseFloat(formData.estimatedCost),
         raisedAmount: 0,
-        deadline: formData.deadline ? new Date(formData.deadline) : undefined,
+        deadline: formData.deadline ? new Date(formData.deadline) : null,
       };
 
       await createIssue(issueData);
@@ -117,7 +117,7 @@ export default function OrphanageRequestPage() {
         category: "medical",
         priority: "medium",
         estimatedCost: "",
-        deadline: undefined,
+        deadline: null,
       });
       setShowCreateForm(false);
 
@@ -140,10 +140,10 @@ export default function OrphanageRequestPage() {
       // Delete from Firebase
       const { deleteIssue } = await import("@/firebase/issues");
       await deleteIssue(issueId);
-      
+
       // Update local state
       setIssues((prev) => prev.filter((issue) => issue.id !== issueId));
-      
+
       toast.success("Request deleted successfully!");
     } catch (error) {
       console.error("Error deleting issue:", error);
@@ -278,7 +278,7 @@ export default function OrphanageRequestPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen space-y-4">
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
@@ -295,6 +295,22 @@ export default function OrphanageRequestPage() {
               New Request
             </Button>
           )}
+        </div>
+      </div>
+
+      <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+        <div className="flex items-start gap-3">
+          <CircleAlert className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+          <div>
+            <h4 className="font-medium text-red-900 dark:text-red-100 mb-1">
+              Important
+            </h4>
+            <p className="text-sm text-red-800 dark:text-red-200">
+              Please note that after requesting for assistance, our team would
+              need to pay you a visit to verify the claims made. Only after that
+              would your request be considered.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -394,11 +410,11 @@ export default function OrphanageRequestPage() {
                 <div>
                   <DatePicker
                     label={"Deadline (Optional)"}
-                    date={formData.deadline}
+                    date={formData.deadline || undefined}
                     setDate={(date) => {
                       setFormData({
                         ...formData,
-                        deadline: date,
+                        deadline: date ? date : null,
                       });
                     }}
                     open={isDatePickerOpen}

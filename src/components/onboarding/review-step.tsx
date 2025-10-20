@@ -11,6 +11,7 @@ import {
   FileText,
   CreditCard,
   CheckCircle,
+  CircleAlert,
   Image as ImageIcon,
 } from "lucide-react";
 import type { Orphanage } from "@/common/types";
@@ -29,14 +30,17 @@ interface ReviewStepProps {
 export default function ReviewStep({
   data,
   onPrev,
-  onUpdate,
-  onNext,
-  isFirstStep,
-  isLastStep,
+  // onUpdate,
+  // onNext,
+  // isFirstStep,
+  // isLastStep,
   onComplete,
   isLoading,
 }: ReviewStepProps) {
-  const formatValue = (value: unknown, fallback: string = "Not provided"): string => {
+  const formatValue = (
+    value: unknown,
+    fallback: string = "Not provided"
+  ): string => {
     if (value === null || value === undefined || value === "") {
       return fallback;
     }
@@ -192,19 +196,19 @@ export default function ReviewStep({
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                <div className="text-2xl font-bold text-main-blue dark:text-white">
                   {data.childrenCount || 0}
                 </div>
                 <div className="text-sm text-gray-500">Children</div>
               </div>
               <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                <div className="text-2xl font-bold text-main-blue dark:text-white">
                   {data.staffCount || 0}
                 </div>
                 <div className="text-sm text-gray-500">Staff Members</div>
               </div>
               <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                <div className="text-2xl font-bold text-main-blue dark:text-white">
                   {data.foundedYear || new Date().getFullYear()}
                 </div>
                 <div className="text-sm text-gray-500">Founded</div>
@@ -296,7 +300,9 @@ export default function ReviewStep({
         )}
 
         {/* Images */}
-        {(data.logoURL || data.coverImageURL || (data.images && data.images.length > 0)) && (
+        {(data.logoURL ||
+          data.coverImageURL ||
+          (data.images && data.images.length > 0)) && (
           <Card className={"py-4"}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -343,7 +349,8 @@ export default function ReviewStep({
               {data.images && data.images.length > 0 && (
                 <div>
                   <span className="text-sm font-medium text-gray-500 block mb-2">
-                    Photo Gallery ({data.images.length} {data.images.length === 1 ? 'image' : 'images'}):
+                    Photo Gallery ({data.images.length}{" "}
+                    {data.images.length === 1 ? "image" : "images"}):
                   </span>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                     {data.images.map((image, index) => (
@@ -363,11 +370,14 @@ export default function ReviewStep({
                 </div>
               )}
 
-              {!data.logoURL && !data.coverImageURL && (!data.images || data.images.length === 0) && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                  No images uploaded. You can add images later from your settings.
-                </p>
-              )}
+              {!data.logoURL &&
+                !data.coverImageURL &&
+                (!data.images || data.images.length === 0) && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                    No images uploaded. You can add images later from your
+                    settings.
+                  </p>
+                )}
             </CardContent>
           </Card>
         )}
@@ -384,6 +394,22 @@ export default function ReviewStep({
               Your profile looks complete! Once you submit, our team will review
               your information and verify your organization. You&apos;ll receive
               an email notification once verification is complete.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+        <div className="flex items-start gap-3">
+          <CircleAlert className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+          <div>
+            <h4 className="font-medium text-red-900 dark:text-red-100 mb-1">
+              Important
+            </h4>
+            <p className="text-sm text-red-800 dark:text-red-200">
+              Please note that after requesting for assistance, our team would
+              need to pay you a visit to verify the claims made. Only after that
+              would your request be considered.
             </p>
           </div>
         </div>

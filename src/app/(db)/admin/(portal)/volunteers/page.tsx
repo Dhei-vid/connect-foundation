@@ -70,6 +70,7 @@ import type {
   Orphanage,
   VolunteerOpportunity,
 } from "@/common/types";
+import { Spinner } from "@/components/ui/spinner";
 import { SelectField } from "@/components/ui/form-field";
 import { SelectItem } from "@/components/ui/select";
 
@@ -765,7 +766,7 @@ export default function VolunteersPage() {
                                     disabled={actionLoading === volunteer.id}
                                   >
                                     {actionLoading === volunteer.id ? (
-                                      <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                      <Spinner className="w-4 h-4" />
                                     ) : (
                                       <Check className="w-4 h-4" />
                                     )}
@@ -801,7 +802,7 @@ export default function VolunteersPage() {
                                       disabled={actionLoading === volunteer.id}
                                     >
                                       {actionLoading === volunteer.id ? (
-                                        <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                                        <Spinner className="w-4 h-4 mr-2" />
                                       ) : null}
                                       Approve
                                     </AlertDialogAction>
@@ -816,7 +817,7 @@ export default function VolunteersPage() {
                                     disabled={actionLoading === volunteer.id}
                                   >
                                     {actionLoading === volunteer.id ? (
-                                      <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                      <Spinner className="w-4 h-4" />
                                     ) : (
                                       <XCircle className="w-4 h-4" />
                                     )}
@@ -853,7 +854,7 @@ export default function VolunteersPage() {
                                       className="bg-red-600 hover:bg-red-700"
                                     >
                                       {actionLoading === volunteer.id ? (
-                                        <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                                        <Spinner className="w-4 h-4 mr-2" />
                                       ) : null}
                                       Reject
                                     </AlertDialogAction>
@@ -871,7 +872,7 @@ export default function VolunteersPage() {
                                   disabled={actionLoading === volunteer.id}
                                 >
                                   {actionLoading === volunteer.id ? (
-                                    <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                    <Spinner className="w-4 h-4" />
                                   ) : (
                                     <Ban className="w-4 h-4" />
                                   )}
@@ -905,7 +906,7 @@ export default function VolunteersPage() {
                                     className="bg-red-600 hover:bg-red-700"
                                   >
                                     {actionLoading === volunteer.id ? (
-                                      <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                                      <Spinner className="w-4 h-4 mr-2" />
                                     ) : null}
                                     Suspend
                                   </AlertDialogAction>
@@ -926,7 +927,7 @@ export default function VolunteersPage() {
                               disabled={actionLoading === volunteer.id}
                             >
                               {actionLoading === volunteer.id ? (
-                                <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                <Spinner className="w-4 h-4" />
                               ) : (
                                 <Trash2 className="w-4 h-4" />
                               )}
@@ -1169,7 +1170,7 @@ export default function VolunteersPage() {
                           disabled={actionLoading === selectedVolunteer.id}
                         >
                           {actionLoading === selectedVolunteer.id ? (
-                            <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                            <Spinner className="w-4 h-4 mr-2" />
                           ) : (
                             <CheckCircle className="w-4 h-4 mr-2" />
                           )}
@@ -1201,7 +1202,7 @@ export default function VolunteersPage() {
                             disabled={actionLoading === selectedVolunteer.id}
                           >
                             {actionLoading === selectedVolunteer.id ? (
-                              <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                              <Spinner className="w-4 h-4 mr-2" />
                             ) : null}
                             Approve
                           </AlertDialogAction>
@@ -1216,7 +1217,7 @@ export default function VolunteersPage() {
                           disabled={actionLoading === selectedVolunteer.id}
                         >
                           {actionLoading === selectedVolunteer.id ? (
-                            <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                            <Spinner className="w-4 h-4 mr-2" />
                           ) : (
                             <XCircle className="w-4 h-4 mr-2" />
                           )}
@@ -1250,7 +1251,7 @@ export default function VolunteersPage() {
                             className="bg-red-600 hover:bg-red-700"
                           >
                             {actionLoading === selectedVolunteer.id ? (
-                              <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                              <Spinner className="w-4 h-4 mr-2" />
                             ) : null}
                             Reject
                           </AlertDialogAction>
@@ -1268,7 +1269,7 @@ export default function VolunteersPage() {
                         disabled={actionLoading === selectedVolunteer.id}
                       >
                         {actionLoading === selectedVolunteer.id ? (
-                          <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                          <Spinner className="w-4 h-4 mr-2" />
                         ) : (
                           <Ban className="w-4 h-4 mr-2" />
                         )}
@@ -1302,7 +1303,7 @@ export default function VolunteersPage() {
                           className="bg-red-600 hover:bg-red-700"
                         >
                           {actionLoading === selectedVolunteer.id ? (
-                            <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                            <Spinner className="w-4 h-4 mr-2" />
                           ) : null}
                           Suspend
                         </AlertDialogAction>

@@ -22,11 +22,11 @@ export default function LegalFinancialStep({
   onUpdate,
   onNext,
   onPrev,
-  isFirstStep,
-  isLastStep,
-  onComplete,
-  isLoading,
-}: LegalFinancialStepProps) {
+}: // isFirstStep,
+// isLastStep,
+// onComplete,
+// isLoading,
+LegalFinancialStepProps) {
   const [formData, setFormData] = useState({
     registrationNumber: data.registrationNumber || "",
     licenseNumber: data.licenseNumber || "",
@@ -50,11 +50,11 @@ export default function LegalFinancialStep({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -63,7 +63,8 @@ export default function LegalFinancialStep({
 
     // These fields are optional, but if provided, they should be valid
     if (formData.bankAccountNumber && formData.bankAccountNumber.length < 8) {
-      newErrors.bankAccountNumber = "Bank account number should be at least 8 digits";
+      newErrors.bankAccountNumber =
+        "Bank account number should be at least 8 digits";
     }
 
     setErrors(newErrors);
@@ -81,10 +82,11 @@ export default function LegalFinancialStep({
     <div className="space-y-6">
       <div className="text-center mb-6">
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-          Legal & Financial Information
+          Legal & Financial Information (optional)
         </h3>
         <p className="text-gray-600 dark:text-gray-400">
-          Provide legal and financial details to help with verification and donations
+          Provide legal and financial details to help with verification and
+          donations
         </p>
       </div>
 
@@ -96,7 +98,8 @@ export default function LegalFinancialStep({
               Privacy & Security Notice
             </h4>
             <p className="text-sm text-yellow-800 dark:text-yellow-200">
-              All financial information is encrypted and stored securely. This information is only used for:
+              All financial information is encrypted and stored securely. This
+              information is only used for:
             </p>
             <ul className="text-sm text-yellow-800 dark:text-yellow-200 mt-2 space-y-1">
               <li>• Processing donations to your organization</li>
@@ -193,11 +196,15 @@ export default function LegalFinancialStep({
                   value={formData.bankAccountNumber}
                   onChange={handleInputChange}
                   placeholder="Enter bank account number"
-                  className={`pl-10 ${errors.bankAccountNumber ? "border-red-500" : ""}`}
+                  className={`pl-10 ${
+                    errors.bankAccountNumber ? "border-red-500" : ""
+                  }`}
                 />
               </div>
               {errors.bankAccountNumber && (
-                <p className="text-red-500 text-sm mt-1">{errors.bankAccountNumber}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.bankAccountNumber}
+                </p>
               )}
               <p className="text-sm text-gray-500 mt-1">
                 This will be used to process donations to your organization
@@ -212,9 +219,10 @@ export default function LegalFinancialStep({
           Verification Process
         </h4>
         <p className="text-sm text-blue-800 dark:text-blue-200">
-          Our team will review your legal and financial information to verify your organization. 
-          This process typically takes 1-3 business days. You&apos;ll receive an email notification 
-          once verification is complete.
+          Our team will review your legal and financial information to verify
+          your organization. This process typically takes 1-3 business days.
+          You&apos;ll receive an email notification once verification is
+          complete.
         </p>
       </div>
 
@@ -222,9 +230,7 @@ export default function LegalFinancialStep({
         <Button variant="outline" onClick={onPrev}>
           Previous
         </Button>
-        <Button onClick={handleNext}>
-          Continue
-        </Button>
+        <Button onClick={handleNext}>Continue</Button>
       </div>
     </div>
   );

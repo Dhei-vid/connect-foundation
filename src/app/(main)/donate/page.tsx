@@ -18,6 +18,7 @@ import ImpactCard from "@/components/general/impact-card";
 import FAQ from "@/components/general/faq";
 import { impactInfo, faqData } from "@/common/data";
 import MasonryGrid from "@/components/general/masonry-grid";
+import { Spinner } from "@/components/ui/spinner";
 
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -640,7 +641,7 @@ export default function Page() {
                 >
                   {isProcessing ? (
                     <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      <Spinner className="w-5 h-5 mr-2" />
                       Processing payment...
                     </>
                   ) : (

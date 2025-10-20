@@ -23,6 +23,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 import Image from "next/image";
 import type { Issue, Orphanage } from "@/common/types";
 import { getIssues, updateIssue } from "@/firebase/issues";
@@ -351,7 +352,7 @@ function DonateDialog({
           >
             {isProcessing ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Spinner className="w-4 h-4 mr-2" />
                 Processing...
               </>
             ) : (

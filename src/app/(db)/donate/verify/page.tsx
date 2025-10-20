@@ -8,6 +8,7 @@ import { CheckCircle2, XCircle, Loader2, ArrowRight, Home } from "lucide-react";
 import { verifyTransaction } from "@/payment/transaction";
 import { updateDonationStatus } from "@/firebase/donations";
 import { updateIssue } from "@/firebase/issues";
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/common/helpers";
 
@@ -117,7 +118,7 @@ function VerifyContent() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <Card className="w-full max-w-md">
           <CardContent className="pt-12 pb-12 text-center">
-            <Loader2 className="w-16 h-16 mx-auto mb-4 animate-spin text-main-blue" />
+            <Spinner className="w-16 h-16 mx-auto mb-4 text-main-blue" />
             <h2 className="text-2xl font-bold mb-2">Verifying Payment</h2>
             <p className="text-gray-600 dark:text-gray-400">
               Please wait while we confirm your donation...
@@ -227,7 +228,7 @@ export default function VerifyPage() {
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-          <Loader2 className="w-16 h-16 animate-spin text-main-blue" />
+          <Spinner className="w-16 h-16 text-main-blue" />
         </div>
       }
     >

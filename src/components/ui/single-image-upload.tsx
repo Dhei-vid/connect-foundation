@@ -5,6 +5,7 @@ import { X, Upload, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./button";
 import { cn } from "@/lib/utils";
+import { Spinner } from "./spinner";
 
 interface SingleImageUploadProps {
   value?: string; // Current image URL
@@ -189,7 +190,7 @@ export function SingleImageUpload({
             )}
             {uploading && (
               <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 text-white animate-spin" />
+                <Spinner className="h-8 w-8 text-white" />
               </div>
             )}
           </>

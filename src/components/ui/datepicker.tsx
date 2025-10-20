@@ -37,9 +37,15 @@ interface INewDatePicker {
   label: string;
   date: Date | undefined;
   setDate: Dispatch<SetStateAction<Date | undefined>>;
+  required?: boolean;
 }
 
-export function NewDatePicker({ label, date, setDate }: INewDatePicker) {
+export function NewDatePicker({
+  label,
+  date,
+  setDate,
+  required,
+}: INewDatePicker) {
   const [open, setOpen] = React.useState(false);
 
   const [month, setMonth] = React.useState<Date | undefined>(date);
@@ -48,7 +54,7 @@ export function NewDatePicker({ label, date, setDate }: INewDatePicker) {
   return (
     <div className="flex flex-col gap-3">
       <Label htmlFor="date" className="px-1">
-        {label}
+        {label} {required && "*"}
       </Label>
       <div className="relative flex gap-2">
         <Input

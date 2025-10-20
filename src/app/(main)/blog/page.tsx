@@ -8,9 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, Filter, Grid, List } from "lucide-react";
-import { getAllBlogPosts, getFeaturedBlogPosts, searchBlogPosts } from "@/firebase/blog";
+import { Search, Grid, List } from "lucide-react";
+import {
+  getAllBlogPosts,
+  getFeaturedBlogPosts,
+  searchBlogPosts,
+} from "@/firebase/blog";
 import type { BlogPost } from "@/common/types";
+import { cn } from "@/lib/utils";
+import { heroHeaderStyle } from "@/common/style";
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -20,7 +26,15 @@ export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const categories = ["All", "Impact", "Stories", "Updates", "Volunteer", "Education", "Health"];
+  const categories = [
+    "All",
+    "Impact",
+    "Stories",
+    "Updates",
+    "Volunteer",
+    "Education",
+    "Health",
+  ];
 
   useEffect(() => {
     loadBlogPosts();
@@ -31,7 +45,7 @@ export default function BlogPage() {
       setLoading(true);
       const [allPosts, featured] = await Promise.all([
         getAllBlogPosts(),
-        getFeaturedBlogPosts()
+        getFeaturedBlogPosts(),
       ]);
       setPosts(allPosts);
       setFeaturedPosts(featured);
@@ -65,26 +79,29 @@ export default function BlogPage() {
       loadBlogPosts();
     } else {
       // Filter posts by category
-      const filtered = posts.filter(post => 
+      const filtered = posts.filter((post) =>
         post.categories.includes(category.toLowerCase())
       );
       setPosts(filtered);
     }
   };
 
-  const filteredPosts = selectedCategory && selectedCategory !== "All" 
-    ? posts.filter(post => post.categories.includes(selectedCategory.toLowerCase()))
-    : posts;
+  const filteredPosts =
+    selectedCategory && selectedCategory !== "All"
+      ? posts.filter((post) =>
+          post.categories.includes(selectedCategory.toLowerCase())
+        )
+      : posts;
 
   return (
     <>
       <HeroLayout bgImage="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.1.0">
         <TopNav />
         <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+          <h1 className={cn(heroHeaderStyle, "font-bold text-white mb-6")}>
             Our Blog
           </h1>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl text-grey/70 max-w-3xl mx-auto leading-relaxed">
             Stories of hope, impact, and transformation from our community
           </p>
         </div>
@@ -120,7 +137,10 @@ export default function BlogPage() {
                   className="pl-10"
                 />
               </div>
-              <Button onClick={handleSearch} className="bg-main-red hover:bg-main-red/90">
+              <Button
+                onClick={handleSearch}
+                className="bg-main-red hover:bg-main-red/90"
+              >
                 Search
               </Button>
             </div>
@@ -172,7 +192,13 @@ export default function BlogPage() {
           </div>
 
           {loading ? (
-            <div className={`grid gap-8 ${viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}>
+            <div
+              className={`grid gap-8 ${
+                viewMode === "grid"
+                  ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                  : "grid-cols-1"
+              }`}
+            >
               {Array.from({ length: 6 }).map((_, index) => (
                 <div key={index} className="space-y-4">
                   <Skeleton className="h-48 w-full" />
@@ -183,12 +209,18 @@ export default function BlogPage() {
               ))}
             </div>
           ) : filteredPosts.length > 0 ? (
-            <div className={`grid gap-8 ${viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}>
+            <div
+              className={`grid gap-8 ${
+                viewMode === "grid"
+                  ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                  : "grid-cols-1"
+              }`}
+            >
               {filteredPosts.map((post) => (
-                <BlogCard 
-                  key={post.id} 
-                  post={post} 
-                  variant={viewMode === "list" ? "compact" : "default"} 
+                <BlogCard
+                  key={post.id}
+                  post={post}
+                  variant={viewMode === "list" ? "compact" : "default"}
                 />
               ))}
             </div>
@@ -199,10 +231,12 @@ export default function BlogPage() {
                 No posts found
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
-                {searchTerm ? "Try adjusting your search terms" : "No blog posts available at the moment"}
+                {searchTerm
+                  ? "Try adjusting your search terms"
+                  : "No blog posts available at the moment"}
               </p>
               {searchTerm && (
-                <Button 
+                <Button
                   onClick={() => {
                     setSearchTerm("");
                     loadBlogPosts();
@@ -215,7 +249,7 @@ export default function BlogPage() {
             </div>
           )}
         </section>
-    </div>
+      </div>
     </>
   );
 }

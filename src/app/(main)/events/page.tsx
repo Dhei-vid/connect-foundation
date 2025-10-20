@@ -8,13 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, Calendar, Filter, Grid, List } from "lucide-react";
+import { Search, Calendar, Grid, List } from "lucide-react";
 import {
   getAllEvents,
   getFeaturedEvents,
   searchEvents,
 } from "@/firebase/events";
 import type { Event } from "@/common/types";
+import { cn } from "@/lib/utils";
+import { heroHeaderStyle } from "@/common/style";
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -100,10 +102,10 @@ export default function EventsPage() {
       <HeroLayout bgImage="https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.1.0">
         <TopNav />
         <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+          <h1 className={cn(heroHeaderStyle, "font-bold text-white mb-6")}>
             Events & Activities
           </h1>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl text-grey/70 max-w-3xl mx-auto leading-relaxed">
             Join us in making a difference through community events and
             volunteer activities
           </p>
@@ -169,9 +171,8 @@ export default function EventsPage() {
           </div>
 
           {/* Filters */}
-          <div className="flex flex-wrap gap-4 mb-8">
+          <div className="flex justify-between flex-wrap gap-4 mb-8">
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-gray-500" />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Category:
               </span>

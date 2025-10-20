@@ -28,6 +28,8 @@ import { getOrphanages } from "@/firebase/orphanages";
 import { getIssues } from "@/firebase/issues";
 import { toast } from "sonner";
 import type { SuccessStory, Orphanage, Issue } from "@/common/types";
+import { Spinner } from "@/components/ui/spinner";
+import { NewDatePicker } from "../ui/datepicker";
 
 interface AddSuccessStoryModalProps {
   isOpen: boolean;
@@ -56,7 +58,7 @@ export function AddSuccessStoryModal({
     impact: "",
     beneficiaries: 0,
     cost: 0,
-    completedAt: new Date().toISOString().split("T")[0], // YYYY-MM-DD format
+    completedAt: new Date(),
     images: [] as string[],
   });
 
@@ -72,7 +74,7 @@ export function AddSuccessStoryModal({
           impact: editingStory.impact,
           beneficiaries: editingStory.beneficiaries,
           cost: editingStory.cost,
-          completedAt: editingStory.completedAt.toISOString().split("T")[0],
+          completedAt: editingStory.completedAt,
           images: editingStory.images || [],
         });
       } else {
@@ -85,7 +87,7 @@ export function AddSuccessStoryModal({
           impact: "",
           beneficiaries: 0,
           cost: 0,
-          completedAt: new Date().toISOString().split("T")[0],
+          completedAt: new Date(),
           images: [],
         });
       }
@@ -108,11 +110,11 @@ export function AddSuccessStoryModal({
 
   const handleInputChange = (
     field: keyof typeof formData,
-    value: string | number | string[]
+    value: string | number | string[] | Date | undefined
   ) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: value as string | number | string[] | Date | undefined,
     }));
   };
 
@@ -181,7 +183,7 @@ export function AddSuccessStoryModal({
         images: formData.images,
         beneficiaries: formData.beneficiaries,
         cost: formData.cost,
-        completedAt: new Date(formData.completedAt),
+        completedAt: formData.completedAt,
       };
 
       if (editingStory) {
@@ -261,19 +263,14 @@ export function AddSuccessStoryModal({
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Completion Date *
-              </label>
-              <Input
-                type="date"
-                value={formData.completedAt}
-                onChange={(e) =>
-                  handleInputChange("completedAt", e.target.value)
-                }
-                required
-              />
-            </div>
+            <NewDatePicker
+              label={"Completion Date"}
+              date={formData.completedAt}
+              setDate={(value) =>
+                handleInputChange("completedAt", value as Date)
+              }
+              required
+            />
           </div>
 
           <div>
@@ -322,7 +319,7 @@ export function AddSuccessStoryModal({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Total Cost ($)
+                Total Cost (₦)
               </label>
               <Input
                 type="number"
@@ -359,7 +356,7 @@ export function AddSuccessStoryModal({
 
             {uploadingImages && (
               <div className="mt-2 flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
-                <Upload className="w-4 h-4 animate-spin" />
+                <Spinner className="w-4 h-4" />
                 Uploading images...
               </div>
             )}
@@ -384,7 +381,7 @@ export function AddSuccessStoryModal({
           >
             {loading ? (
               <>
-                <Upload className="w-4 h-4 mr-2 animate-spin" />
+                <Spinner className="w-4 h-4 mr-2" />
                 {editingStory ? "Updating..." : "Creating..."}
               </>
             ) : (

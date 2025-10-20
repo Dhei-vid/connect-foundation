@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Mail, Phone, MapPin, Clock, Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { heroLayoutStyle } from "@/common/style";
+import { Spinner } from "@/components/ui/spinner";
 
 import { TopNav } from "@/components/navigation/top-nav";
 import HeroLayout from "@/components/general/hero-layout";
@@ -194,7 +195,7 @@ export default function Page() {
                   >
                     {isPending ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        <Spinner className="w-4 h-4 mr-2" />
                         Sending...
                       </>
                     ) : (

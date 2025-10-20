@@ -2,14 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  Heart,
-  Users,
-  TrendingUp,
-  Target,
-  Star,
-  CheckCircle,
-} from "lucide-react";
+import { Heart, Users, Target, Star, CheckCircle } from "lucide-react";
 import Link from "next/link";
 // import Awards from "@/components/impact/awards";
 import AccordionComp from "@/components/general/accordion-component";
@@ -21,6 +14,7 @@ import { heroLayoutStyle } from "@/common/style";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { getMockSuccessStories } from "@/common/mock-data";
+import { Testimonials } from "@/components/landing/testimonials";
 
 export default function Page() {
   const router = useRouter();
@@ -189,7 +183,10 @@ export default function Page() {
           </div>
           <div className="text-center mt-12">
             <Link href="/success-stories">
-              <Button size="lg" className="bg-main-blue hover:bg-main-blue/90 text-white">
+              <Button
+                size="lg"
+                className="bg-main-blue hover:bg-main-blue/90 text-white"
+              >
                 View All Success Stories
               </Button>
             </Link>
@@ -272,15 +269,16 @@ export default function Page() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative">
-              <div className="w-full h-80 bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-2xl flex items-center justify-center">
-                <div className="text-center text-gray-500 dark:text-gray-400">
-                  <TrendingUp className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg">
-                    Image: Financial transparency dashboard
-                  </p>
-                  <p className="text-sm">Placeholder for transparency report</p>
-                  <p className="text-sm">Real-time donation tracking</p>
-                </div>
+              <div className="w-full h-80 rounded-2xl flex items-center justify-center overflow-hidden">
+                <Image
+                  src={
+                    "https://images.pexels.com/photos/7680554/pexels-photo-7680554.jpeg"
+                  }
+                  alt={"transparency photo"}
+                  width={400}
+                  height={400}
+                  className="object-cover object-center w-full"
+                />
               </div>
             </div>
             <div>
@@ -319,6 +317,9 @@ export default function Page() {
 
       {/* Recognition */}
       {/* <Awards /> */}
+
+      {/* Testimonials */}
+      <Testimonials />
 
       {/* CTA Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">

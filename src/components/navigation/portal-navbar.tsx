@@ -23,9 +23,9 @@ import {
   Moon,
 } from "lucide-react";
 import { PersonAvatar } from "@/components/ui/person-avatar";
-import LoadingSpinner from "../general/spinner";
 import { toast } from "sonner";
 import { useAuthContext } from "../providers";
+import { Spinner } from "@/components/ui/spinner";
 
 interface PortalNavbarProps {
   user: User;
@@ -217,7 +217,7 @@ export default function PortalNavbar({ user, onMenuClick }: PortalNavbarProps) {
                   >
                     {navigationLoading === title ? (
                       <>
-                        <LoadingSpinner />
+                        <Spinner className="w-4 h-4 mr-2" />
                         {title}...
                       </>
                     ) : (
@@ -236,7 +236,7 @@ export default function PortalNavbar({ user, onMenuClick }: PortalNavbarProps) {
               >
                 {logoutLoading ? (
                   <>
-                    <LoadingSpinner />
+                    <Spinner className="w-4 h-4 mr-2" />
                     Logging out...
                   </>
                 ) : (

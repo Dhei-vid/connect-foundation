@@ -4,6 +4,7 @@ import { VolunteerSection } from "@/components/landing/volunteer-section";
 import { StoriesSection } from "@/components/landing/stories";
 import { OrphanagesNeedHelpSection } from "@/components/landing/orphanages-need-help";
 import { Footer } from "@/components/landing/footer";
+import { Testimonials } from "@/components/landing/testimonials";
 
 // import { HowItWorks } from "@/components/landing/how-it-works";
 // import { Testimonials } from "@/components/landing/testimonials";
@@ -32,7 +33,7 @@ export default function Home() {
         <OrphanageBanner />
       </div>
       {/* <HowItWorks /> */}
-      {/* <Testimonials /> */}
+      <Testimonials />
       <Footer />
     </>
   );

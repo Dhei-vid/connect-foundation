@@ -31,14 +31,15 @@ import {
   getSuccessStories,
   getSuccessStoryStats,
   deleteSuccessStory,
-  createSuccessStory,
-  updateSuccessStory,
+  // createSuccessStory,
+  // updateSuccessStory,
 } from "@/firebase/success-stories";
 import { getOrphanages } from "@/firebase/orphanages";
 import { getIssues } from "@/firebase/issues";
 import { toast } from "sonner";
 import { formatFirebaseDate } from "@/lib/date-utils";
 import type { SuccessStory, Orphanage, Issue } from "@/common/types";
+import { formatCurrency } from "@/common/helpers";
 
 // Mock data for success stories
 const getMockSuccessStories = (): SuccessStory[] => {
@@ -560,7 +561,7 @@ export default function SuccessStoriesPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${stats.totalCost.toLocaleString()}
+              {formatCurrency(stats.totalCost)}
             </div>
           </CardContent>
         </Card>
@@ -688,7 +689,7 @@ export default function SuccessStoriesPage() {
                           Cost:
                         </span>
                         <div className="font-bold text-green-600 dark:text-green-400">
-                          ${story.cost.toLocaleString()}
+                          {formatCurrency(story.cost)}
                         </div>
                       </div>
                       <div>
@@ -796,7 +797,7 @@ export default function SuccessStoriesPage() {
                           <div>
                             <span className="text-gray-500">Cost:</span>
                             <div className="font-medium">
-                              ${story.cost.toLocaleString()}
+                              {formatCurrency(story.cost)}
                             </div>
                           </div>
                         </div>

@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuthContext } from "@/components/providers";
 import { extractErrorMessage, type UnknownError } from "@/common/helpers";
 import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function AdminSignInPage() {
   const router = useRouter();
@@ -121,7 +122,7 @@ export default function AdminSignInPage() {
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <Spinner className="w-4 h-4" />
                   Signing in...
                 </div>
               ) : (

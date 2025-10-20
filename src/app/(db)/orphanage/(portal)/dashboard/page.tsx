@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Orphanage, Issue, Donation } from "@/common/types";
+import { formatFirebaseDate, formatCurrency } from "@/common/helpers";
 
 export default function OrphanageDashboard() {
   const router = useRouter();
@@ -143,7 +144,10 @@ export default function OrphanageDashboard() {
             <CardContent>
               <div className="space-y-4">
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div
+                    key={i}
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                  >
                     <div className="flex items-center space-x-3">
                       <Skeleton className="w-10 h-10 rounded-full" />
                       <div>
@@ -184,10 +188,10 @@ export default function OrphanageDashboard() {
   }
 
   // Calculate statistics
-  const totalDonations = donations.reduce(
-    (sum, donation) => sum + donation.amount,
-    0
-  );
+  // const totalDonations = donations.reduce(
+  //   (sum, donation) => sum + donation.amount,
+  //   0
+  // );
   const completedDonations = donations.filter((d) => d.status === "completed");
   const totalRaised = completedDonations.reduce(
     (sum, donation) => sum + donation.amount,
@@ -336,8 +340,8 @@ export default function OrphanageDashboard() {
                       <div className="flex-1">
                         <h4 className="font-medium text-sm">{issue.title}</h4>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          ${issue.raisedAmount.toLocaleString()} / $
-                          {issue.estimatedCost.toLocaleString()}
+                          {formatCurrency(issue.raisedAmount)} /
+                          {formatCurrency(issue.estimatedCost)}
                         </p>
                       </div>
                       <Badge
@@ -391,7 +395,7 @@ export default function OrphanageDashboard() {
                   <span className="text-sm font-medium">Member Since</span>
                   <span className="text-sm text-gray-600 dark:text-gray-400">
                     {user?.createdAt
-                      ? new Date(user.createdAt).toLocaleDateString()
+                      ? formatFirebaseDate(user.createdAt)
                       : "N/A"}
                   </span>
                 </div>

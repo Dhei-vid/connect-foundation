@@ -25,6 +25,7 @@ import { userAtom, isAuthenticatedAtom } from "@/store/auth";
 import { signOutUser } from "@/firebase/auth";
 import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Spinner } from "@/components/ui/spinner";
 
 const navItems = [
   { icon: Home, label: "Home", href: "/" },
@@ -52,6 +53,7 @@ const orphanageItems = [
 export function FloatingNav() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [logoutLoading, setLogoutLoading] = useState<boolean>(false);
   const pathname = usePathname();
   const [user] = useAtom(userAtom);
   const [isAuthenticated] = useAtom(isAuthenticatedAtom);
@@ -59,6 +61,7 @@ export function FloatingNav() {
 
   const handleSignOut = async () => {
     try {
+      setLogoutLoading(true);
       await signOutUser();
       toast({
         title: "Signed out successfully",
@@ -71,6 +74,8 @@ export function FloatingNav() {
         description: "There was an error signing you out. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setLogoutLoading(false);
     }
   };
 
@@ -245,9 +250,19 @@ export function FloatingNav() {
                       variant="ghost"
                       className="w-full justify-start text-white hover:bg-white/10"
                       onClick={handleSignOut}
+                      disabled={logoutLoading}
                     >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Sign Out
+                      {logoutLoading ? (
+                        <>
+                          <Spinner className="h-4 w-4 mr-2" />
+                          Signing out...
+                        </>
+                      ) : (
+                        <>
+                          <LogOut className="h-4 w-4 mr-2" />
+                          Sign Out
+                        </>
+                      )}
                     </Button>
                   </div>
                 </motion.div>

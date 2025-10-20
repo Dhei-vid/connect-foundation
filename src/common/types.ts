@@ -63,7 +63,7 @@ export interface Issue {
   images: string[];
   estimatedCost: number;
   raisedAmount: number;
-  deadline?: Date;
+  deadline?: Date | null;
   createdAt: Date;
   updatedAt: Date;
   resolvedAt?: Date;

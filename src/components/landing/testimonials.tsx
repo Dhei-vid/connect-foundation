@@ -1,11 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Star, Quote } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Quote, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { headerStyle } from "@/common/style";
+import { cn } from "@/lib/utils";
 
-const testimonials = [
+type Testimonial = {
+  name: string;
+  role: string;
+  content?: string;
+  rating: number;
+  avatar: string;
+  color: string;
+  videoUrl?: string; // Optional MP4 video URL
+  imageUrl?: string; // Optional image for hero-style card
+};
+
+// Source data: includes one hero-style testimonial with image
+const testimonials: Testimonial[] = [
   {
     name: "Sarah Johnson",
     role: "Monthly Donor",
@@ -16,13 +38,17 @@ const testimonials = [
     color: "from-pink-500 to-rose-500",
   },
   {
-    name: "Michael Chen",
+    name: "Joyce Abk",
     role: "Volunteer & Donor",
     content:
       "I've been donating for years, but this is the first time I feel truly connected to the children I'm helping. The real-time updates and photos make all the difference.",
     rating: 5,
     avatar: "MC",
     color: "from-blue-500 to-cyan-500",
+    imageUrl:
+      "https://images.pexels.com/photos/6647021/pexels-photo-6647021.jpeg", // hero image
+    videoUrl:
+      "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
   },
   {
     name: "Maria Rodriguez",
@@ -54,8 +80,9 @@ const testimonials = [
   {
     name: "James Wilson",
     role: "Long-term Supporter",
-    content:
-      "I've supported various charities for decades, but Connect Foundation's approach is revolutionary. The ability to track impact in real-time is game-changing.",
+    // Example of a video testimonial; replace with a real MP4 URL if available
+    videoUrl:
+      "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
     rating: 5,
     avatar: "JW",
     color: "from-teal-500 to-green-500",
@@ -63,6 +90,24 @@ const testimonials = [
 ];
 
 export function Testimonials() {
+  const [videoOpen, setVideoOpen] = useState(false);
+  const [activeVideoUrl, setActiveVideoUrl] = useState<string | undefined>();
+
+  const hero = useMemo(
+    () => testimonials.find((t) => t.imageUrl) ?? testimonials[0],
+    []
+  );
+  const gridTestimonials = useMemo(
+    () => testimonials.filter((t) => t !== hero).slice(0, 3),
+    [hero]
+  );
+
+  function openVideo(url?: string) {
+    if (!url) return;
+    setActiveVideoUrl(url);
+    setVideoOpen(true);
+  }
+
   return (
     <section className="py-20 px-4 relative overflow-hidden">
       {/* Background */}
@@ -75,125 +120,139 @@ export function Testimonials() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Quote className="w-6 h-6 text-main-red" />
+            <p className="text-main-red italic font-medium">Testimonials</p>
+          </div>
+          <h2 className={cn(headerStyle, "text-main-blue dark:text-white")}>
             What Our <span className="gradient-text">Community</span> Says
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Hear from donors, volunteers, and orphanage directors about their
-            experiences with Connect Foundation.
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            Voices that shape our mission — from the donors who give, the
+            volunteers who serve, and the orphanages we support.
           </p>
         </motion.div>
 
-        {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={testimonial.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -5 }}
+        {/* Top row: stat card + hero image quote */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Stat card */}
+          <Card className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-muted/40 via-background to-muted/30" />
+            <div className="relative p-8 h-full flex flex-col justify-between">
+              <div>
+                <div className="text-6xl font-extrabold bg-clip-text text-transparent bg-main-red mb-4">
+                  83%
+                </div>
+                <p className="text-muted-foreground text-lg max-w-md">
+                  of supporters say Connect helps them give smarter, faster, and
+                  more effectively.
+                </p>
+              </div>
+              <div className="mt-8">
+                <Button asChild className="bg-main-red hover:bg-main-red/90">
+                  <a href="/donate">Support Now</a>
+                </Button>
+              </div>
+            </div>
+          </Card>
+
+          {/* Hero image quote */}
+          <div className="relative">
+            <div
+              className="h-full min-h-[260px] w-full rounded-3xl overflow-hidden relative"
+              style={{
+                backgroundImage: `url(${hero.imageUrl || ""})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
             >
-              <Card className="h-full glass hover:shadow-2xl transition-all duration-300 group">
-                <CardHeader className="pb-4">
-                  <div className="flex items-start justify-between mb-4">
-                    <div
-                      className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${testimonial.color} p-4 flex items-center justify-center text-white font-bold text-xl`}
+              <div className="absolute inset-0 bg-black/30" />
+              <div className="relative p-6 md:p-8 h-full flex flex-col justify-end">
+                <Quote className="w-8 h-8 text-white/80 mb-3" />
+                <p className="text-white text-xl md:text-lg font-semibold max-w-2xl">
+                  {hero.content || ""}
+                </p>
+                <p className="text-white/90 mt-2 text-sm">
+                  {hero.name} — {hero.role}
+                </p>
+                {hero.videoUrl ? (
+                  <div className="mt-4">
+                    <Button
+                      onClick={() => openVideo(hero.videoUrl)}
+                      className="bg-white/90 text-gray-900 hover:bg-white"
                     >
-                      {testimonial.avatar}
+                      <Play className="w-4 h-4 mr-2" /> Watch video
+                    </Button>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom row: three quote cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {gridTestimonials.map((t, index) => (
+            <motion.div
+              key={t.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.05 }}
+              viewport={{ once: true }}
+            >
+              <Card className="h-full">
+                <CardContent className="p-6">
+                  <Quote className="w-6 h-6 text-muted-foreground/50" />
+                  <p className="mt-3 text-muted-foreground italic leading-relaxed">
+                    {t.content}
+                  </p>
+                  <div className="mt-6 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        <AvatarFallback className={`bg-main-blue text-white`}>
+                          {t.avatar}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium">{t.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {t.role}
+                        </div>
+                      </div>
                     </div>
-                    <Quote className="w-8 h-8 text-muted-foreground/30" />
+                    {t.videoUrl ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openVideo(t.videoUrl)}
+                      >
+                        <Play className="w-4 h-4 mr-2" /> Watch video
+                      </Button>
+                    ) : null}
                   </div>
-
-                  {/* Rating */}
-                  <div className="flex gap-1 mb-3">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className="w-5 h-5 fill-yellow-400 text-yellow-400"
-                      />
-                    ))}
-                  </div>
-
-                  <CardTitle className="text-lg font-semibold">
-                    {testimonial.name}
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    {testimonial.role}
-                  </p>
-                </CardHeader>
-
-                <CardContent>
-                  <p className="text-muted-foreground leading-relaxed italic">
-                    {testimonial.content}
-                  </p>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
         </div>
 
-        {/* Stats Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16"
-        >
-          <div className="text-center">
-            <div className="text-4xl font-bold text-primary mb-2">98%</div>
-            <div className="text-muted-foreground">Donor Satisfaction</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-secondary mb-2">$2.5M+</div>
-            <div className="text-muted-foreground">Total Donations</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-accent mb-2">15,000+</div>
-            <div className="text-muted-foreground">Lives Impacted</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-green-500 mb-2">95%</div>
-            <div className="text-muted-foreground">Funds to Programs</div>
-          </div>
-        </motion.div>
-
-        {/* Bottom CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center"
-        >
-          <div className="glass rounded-3xl p-8 max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold mb-4">
-              Join Our Growing Community
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              Be part of the change. Start making a difference today with
-              transparent, accountable giving.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/donate"
-                className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300 hover:scale-105"
-              >
-                Start Donating
-              </a>
-              <a
-                href="/signup"
-                className="inline-flex items-center justify-center px-6 py-3 border-2 border-primary text-primary rounded-lg font-medium hover:bg-primary hover:text-white transition-all duration-300"
-              >
-                Create Account
-              </a>
-            </div>
-          </div>
-        </motion.div>
+        {/* Video dialog */}
+        <Dialog open={videoOpen} onOpenChange={setVideoOpen}>
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Testimonial Video</DialogTitle>
+            </DialogHeader>
+            {activeVideoUrl ? (
+              <div className="rounded-lg overflow-hidden">
+                <video className="w-full h-auto" controls autoPlay>
+                  <source src={activeVideoUrl} type="video/mp4" />
+                </video>
+              </div>
+            ) : null}
+          </DialogContent>
+        </Dialog>
       </div>
     </section>
   );

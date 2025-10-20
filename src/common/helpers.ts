@@ -1,3 +1,6 @@
+import { format } from "date-fns";
+import { Timestamp } from "firebase/firestore";
+
 // Error interface for better type safety
 interface ErrorWithResponse {
   response?: {
@@ -18,6 +21,11 @@ export type UnknownError =
   | null
   | undefined;
 
+/**
+ * Format Date
+ * @param date
+ * @returns
+ */
 export function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
@@ -163,3 +171,49 @@ export const getHeaderStyle = (level: number): string => {
       return "text-base sm:text-lg lg:text-xl 2xl:text-2xl"; // fallback
   }
 };
+
+/**
+ * Formats a Firebase Timestamp or Date into a readable string.
+ *
+ * @param timestamp - Firebase Timestamp, JS Date, or plain object with seconds/nanoseconds.
+ * @param pattern - date-fns format pattern (default: "MMM dd, yyyy").
+ * @returns Formatted date string or "N/A" if invalid.
+ */
+export function formatFirebaseDate(
+  timestamp?:
+    | Timestamp
+    | Date
+    | { seconds: number; nanoseconds: number }
+    | null,
+  pattern: string = "MMM dd, yyyy"
+): string {
+  if (!timestamp) return "N/A";
+
+  try {
+    let date: Date;
+
+    // Case 1: Firestore Timestamp instance
+    if (timestamp instanceof Timestamp) {
+      date = timestamp.toDate();
+    }
+    // Case 2: Native JS Date
+    else if (timestamp instanceof Date) {
+      date = timestamp;
+    }
+    // Case 3: Plain object { seconds, nanoseconds }
+    else if (
+      typeof timestamp === "object" &&
+      "seconds" in timestamp &&
+      "nanoseconds" in timestamp
+    ) {
+      date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1e6);
+    } else {
+      return "Invalid Date";
+    }
+
+    return format(date, pattern);
+  } catch (error) {
+    console.error("Date formatting error:", error);
+    return "Invalid Date";
+  }
+}

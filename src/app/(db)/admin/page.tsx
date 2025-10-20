@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/components/providers";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, ArrowRight } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Page() {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function Page() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <Spinner className="h-12 w-12 mx-auto" />
           <p className="mt-4 text-gray-600 dark:text-gray-400">
             Just checking your authenticity...Please wait
           </p>

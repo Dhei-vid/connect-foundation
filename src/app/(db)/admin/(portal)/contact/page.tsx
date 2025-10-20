@@ -12,13 +12,23 @@ import {
   User,
   Calendar,
   Archive,
-  XCircle,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { formatDate } from "@/common/helpers";
+import { SelectField } from "@/components/ui/form-field";
+import { SelectItem } from "@/components/ui/select";
 
 // Inquiry interface
 interface Inquiry {
@@ -124,9 +134,11 @@ const mockInquiries = [
 const statusColors = {
   new: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
   read: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-  in_progress: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+  in_progress:
+    "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
   resolved: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
-  archived: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+  archived:
+    "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
 };
 
 export default function ContactPage() {
@@ -171,6 +183,11 @@ export default function ContactPage() {
     setSelectedInquiry(null);
   };
 
+  const handleCloseModal = () => {
+    setSelectedInquiry(null);
+    setReplyText("");
+  };
+
   const handleArchive = (inquiryId: string) => {
     // TODO: Implement archive logic
     console.log("Archive inquiry:", inquiryId);
@@ -179,7 +196,9 @@ export default function ContactPage() {
   // Calculate statistics
   const totalInquiries = mockInquiries.length;
   const newInquiries = mockInquiries.filter((i) => i.status === "new").length;
-  const readInquiries = mockInquiries.filter((i) => i.status === "resolved").length;
+  const readInquiries = mockInquiries.filter(
+    (i) => i.status === "resolved"
+  ).length;
   const repliedInquiries = mockInquiries.filter(
     (i) => i.status === "in_progress"
   ).length;
@@ -401,19 +420,27 @@ export default function ContactPage() {
                 />
               </div>
             </div>
-            <div className="flex gap-2">
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value as "all" | "new" | "in_progress" | "resolved" | "archived")}
-                className="px-3 py-2 border rounded-lg text-sm"
-              >
-                <option value="all">All Status</option>
-                <option value="new">New</option>
-                <option value="in_progress">In Progress</option>
-                <option value="resolved">Resolved</option>
-                <option value="archived">Archived</option>
-              </select>
-            </div>
+
+            <SelectField
+              value={filterStatus}
+              onValueChange={(value) =>
+                setFilterStatus(
+                  value as
+                    | "all"
+                    | "new"
+                    | "in_progress"
+                    | "resolved"
+                    | "archived"
+                )
+              }
+              placeholder="Status"
+            >
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="new">New</SelectItem>
+              <SelectItem value="in_progress">In Progress</SelectItem>
+              <SelectItem value="resolved">Resolved</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+            </SelectField>
           </div>
         </CardContent>
       </Card>
@@ -422,23 +449,29 @@ export default function ContactPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {filteredInquiries.map((inquiry) => (
           <Card key={inquiry.id} className="hover:shadow-lg transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
+            <CardContent className="p-6 h-full">
+              <div className="flex flex-col items-start justify-between h-full">
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-row justify-between items-center gap-2 mb-2">
                     <h3 className="text-lg font-semibold">{inquiry.subject}</h3>
                     <Badge className={statusColors[inquiry.status]}>
                       {inquiry.status}
                     </Badge>
                   </div>
 
-                  <div className="flex items-center text-sm text-gray-500 mb-2">
-                    <User className="w-4 h-4 mr-1" />
-                    {inquiry.name}
-                    <Mail className="w-4 h-4 mr-1 ml-3" />
-                    {inquiry.email}
-                    <Calendar className="w-4 h-4 mr-1 ml-3" />
-                    {inquiry.createdAt.toLocaleDateString()}
+                  <div className="flex flex-row gap-2 flex-wrap justify-between text-sm text-gray-500 mb-2">
+                    <div className="flex flex-row items-center">
+                      <User className="w-4 h-4 mr-1" />
+                      {inquiry.name}
+                    </div>
+                    <div className="flex flex-row items-center">
+                      <Mail className="w-4 h-4 mr-1" />
+                      {inquiry.email}
+                    </div>
+                    <div className="flex flex-row items-center">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      {formatDate(inquiry.createdAt)}
+                    </div>
                   </div>
 
                   <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
@@ -446,7 +479,7 @@ export default function ContactPage() {
                   </p>
                 </div>
 
-                <div className="flex flex-col gap-2 ml-4">
+                <div className="w-full flex flex-row justify-between">
                   <Button
                     size="sm"
                     variant="outline"
@@ -481,34 +514,31 @@ export default function ContactPage() {
         ))}
       </div>
 
-      {/* Inquiry Details Modal */}
-      {selectedInquiry && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  {selectedInquiry.subject}
-                  <Badge
-                    className={
-                      statusColors[
-                        selectedInquiry.status as keyof typeof statusColors
-                      ]
-                    }
-                  >
-                    {selectedInquiry.status}
-                  </Badge>
-                </CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedInquiry(null)}
+      {/* Inquiry Details Dialog */}
+      <Dialog open={!!selectedInquiry} onOpenChange={handleCloseModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {selectedInquiry?.subject}
+              {selectedInquiry && (
+                <Badge
+                  className={
+                    statusColors[
+                      selectedInquiry.status as keyof typeof statusColors
+                    ]
+                  }
                 >
-                  <XCircle className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
+                  {selectedInquiry.status}
+                </Badge>
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              View and respond to this inquiry
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedInquiry && (
+            <div className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <h3 className="font-semibold mb-2">Contact Information</h3>
@@ -571,10 +601,10 @@ export default function ContactPage() {
               {selectedInquiry.status !== "resolved" && (
                 <div>
                   <h3 className="font-semibold mb-2">Reply</h3>
-                  <textarea
+                  <Textarea
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    className="w-full p-3 border rounded-lg"
+                    className="w-full"
                     rows={4}
                     placeholder="Type your reply here..."
                   />
@@ -586,7 +616,7 @@ export default function ContactPage() {
                   <Button
                     onClick={() => {
                       handleStatusUpdate(selectedInquiry.id, "read");
-                      setSelectedInquiry(null);
+                      handleCloseModal();
                     }}
                   >
                     <Eye className="w-4 h-4 mr-2" />
@@ -606,7 +636,7 @@ export default function ContactPage() {
                   variant="outline"
                   onClick={() => {
                     handleStatusUpdate(selectedInquiry.id, "closed");
-                    setSelectedInquiry(null);
+                    handleCloseModal();
                   }}
                 >
                   <Archive className="w-4 h-4 mr-2" />
@@ -614,16 +644,16 @@ export default function ContactPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => setSelectedInquiry(null)}
+                  onClick={handleCloseModal}
                   className="flex-1"
                 >
                   Close
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

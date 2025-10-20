@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   Image as ImageIcon,
 } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { extractErrorMessage, type UnknownError } from "@/common/helpers";
 import type { Orphanage } from "@/common/types";
@@ -58,19 +59,11 @@ const steps = [
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { user, isAuthenticated, isOrphanage, signOut } = useAuthContext();
+  const { user, isAuthenticated, isOrphanage } = useAuthContext();
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
   const [formData, setFormData] = useState<Partial<Orphanage>>({});
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error("Sign out error:", error);
-    }
-  };
 
   // Redirect if not authenticated or not orphanage
   useEffect(() => {
@@ -163,7 +156,7 @@ export default function OnboardingPage() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <Spinner className="h-12 w-12 mx-auto mb-4" />
           <p className="text-gray-600 dark:text-gray-400">
             Loading your data...
           </p>
@@ -176,8 +169,6 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <Button onClick={handleSignOut}>Logout</Button>
-
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">

@@ -20,16 +20,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  DollarSign,
-  Calendar,
-  Edit,
-  Trash2,
-  MoreVertical,
-} from "lucide-react";
+import { DollarSign, Calendar, Edit, Trash2, MoreVertical } from "lucide-react";
 import { toast } from "sonner";
 import type { Issue } from "@/common/types";
-import { formatCurrency } from "@/common/helpers";
+import { formatCurrency, formatDate } from "@/common/helpers";
 
 interface IssueCardProps {
   issue: Issue;
@@ -38,7 +32,12 @@ interface IssueCardProps {
   onUpdate: () => void;
 }
 
-export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps) {
+export function IssueCard({
+  issue,
+  onEdit,
+  onDelete,
+}: // onUpdate,
+IssueCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -114,7 +113,7 @@ export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps)
                   <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => setShowDeleteDialog(true)}
                   className="text-red-600 focus:text-red-600"
                 >
@@ -130,7 +129,7 @@ export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps)
             {issue.description}
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="flex flex-row flex-wrap justify-between gap-4 mb-4">
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-gray-400" />
               <span className="text-sm font-medium">Raised:</span>
@@ -149,7 +148,7 @@ export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps)
               <Calendar className="h-4 w-4 text-gray-400" />
               <span className="text-sm font-medium">Created:</span>
               <span className="text-sm">
-                {new Date(issue.createdAt).toLocaleDateString()}
+                {formatDate(new Date(issue.createdAt))}
               </span>
             </div>
           </div>
@@ -157,14 +156,9 @@ export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps)
           {/* Progress Bar */}
           <div className="space-y-2 mb-4">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">
-                Progress
-              </span>
+              <span className="text-gray-600 dark:text-gray-400">Progress</span>
               <span className="font-medium">
-                {Math.round(
-                  (issue.raisedAmount / issue.estimatedCost) * 100
-                )}
-                %
+                {Math.round((issue.raisedAmount / issue.estimatedCost) * 100)}%
               </span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -209,13 +203,12 @@ export function IssueCard({ issue, onEdit, onDelete, onUpdate }: IssueCardProps)
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Request</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete &quot;{issue.title}&quot;? This action cannot be undone.
+              Are you sure you want to delete &quot;{issue.title}&quot;? This
+              action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}

@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import { getEventById, updateEvent } from "@/firebase/events";
 import type { Event } from "@/common/types";
 import { NewDatePicker } from "@/components/ui/datepicker";
+import { Spinner } from "@/components/ui/spinner";
 
 const CATEGORIES = [
   "fundraising",
@@ -395,7 +396,7 @@ export default function EditEventPage() {
           >
             {saving ? (
               <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                <Spinner className="w-4 h-4 mr-2" />
                 Saving...
               </>
             ) : (

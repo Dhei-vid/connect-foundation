@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Save, Eye, X, Calendar, User, Edit, ArrowLeft } from "lucide-react";
+import { Save, Eye, X, Calendar, User, Edit } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/form-field";
@@ -501,19 +501,22 @@ export default function CreateBlogPostPage() {
 
   return (
     <div className="mx-auto space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="outline" size="icon" onClick={() => router.back()}>
-          <ArrowLeft className="h-4 w-4" />
+      <div className="flex flex-row justify-between items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+            Create Blog
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            Create a blog to engage with your community
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => router.back()}
+          disabled={loading}
+        >
+          Cancel
         </Button>
-      </div>
-
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-          Create Blog
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
-          Create a blog to engage with your community
-        </p>
       </div>
 
       <Card className="py-4">

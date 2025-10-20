@@ -28,6 +28,16 @@ import {
 import type { Donation } from "@/common/types";
 import { SelectField } from "@/components/ui/form-field";
 import { SelectItem } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { getIssue } from "@/firebase/issues";
+import type { Issue } from "@/common/types";
 
 // Loading and error states
 interface LoadingState {
@@ -74,6 +84,8 @@ export default function DonationsPage() {
   const [selectedDonation, setSelectedDonation] = useState<Donation | null>(
     null
   );
+  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+  const [loadingIssue, setLoadingIssue] = useState<boolean>(false);
 
   // Load data on component mount
   useEffect(() => {
@@ -174,6 +186,32 @@ export default function DonationsPage() {
     }
   };
 
+  const handleViewDonation = async (donation: Donation) => {
+    setSelectedDonation(donation);
+    
+    // If the donation has a target issue, fetch the issue details
+    if (donation.targetIssueId) {
+      try {
+        setLoadingIssue(true);
+        const issue = await getIssue(donation.targetIssueId);
+        setSelectedIssue(issue);
+      } catch (error) {
+        console.error("Error fetching issue:", error);
+        setError("Failed to load issue details");
+        setSelectedIssue(null);
+      } finally {
+        setLoadingIssue(false);
+      }
+    } else {
+      setSelectedIssue(null);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setSelectedDonation(null);
+    setSelectedIssue(null);
+  };
+
   const handleExport = () => {
     // TODO: Implement export logic
     console.log("Export donations");
@@ -209,11 +247,11 @@ export default function DonationsPage() {
             variant="outline"
             disabled={loading.donations || loading.stats}
           >
-            <RefreshCw
-              className={`w-4 h-4 mr-2 ${
-                loading.donations || loading.stats ? "animate-spin" : ""
-              }`}
-            />
+            {loading.donations || loading.stats ? (
+              <Spinner className="w-4 h-4 mr-2" />
+            ) : (
+              <RefreshCw className="w-4 h-4 mr-2" />
+            )}
             Refresh
           </Button>
           <Button onClick={handleExport}>
@@ -580,7 +618,7 @@ export default function DonationsPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => setSelectedDonation(donation)}
+                              onClick={() => handleViewDonation(donation)}
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
@@ -617,23 +655,18 @@ export default function DonationsPage() {
         </CardContent>
       </Card>
 
-      {/* Donation Details Modal */}
-      {selectedDonation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-2xl">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Donation Details</CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedDonation(null)}
-                >
-                  <XCircle className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
+      {/* Donation Details Dialog */}
+      <Dialog open={!!selectedDonation} onOpenChange={handleCloseModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Donation Details</DialogTitle>
+            <DialogDescription>
+              View detailed information about this donation
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedDonation && (
+            <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h3 className="font-semibold mb-2">Donor Information</h3>
@@ -698,6 +731,61 @@ export default function DonationsPage() {
                 </div>
               </div>
 
+              {/* Orphanage Information */}
+              {selectedIssue && (
+                <div>
+                  <h3 className="font-semibold mb-2">Orphanage Information</h3>
+                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>Orphanage Name:</span>
+                        <span className="font-medium">{selectedIssue.orphanageName}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Issue Title:</span>
+                        <span className="font-medium">{selectedIssue.title}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Category:</span>
+                        <span className="font-medium capitalize">{selectedIssue.category}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Priority:</span>
+                        <Badge
+                          className={
+                            selectedIssue.priority === "urgent"
+                              ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                              : selectedIssue.priority === "high"
+                              ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
+                              : selectedIssue.priority === "medium"
+                              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                              : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                          }
+                        >
+                          {selectedIssue.priority}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Estimated Cost:</span>
+                        <span className="font-medium">₦{selectedIssue.estimatedCost.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Amount Raised:</span>
+                        <span className="font-medium">₦{selectedIssue.raisedAmount.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Loading state for issue */}
+              {loadingIssue && (
+                <div className="flex items-center justify-center p-4">
+                  <Spinner className="w-6 h-6 mr-2" />
+                  <span>Loading orphanage information...</span>
+                </div>
+              )}
+
               {selectedDonation.message && (
                 <div>
                   <h3 className="font-semibold mb-2">Message</h3>
@@ -707,7 +795,7 @@ export default function DonationsPage() {
                 </div>
               )}
 
-              {selectedDonation.targetIssueId && (
+              {selectedDonation.targetIssueId && !selectedIssue && !loadingIssue && (
                 <div>
                   <h3 className="font-semibold mb-2">Target Issue</h3>
                   <p className="text-blue-600">
@@ -722,7 +810,7 @@ export default function DonationsPage() {
                     <Button
                       onClick={() => {
                         handleStatusUpdate(selectedDonation.id, "completed");
-                        setSelectedDonation(null);
+                        handleCloseModal();
                       }}
                       className="flex-1"
                     >
@@ -733,7 +821,7 @@ export default function DonationsPage() {
                       variant="destructive"
                       onClick={() => {
                         handleStatusUpdate(selectedDonation.id, "failed");
-                        setSelectedDonation(null);
+                        handleCloseModal();
                       }}
                       className="flex-1"
                     >
@@ -744,16 +832,16 @@ export default function DonationsPage() {
                 )}
                 <Button
                   variant="outline"
-                  onClick={() => setSelectedDonation(null)}
+                  onClick={handleCloseModal}
                   className="flex-1"
                 >
                   Close
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
