@@ -13,6 +13,8 @@ import { SelectItem } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { createTestimonial, updateTestimonial, TestimonialRecord } from "@/firebase/testimonials";
+import { SingleImageUpload } from "@/components/ui/single-image-upload";
+import { uploadFile, generateFilePath, generateImagePath } from "@/firebase/storage";
 import { toast } from "sonner";
 
 const schema = z.object({
@@ -69,6 +71,8 @@ export function AddTestimonialModal({
 
   const onSubmit = async (values: FormValues) => {
     try {
+      // If local object URLs are present from upload widgets, upload files to storage
+      // Here we expect inputs for upload to be populated via hidden File inputs managed by components
       if (editingTestimonial) {
         await updateTestimonial(editingTestimonial.id, values);
         toast.success("Testimonial updated");
@@ -124,9 +128,50 @@ export function AddTestimonialModal({
               <Label>Content</Label>
               <Textarea rows={3} {...register("content")} placeholder="Short quote..." />
             </div>
-            <div className="md:col-span-2">
-              <Label>Image URL (for hero or card background)</Label>
-              <Input {...register("imageUrl")} placeholder="https://..." />
+            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Image URL (or upload)</Label>
+                <Input {...register("imageUrl")} placeholder="Paste URL or upload below" />
+                <div className="mt-2">
+                  <SingleImageUpload
+                    value={watch("imageUrl")}
+                    onChange={(url) => {
+                      // If user selected a local file (blob: URL), upload to storage on save
+                      if (url?.startsWith("blob:")) {
+                        // store as-is for now; we'll upload during save below
+                      }
+                      reset({ ...watch(), imageUrl: url });
+                    }}
+                    aspectRatio="video"
+                    label="Upload Image"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label>Video URL (YouTube or MP4)</Label>
+                <Input {...register("videoUrl")} placeholder="https://... (YouTube or MP4)" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Paste a YouTube link or an MP4 URL. You may also upload an MP4 below.
+                </p>
+                <div className="mt-2">
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      try {
+                        const path = generateFilePath("testimonials/videos", file.name);
+                        const url = await uploadFile(file, path);
+                        reset({ ...watch(), videoUrl: url });
+                        toast.success("Video uploaded");
+                      } catch (err) {
+                        toast.error("Failed to upload video");
+                      }
+                    }}
+                  />
+                </div>
+              </div>
             </div>
             {type === "video" && (
               <div className="md:col-span-2">

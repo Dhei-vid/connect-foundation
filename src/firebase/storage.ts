@@ -6,6 +6,19 @@ import {
 } from "firebase/storage";
 import { storage } from "@/config/firebase";
 
+// Generic file upload
+export async function uploadFile(file: File, path: string): Promise<string> {
+  try {
+    const storageRef = ref(storage, path);
+    const snapshot = await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(snapshot.ref);
+    return downloadURL;
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    throw new Error("Failed to upload file");
+  }
+}
+
 // Upload image to Firebase Storage
 export async function uploadImage(file: File, path: string): Promise<string> {
   try {
@@ -42,6 +55,13 @@ export function generateImagePath(folder: string, filename: string): string {
   const timestamp = Date.now();
   const randomString = Math.random().toString(36).substring(2, 15);
   const extension = filename.split(".").pop() || "jpg";
+  return `${folder}/${timestamp}_${randomString}.${extension}`;
+}
+
+export function generateFilePath(folder: string, filename: string): string {
+  const timestamp = Date.now();
+  const randomString = Math.random().toString(36).substring(2, 15);
+  const extension = filename.split(".").pop() || "dat";
   return `${folder}/${timestamp}_${randomString}.${extension}`;
 }
 
