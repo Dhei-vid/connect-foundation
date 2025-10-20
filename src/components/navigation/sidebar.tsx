@@ -19,6 +19,7 @@ import {
   // Settings,
   HelpCircle,
   HandHelping,
+  Quote,
 } from "lucide-react";
 
 interface PortalSidebarProps {
@@ -57,6 +58,12 @@ const navigationItems: NavItem[] = [
     name: "Blog",
     href: "/admin/blog",
     lucideIcon: BookOpen,
+    roles: ["ADMIN"],
+  },
+  {
+    name: "Testimonials",
+    href: "/admin/testimonials",
+    lucideIcon: Quote,
     roles: ["ADMIN"],
   },
   {
