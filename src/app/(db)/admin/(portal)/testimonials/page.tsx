@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -53,10 +53,17 @@ export default function AdminTestimonialsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Testimonials</h1>
-          <p className="text-muted-foreground">Create and manage testimonials. Not linked publicly yet.</p>
+          <p className="text-muted-foreground">
+            Create and manage testimonials.
+          </p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => { setEditing(null); setShowModal(true); }}>
+          <Button
+            onClick={() => {
+              setEditing(null);
+              setShowModal(true);
+            }}
+          >
             <Plus className="w-4 h-4 mr-2" /> Add Testimonial
           </Button>
         </div>
@@ -66,7 +73,12 @@ export default function AdminTestimonialsPage() {
         <CardContent className="p-6">
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search testimonials..." className="pl-9" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search testimonials..."
+              className="pl-9"
+            />
           </div>
         </CardContent>
       </Card>
@@ -76,7 +88,12 @@ export default function AdminTestimonialsPage() {
           <Card key={t.id} className="overflow-hidden">
             {t.imageUrl ? (
               <div className="relative h-40">
-                <Image src={t.imageUrl} alt={t.name} fill className="object-cover" />
+                <Image
+                  src={t.imageUrl}
+                  alt={t.name}
+                  fill
+                  className="object-cover"
+                />
                 <div className="absolute inset-0 bg-black/30" />
               </div>
             ) : null}
@@ -99,14 +116,31 @@ export default function AdminTestimonialsPage() {
                 )}
               </div>
               {t.content ? (
-                <p className="mt-4 text-muted-foreground text-sm line-clamp-3">{t.content}</p>
+                <p className="mt-4 text-muted-foreground text-sm line-clamp-3">
+                  {t.content}
+                </p>
               ) : null}
 
               <div className="mt-6 flex justify-end gap-2">
-                <Button size="sm" variant="outline" onClick={() => { setEditing(t); setShowModal(true); }}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setEditing(t);
+                    setShowModal(true);
+                  }}
+                >
                   <Edit className="w-4 h-4" />
                 </Button>
-                <Button size="sm" variant="destructive" onClick={async () => { await deleteTestimonial(t.id); toast.success("Deleted"); load(); }}>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={async () => {
+                    await deleteTestimonial(t.id);
+                    toast.success("Deleted");
+                    load();
+                  }}
+                >
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
@@ -124,5 +158,3 @@ export default function AdminTestimonialsPage() {
     </div>
   );
 }
-
-

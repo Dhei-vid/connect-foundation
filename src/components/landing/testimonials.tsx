@@ -18,9 +18,12 @@ import { cn } from "@/lib/utils";
 type Testimonial = {
   name: string;
   role: string;
+  email?: string;
+  organization?: string;
   content?: string;
   rating: number;
   avatar: string;
+  avatarImageUrl?: string;
   color: string;
   videoUrl?: string; // Optional MP4 video URL
   imageUrl?: string; // Optional image for hero-style card
@@ -211,15 +214,22 @@ export function Testimonials() {
                   <div className="mt-6 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <Avatar>
-                        <AvatarFallback className={`bg-main-blue text-white`}>
-                          {t.avatar}
-                        </AvatarFallback>
+                        {t.avatarImageUrl ? (
+                          <img src={t.avatarImageUrl} alt={t.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <AvatarFallback className={`bg-main-blue text-white`}>
+                            {t.avatar}
+                          </AvatarFallback>
+                        )}
                       </Avatar>
                       <div>
                         <div className="font-medium">{t.name}</div>
                         <div className="text-sm text-muted-foreground">
                           {t.role}
                         </div>
+                        {t.organization && (
+                          <div className="text-xs text-muted-foreground">{t.organization}</div>
+                        )}
                       </div>
                     </div>
                     {t.videoUrl ? (
