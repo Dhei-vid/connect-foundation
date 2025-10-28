@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Mail, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,19 +14,12 @@ import { Spinner } from "@/components/ui/spinner";
 
 export default function OrphanageSignInPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const { isAuthenticated, signIn } = useAuthContext();
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/orphanage/dashboard");
-    }
-  }, [isAuthenticated, router]);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const { signIn, user } = useAuthContext();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +30,12 @@ export default function OrphanageSignInPage() {
       const success = await signIn(email, password);
       if (success) {
         toast.success("Signed in successfully");
-        router.push("/orphanage/dashboard");
+
+        if (user && !user.onboardingCompleted) {
+          router.push("/orphanage/onboarding");
+        } else {
+          router.push("/orphanage/dashboard");
+        }
       } else {
         setError("Invalid email or password");
       }
@@ -116,9 +114,9 @@ export default function OrphanageSignInPage() {
               </div>
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full h-11 bg-main-red hover:bg-main-red/90 text-white font-medium transition-colors" 
+            <Button
+              type="submit"
+              className="w-full h-11 bg-main-red hover:bg-main-red/90 text-white font-medium transition-colors"
               disabled={isLoading}
             >
               {isLoading ? (

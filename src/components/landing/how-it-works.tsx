@@ -111,7 +111,7 @@ export function HowItWorks() {
                 </div>
               )}
 
-              <Card className="h-full glass hover:shadow-2xl transition-all duration-300 group">
+              <Card className="h-full  hover:shadow-2xl transition-all duration-300 group">
                 <CardHeader className="text-center pb-4">
                   <div
                     className={`w-20 h-20 rounded-3xl bg-gradient-to-r ${step.color} p-5 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}
@@ -157,7 +157,7 @@ export function HowItWorks() {
           viewport={{ once: true }}
           className="text-center"
         >
-          <div className="glass rounded-3xl p-8 max-w-3xl mx-auto">
+          <div className=" rounded-3xl p-8 max-w-3xl mx-auto">
             <h3 className="text-3xl font-bold mb-4">
               Ready to Start Your Journey?
             </h3>

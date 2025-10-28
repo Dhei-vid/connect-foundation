@@ -3,14 +3,14 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Mail, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuthContext } from "@/components/providers";
 import { extractErrorMessage, type UnknownError } from "@/common/helpers";
-import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 
 export default function AdminSignInPage() {
   const router = useRouter();
@@ -115,9 +115,9 @@ export default function AdminSignInPage() {
               </div>
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full h-11 bg-main-red hover:bg-main-red/90 text-white font-medium transition-colors" 
+            <Button
+              type="submit"
+              className="w-full h-11 bg-main-red hover:bg-main-red/90 text-white font-medium transition-colors"
               disabled={isLoading}
             >
               {isLoading ? (

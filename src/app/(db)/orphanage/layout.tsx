@@ -15,20 +15,24 @@ export default function OrganizationsLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated && isOrphanage) {
-      // If user is an orphanage and hasn't completed onboarding, redirect to onboarding
-      if (!user?.onboardingCompleted && pathname !== "/orphanage/onboarding") {
-        router.push("/orphanage/onboarding");
-      }
-      // If user has completed onboarding and is on onboarding page, redirect to main orphanage page
-      else if (
-        user?.onboardingCompleted &&
-        pathname === "/orphanage/onboarding"
-      ) {
-        router.push("/orphanage/dashboard");
-      }
+    if (isLoading) return; // Don’t run until auth state is known
+    if (!isAuthenticated || !isOrphanage) return; // Only run for orphanages
+
+    const onboardingIncomplete = !user?.onboardingCompleted;
+    const isOnboardingPage = pathname === "/orphanage/onboarding";
+    const isDashboardPage = pathname === "/orphanage/dashboard";
+
+    // 1️⃣ If onboarding not complete and not already on onboarding page
+    if (onboardingIncomplete && !isOnboardingPage) {
+      router.replace("/orphanage/onboarding");
+      return;
     }
-  }, [user, isAuthenticated, isOrphanage, isLoading, pathname, router]);
+
+    // 2️⃣ If onboarding complete but currently on onboarding page
+    if (!onboardingIncomplete && isOnboardingPage) {
+      router.replace("/orphanage/dashboard");
+    }
+  }, []);
 
   return (
     <main>

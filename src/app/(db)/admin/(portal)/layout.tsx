@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/components/providers";
-import LoadingSpinner from "@/components/general/spinner";
+import { Spinner } from "@/components/ui/spinner";
 import PortalSidebar from "@/components/navigation/sidebar";
 import PortalNavbar from "@/components/navigation/portal-navbar";
 
@@ -26,7 +26,7 @@ export default function AdminPortalLayout({
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <LoadingSpinner size="lg" />
+          <Spinner className={"h-12 w-12 mx-auto"} />
           <p className="mt-4 text-gray-600 dark:text-gray-400">
             {isLoading ? "Loading..." : "Redirecting..."}
           </p>

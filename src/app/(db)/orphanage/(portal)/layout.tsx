@@ -20,10 +20,15 @@ export default function OrphanagePortalLayout({
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push("/orphanage/signin");
-    } else if (!isLoading && isAuthenticated && user && !user.onboardingCompleted) {
+    } else if (
+      !isLoading &&
+      isAuthenticated &&
+      user &&
+      !user.onboardingCompleted
+    ) {
       router.push("/orphanage/onboarding");
     }
-  }, [isLoading, isAuthenticated, user, router]);
+  }, [isLoading, isAuthenticated, user]);
 
   // If loading, show loading state
   if (isLoading) {
@@ -43,7 +48,9 @@ export default function OrphanagePortalLayout({
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="flex flex-col items-center">
           <LoadingSpinner size="lg" />
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Redirecting to sign in...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            Redirecting to sign in...
+          </p>
         </div>
       </div>
     );
@@ -55,7 +62,9 @@ export default function OrphanagePortalLayout({
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="flex flex-col items-center">
           <LoadingSpinner size="lg" />
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Redirecting to onboarding...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            Redirecting to onboarding...
+          </p>
         </div>
       </div>
     );

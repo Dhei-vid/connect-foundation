@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Mail, ArrowLeft, User, Phone } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, User, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthContext } from "@/components/providers";
@@ -22,19 +22,12 @@ export default function OrphanageSignUpPage() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
-  const { isAuthenticated, signUp } = useAuthContext();
+  const { signUp } = useAuthContext();
 
   // Form state
   const [formData, setFormData] = useState<OrphanageFormProps>(
     orphanageDefaultFormValues
   );
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/orphanage");
-    }
-  }, [isAuthenticated, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
