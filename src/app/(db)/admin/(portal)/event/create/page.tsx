@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { NewDatePicker } from "@/components/ui/datepicker";
 import { ImagePicker } from "@/components/ui/image-picker";
 import { Spinner } from "@/components/ui/spinner";
+import { uploadImage } from "@/firebase/storage";
 
 const CATEGORIES = [
   "fundraising",
@@ -78,6 +79,10 @@ export default function CreateEventPage() {
   const [registrationDeadline, setRegistrationDeadline] = useState<
     Date | undefined
   >(undefined);
+
+  const [imageUrl, setImageUrl] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleInputChange = (
     field: string,
@@ -164,9 +169,27 @@ export default function CreateEventPage() {
       return;
     }
 
-    setLoading(true);
-
     try {
+      setLoading(true);
+
+      let uploadedImageUrl = formData.featuredImage;
+
+      // ⬆️ Handle image upload first if file was selected
+      if (selectedFile) {
+        const fileName = `events/${Date.now()}-${selectedFile.name}`;
+
+        uploadedImageUrl = await uploadImage(
+          selectedFile,
+          fileName,
+          (progress) => {
+            setUploadProgress(progress);
+          }
+        );
+
+        toast.success("Image uploaded successfully!");
+      }
+
+      // ✅ Prepare final event data
       const eventData: Omit<
         Event,
         "id" | "createdAt" | "updatedAt" | "views" | "currentAttendees"
@@ -175,7 +198,7 @@ export default function CreateEventPage() {
         slug: generateSlug(formData.title),
         description: formData.description.trim(),
         content: formData.content.trim(),
-        featuredImage: formData.featuredImage.trim(),
+        featuredImage: uploadedImageUrl,
         startDate: new Date(
           `${formData.startDate?.toDateString()} ${formData.startTime}`
         ),
@@ -190,11 +213,6 @@ export default function CreateEventPage() {
           address: formData.location.address.trim(),
           city: formData.location.city.trim(),
           state: formData.location.state.trim(),
-          coordinates:
-            formData.location.coordinates.lat &&
-            formData.location.coordinates.lng
-              ? formData.location.coordinates
-              : undefined,
         },
         organizer: {
           name: formData.organizer.name.trim() || "Connect Foundation",
@@ -205,7 +223,7 @@ export default function CreateEventPage() {
         type: formData.type,
         maxAttendees: formData.maxAttendees
           ? parseInt(formData.maxAttendees)
-          : undefined,
+          : null,
         registrationRequired: formData.registrationRequired,
         registrationDeadline:
           formData.registrationDeadline && formData.registrationDeadlineTime
@@ -214,7 +232,7 @@ export default function CreateEventPage() {
                   formData.registrationDeadlineTime
                 }`
               )
-            : undefined,
+            : null,
         registrationUrl: formData.registrationUrl.trim(),
         cost: {
           amount: formData.cost.free
@@ -228,18 +246,21 @@ export default function CreateEventPage() {
         featured: formData.featured,
       };
 
+      // ✅ Create the event in Firebase
       await createEvent({
         ...eventData,
         views: 0,
         currentAttendees: 0,
       });
-      toast.success("Event created successfully!");
+
+      toast.success("🎉 Event created successfully!");
       router.push("/admin/event");
     } catch (error) {
       console.error("Error creating event:", error);
       toast.error("Failed to create event");
     } finally {
       setLoading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -322,12 +343,10 @@ export default function CreateEventPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Featured Image</label>
                   <ImagePicker
-                    value={formData.featuredImage}
-                    onChange={(imageUrl) =>
-                      handleInputChange("featuredImage", imageUrl)
-                    }
-                    placeholder="Enter image URL or upload a file"
-                    showPreview
+                    value={imageUrl}
+                    onChange={setImageUrl}
+                    progress={uploadProgress}
+                    onFileSelect={setSelectedFile}
                   />
                 </div>
               </CardContent>

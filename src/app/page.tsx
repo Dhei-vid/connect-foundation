@@ -7,7 +7,6 @@ import { Footer } from "@/components/landing/footer";
 import { Testimonials } from "@/components/landing/testimonials";
 
 // import { HowItWorks } from "@/components/landing/how-it-works";
-// import { Testimonials } from "@/components/landing/testimonials";
 
 import { TopNav } from "@/components/navigation/top-nav";
 import HeroLayout from "../components/general/hero-layout";

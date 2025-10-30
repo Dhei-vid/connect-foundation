@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useAuthContext } from "@/components/providers";
+import { useAuthContext } from "@/providers/providers";
 import { Toaster } from "@/components/ui/sonner";
 
 export default function OrganizationsLayout({

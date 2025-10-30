@@ -1,14 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useAuthContext } from "@/components/providers";
+import { useAuthContext } from "@/providers/providers";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, ArrowRight } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function Page() {
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuthContext();
+  const { isAuthenticated, isLoading, user } = useAuthContext();
+  const role = user?.role;
 
   // If loading, show loading state
   if (isLoading) {
@@ -47,7 +48,11 @@ export default function Page() {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           <Button
-            onClick={() => router.push("/admin/signin")}
+            onClick={() =>
+              role === "ADMIN"
+                ? router.push("/admin/signin")
+                : router.push("/orphanage/signin")
+            }
             size="lg"
             className="w-full sm:w-auto"
           >
@@ -57,13 +62,17 @@ export default function Page() {
 
           {isAuthenticated && (
             <Button
-              onClick={() => router.push("admin/dashboard")}
+              onClick={() =>
+                role === "ADMIN"
+                  ? router.push("admin/dashboard")
+                  : router.push("orphanage/dashboard")
+              }
               variant="outline"
               size="lg"
               className="w-full sm:w-auto"
             >
               <LayoutDashboard className="mr-2 h-4 w-4" />
-              Go to Dashboard
+              Go to {role === "ADMIN" ? "Admin" : "Orphanage"} Dashboard
             </Button>
           )}
         </div>

@@ -25,6 +25,8 @@ import type { Event } from "@/common/types";
 import { SelectField } from "@/components/ui/form-field";
 import { SelectItem } from "@/components/ui/select";
 import { getAllEvents, deleteEvent, updateEvent } from "@/firebase/events";
+import { extractErrorMessage, UnknownError, formatFirebaseDate } from "@/common/helpers";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 
 export default function AdminEventsPage() {
   const router = useRouter();
@@ -36,7 +38,9 @@ export default function AdminEventsPage() {
     "all" | "fundraising" | "volunteer" | "awareness" | "community" | "other"
   >("all");
   const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [deleteActionLoading, setDeleteActionLoading] =
+    useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   // Load events from Firebase
@@ -48,15 +52,14 @@ export default function AdminEventsPage() {
     try {
       setLoading(true);
       setError(null);
-      console.log("Loading events from Firebase...");
 
       const eventsData = await getAllEvents();
-      console.log("Loaded events:", eventsData);
+
       setEvents(eventsData);
     } catch (error) {
-      console.error("Error loading events:", error);
+      const errorMessage = extractErrorMessage(error as UnknownError);
       setError("Failed to load events");
-      toast.error("Failed to load events");
+      toast.error("Failed to load events", { description: errorMessage });
     } finally {
       setLoading(false);
     }
@@ -74,16 +77,16 @@ export default function AdminEventsPage() {
     currentStatus: boolean
   ) => {
     try {
-      console.log("Toggling published status for event:", eventId);
       await updateEvent(eventId, { published: !currentStatus });
-      console.log("Event status updated successfully");
       toast.success(
         `Event ${!currentStatus ? "published" : "unpublished"} successfully`
       );
       await loadEvents(); // Reload the list
     } catch (error) {
-      console.error("Error updating event status:", error);
-      toast.error("Failed to update event status");
+      const errorMessage = extractErrorMessage(error as UnknownError);
+      toast.error("Failed to update event status", {
+        description: errorMessage,
+      });
     }
   };
 
@@ -100,29 +103,26 @@ export default function AdminEventsPage() {
       );
       await loadEvents(); // Reload the list
     } catch (error) {
-      console.error("Error updating featured status:", error);
-      toast.error("Failed to update featured status");
+      const errorMessage = extractErrorMessage(error as UnknownError);
+      toast.error("Failed to update featured status", {
+        description: errorMessage,
+      });
     }
   };
 
   const handleDelete = async (eventId: string) => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this event? This action cannot be undone."
-      )
-    ) {
-      return;
-    }
-
+    setDeleteActionLoading(true);
     try {
-      console.log("Deleting event:", eventId);
       await deleteEvent(eventId);
-      console.log("Event deleted successfully");
       toast.success("Event deleted successfully");
       await loadEvents(); // Reload the list
     } catch (error) {
-      console.error("Error deleting event:", error);
-      toast.error("Failed to delete event");
+      const errorMessage = extractErrorMessage(error as UnknownError);
+      toast.error("Failed to delete event", {
+        description: errorMessage,
+      });
+    } finally {
+      setDeleteActionLoading(false);
     }
   };
 
@@ -146,15 +146,7 @@ export default function AdminEventsPage() {
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
-  };
+  const formatDate = (date: Date) => formatFirebaseDate(date, "MMM dd, yyyy 'at' h:mm a");
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -437,14 +429,18 @@ export default function AdminEventsPage() {
                 <CardContent className="p-6">
                   <div className="flex flex-col lg:flex-row gap-6">
                     {/* Event Image */}
-                    <div className="w-full lg:w-48 h-32 lg:h-24 flex-shrink-0">
+                    <div className="w-full h-60 lg:w-48 lg:h-full flex-shrink-0">
                       {event.featuredImage ? (
                         <Image
-                          src={event.featuredImage}
+                          src={
+                            event.featuredImage !== null
+                              ? event.featuredImage
+                              : "https://images.pexels.com/photos/31039958/pexels-photo-31039958.jpeg"
+                          }
                           alt={event.title}
                           width={192}
-                          height={96}
-                          className="w-full h-full object-cover rounded-lg"
+                          height={200}
+                          className="w-full h-full object-cover object-center rounded-lg"
                         />
                       ) : (
                         <div className="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
@@ -553,14 +549,21 @@ export default function AdminEventsPage() {
                         >
                           {event.featured ? "Unfeature" : "Feature"}
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDelete(event.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-2">
+                          <ConfirmationDialog
+                            title="Delete Event"
+                            description={`Are you sure you want to delete "${event.title}"? This action cannot be undone.`}
+                            confirmText="Delete Event"
+                            onConfirm={() => handleDelete(event.id)}
+                            variant="destructive"
+                            loading={deleteActionLoading}
+                          >
+                            <Button variant="destructive" size="sm">
+                              Delete
+                              <Trash2 className="w-4 h-4 mr-2" />
+                            </Button>
+                          </ConfirmationDialog>
+                        </div>
                       </div>
                     </div>
                   </div>

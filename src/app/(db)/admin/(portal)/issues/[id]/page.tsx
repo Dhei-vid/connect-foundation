@@ -23,7 +23,7 @@ import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { getIssue, updateIssueStatus, deleteIssue } from "@/firebase/issues";
 import { toast } from "sonner";
 import type { Issue } from "@/common/types";
-import { formatFirebaseDate, formatFirebaseDateRelative } from "@/lib/date-utils";
+import { formatFirebaseDate } from "@/lib/date-utils";
 import { priorityColors, categoryColors, statusColors } from "@/common/style";
 
 export default function IssueDetailsPage() {

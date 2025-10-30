@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthContext } from "@/components/providers";
+import { useAuthContext } from "@/providers/providers";
 import { Spinner } from "@/components/ui/spinner";
 import PortalSidebar from "@/components/navigation/sidebar";
 import PortalNavbar from "@/components/navigation/portal-navbar";

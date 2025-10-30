@@ -3,6 +3,8 @@ import {
   uploadBytes,
   getDownloadURL,
   deleteObject,
+  UploadTaskSnapshot,
+  uploadBytesResumable,
 } from "firebase/storage";
 import { storage } from "@/config/firebase";
 
@@ -20,18 +22,49 @@ export async function uploadFile(file: File, path: string): Promise<string> {
 }
 
 // Upload image to Firebase Storage
-export async function uploadImage(file: File, path: string): Promise<string> {
+export async function uploadImage(
+  file: File,
+  path: string,
+  onProgress?: (progress: number) => void
+): Promise<string> {
   try {
     // Create a reference to the file location
     const imageRef = ref(storage, path);
+    const uploadTask = uploadBytesResumable(imageRef, file);
 
-    // Upload the file
-    const snapshot = await uploadBytes(imageRef, file);
+    if (onProgress) {
+      return new Promise((resolve, reject) => {
+        // Monitor upload progress
+        uploadTask.on(
+          "state_changed",
+          (snapshot: UploadTaskSnapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            onProgress(progress);
+          },
+          (error) => {
+            console.error("Error uploading image:", error);
+            reject(error);
+            throw new Error("Failed to upload image");
+          },
+          async () => {
+            // Get the download URL
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 
-    // Get the download URL
-    const downloadURL = await getDownloadURL(snapshot.ref);
+            resolve(downloadURL);
+          }
+        );
+      });
+    } else {
+      // Simple upload without progress
+      // Upload the file
+      const snapshot = await uploadBytes(imageRef, file);
 
-    return downloadURL;
+      // Get the download URL
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      return downloadURL;
+    }
   } catch (error) {
     console.error("Error uploading image:", error);
     throw new Error("Failed to upload image");

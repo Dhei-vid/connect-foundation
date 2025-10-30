@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail, User, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuthContext } from "@/components/providers";
+import { useAuthContext } from "@/providers/providers";
 import { extractErrorMessage, type UnknownError } from "@/common/helpers";
 import { toast } from "sonner";
 import type { Orphanage } from "@/common/types";

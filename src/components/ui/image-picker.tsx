@@ -5,10 +5,14 @@ import Image from "next/image";
 import { X, Image as ImageIcon } from "lucide-react";
 import { Button } from "./button";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { Progress } from "@/components/ui/progress";
 
 interface ImagePickerProps {
   value: string;
   onChange: (url: string) => void;
+  onFileSelect?: (file: File | null) => void; // 👈 new prop to pass selected file up
+  progress: number;
   placeholder?: string;
   showPreview?: boolean;
   className?: string;
@@ -18,42 +22,42 @@ interface ImagePickerProps {
 export function ImagePicker({
   value,
   onChange,
+  progress,
+
+  onFileSelect,
   placeholder = "Enter image URL or upload a file",
   showPreview = true,
   className,
   disabled = false,
 }: ImagePickerProps) {
   const [dragActive, setDragActive] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (file: File) => {
     if (!file || disabled) return;
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
-      alert("Please select a valid image file");
+      toast.error("Please select a valid image file");
       return;
     }
 
-    // Create blob URL for preview
     const blobUrl = URL.createObjectURL(file);
+    setImagePreview(blobUrl);
     onChange(blobUrl);
+    onFileSelect?.(file); // 👈 pass file up to parent
   };
 
   const handleFiles = (files: FileList | null) => {
     if (!files || disabled) return;
-    const file = files[0];
-    handleFile(file);
+    handleFile(files[0]);
   };
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
+    if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
+    else if (e.type === "dragleave") setDragActive(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -63,20 +67,16 @@ export function ImagePicker({
     handleFiles(e.dataTransfer.files);
   };
 
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleFiles(e.target.files);
-  };
-
   const removeImage = () => {
-    if (value.startsWith("blob:")) {
-      URL.revokeObjectURL(value);
-    }
+    if (value.startsWith("blob:")) URL.revokeObjectURL(value);
+    setImagePreview(null);
     onChange("");
+    onFileSelect?.(null);
   };
 
   return (
     <div className={cn("space-y-4", className)}>
-      {/* Input Field */}
+      {/* URL Input */}
       <div className="space-y-2">
         <input
           type="text"
@@ -88,7 +88,7 @@ export function ImagePicker({
         />
       </div>
 
-      {/* Upload Area */}
+      {/* Drag & Drop Area */}
       <div
         className={cn(
           "relative border-2 border-dashed rounded-lg p-6 text-center transition-colors",
@@ -106,7 +106,7 @@ export function ImagePicker({
           ref={fileInputRef}
           type="file"
           accept="image/*"
-          onChange={handleFileInput}
+          onChange={(e) => handleFiles(e.target.files)}
           className="hidden"
           disabled={disabled}
         />
@@ -120,7 +120,7 @@ export function ImagePicker({
               disabled={disabled}
               className="text-main-600 hover:text-main-500 font-medium"
             >
-              Click to upload
+              Click to select
             </button>{" "}
             or drag and drop
           </div>
@@ -130,8 +130,8 @@ export function ImagePicker({
         </div>
       </div>
 
-      {/* Preview */}
-      {showPreview && value && (
+      {/* Preview - show when we have a local preview OR an existing value */}
+      {showPreview && (imagePreview || value) && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">Preview</label>
@@ -147,15 +147,37 @@ export function ImagePicker({
           </div>
           <div className="relative w-full h-60 border rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
             <Image
-              src={value}
+              src={imagePreview || value}
               alt="Preview"
               fill
               className="object-cover"
-              onError={() => {
-                // Handle error if needed
-              }}
             />
+            {/* Hover actions - allow changing the image even when editing an existing URL */}
+            <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  fileInputRef.current?.click();
+                }}
+                disabled={disabled}
+              >
+                Change
+              </Button>
+            </div>
           </div>
+        </div>
+      )}
+
+      {progress > 0 && (
+        <div className="space-y-3">
+          <div className="flex flex-row justify-between">
+            <p className="text-sm text-main-blue">Uploading Image:</p>
+            <p className="text-sm text-main-blue">{progress.toPrecision(0)}%</p>
+          </div>
+          <Progress value={progress} />
         </div>
       )}
     </div>

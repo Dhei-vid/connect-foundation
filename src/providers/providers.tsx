@@ -38,7 +38,6 @@ function AppProviders({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChange((user) => {
-      console.log(user);
       setUser(user);
       setIsLoading(false);
     });

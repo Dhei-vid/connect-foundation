@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthContext } from "@/components/providers";
-import LoadingSpinner from "@/components/general/spinner";
+import { useAuthContext } from "@/providers/providers";
+import { Spinner } from "@/components/ui/spinner";
 import PortalSidebar from "@/components/navigation/sidebar";
 import PortalNavbar from "@/components/navigation/portal-navbar";
 
@@ -23,7 +23,7 @@ export default function OrphanagePortalLayout({
     } else if (
       !isLoading &&
       isAuthenticated &&
-      user &&
+      user?.role === "ORPHANAGE" &&
       !user.onboardingCompleted
     ) {
       router.push("/orphanage/onboarding");
@@ -35,7 +35,7 @@ export default function OrphanagePortalLayout({
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="flex flex-col items-center">
-          <LoadingSpinner size="lg" />
+          <Spinner className="w-12 h-12" />
           <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
       </div>
@@ -47,7 +47,7 @@ export default function OrphanagePortalLayout({
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="flex flex-col items-center">
-          <LoadingSpinner size="lg" />
+          <Spinner className="w-12 h-12" />
           <p className="mt-4 text-gray-600 dark:text-gray-400">
             Redirecting to sign in...
           </p>
@@ -61,7 +61,7 @@ export default function OrphanagePortalLayout({
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="flex flex-col items-center">
-          <LoadingSpinner size="lg" />
+          <Spinner className="w-12 h-12" />
           <p className="mt-4 text-gray-600 dark:text-gray-400">
             Redirecting to onboarding...
           </p>

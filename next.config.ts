@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
+      "firebasestorage.googleapis.com",
       "fra1.digitaloceanspaces.com",
       "encrypted-tbn0.gstatic.com",
       "flowbite.s3.amazonaws.com",

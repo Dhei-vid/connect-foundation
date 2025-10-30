@@ -1,26 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import {
-  Calendar,
-  Save,
-  Eye,
-  ArrowLeft,
-  Upload,
-  X,
-  Plus,
-  MapPin,
-  User,
-  Clock,
-  DollarSign,
-  Users,
-} from "lucide-react";
+import { Calendar, Save, Eye, MapPin, User, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/form-field";
 import { TextareaField } from "@/components/ui/form-field";
-import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { SelectField } from "@/components/ui/form-field";
 import { SelectItem } from "@/components/ui/select";
@@ -32,6 +19,8 @@ import { getEventById, updateEvent } from "@/firebase/events";
 import type { Event } from "@/common/types";
 import { NewDatePicker } from "@/components/ui/datepicker";
 import { Spinner } from "@/components/ui/spinner";
+import { ImagePicker } from "@/components/ui/image-picker";
+import { uploadImage } from "@/firebase/storage";
 
 const CATEGORIES = [
   "fundraising",
@@ -49,9 +38,11 @@ export default function EditEventPage() {
   const router = useRouter();
   const params = useParams();
   const eventId = params.id as string;
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -66,10 +57,6 @@ export default function EditEventPage() {
       address: "",
       city: "",
       state: "",
-      coordinates: {
-        lat: 0,
-        lng: 0,
-      },
     },
     organizer: {
       name: "",
@@ -103,12 +90,16 @@ export default function EditEventPage() {
     try {
       setLoading(true);
       const event = await getEventById(eventId);
-      
+
       if (event) {
-        const startDate = event.startDate ? new Date(event.startDate) : undefined;
+        const startDate = event.startDate
+          ? new Date(event.startDate)
+          : undefined;
         const endDate = event.endDate ? new Date(event.endDate) : undefined;
-        const registrationDeadline = event.registrationDeadline ? new Date(event.registrationDeadline) : undefined;
-        
+        const registrationDeadline = event.registrationDeadline
+          ? new Date(event.registrationDeadline)
+          : undefined;
+
         setFormData({
           title: event.title,
           description: event.description,
@@ -123,7 +114,6 @@ export default function EditEventPage() {
             address: event.location.address,
             city: event.location.city,
             state: event.location.state,
-            coordinates: event.location.coordinates || { lat: 0, lng: 0 },
           },
           organizer: {
             name: event.organizer.name,
@@ -135,7 +125,9 @@ export default function EditEventPage() {
           maxAttendees: event.maxAttendees?.toString() || "",
           registrationRequired: event.registrationRequired,
           registrationDeadline: registrationDeadline,
-          registrationDeadlineTime: registrationDeadline ? registrationDeadline.toTimeString().slice(0, 5) : "",
+          registrationDeadlineTime: registrationDeadline
+            ? registrationDeadline.toTimeString().slice(0, 5)
+            : "",
           registrationUrl: event.registrationUrl || "",
           cost: {
             amount: event.cost.amount.toString(),
@@ -158,11 +150,10 @@ export default function EditEventPage() {
     }
   };
 
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [registrationDeadline, setRegistrationDeadline] = useState<Date | undefined>(undefined);
-
-  const handleInputChange = (field: string, value: string | boolean | number | string[] | Date | undefined) => {
+  const handleInputChange = (
+    field: string,
+    value: string | boolean | number | string[] | Date | undefined
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -208,8 +199,8 @@ export default function EditEventPage() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+    e?.preventDefault?.();
+
     if (!formData.title.trim() || !formData.description.trim()) {
       toast.error("Please fill in required fields");
       return;
@@ -233,24 +224,63 @@ export default function EditEventPage() {
     setSaving(true);
 
     try {
-      const updateData = {
+      let uploadedImageUrl = formData.featuredImage;
+
+      // Handle image upload first if file was selected
+      if (selectedFile) {
+        const fileName = `events/${Date.now()}-${selectedFile.name}`;
+
+        uploadedImageUrl = await uploadImage(
+          selectedFile,
+          fileName,
+          (progress) => {
+            setUploadProgress(progress);
+          }
+        );
+
+        toast.success("Image uploaded successfully!");
+      }
+
+      // Helper function to remove undefined values (Firebase doesn't accept undefined)
+      const removeUndefined = (obj: any): any => {
+        if (obj === null || typeof obj !== "object") {
+          return obj;
+        }
+        if (Array.isArray(obj)) {
+          return obj.map(removeUndefined);
+        }
+        return Object.fromEntries(
+          Object.entries(obj)
+            .filter(([_, value]) => value !== undefined)
+            .map(([key, value]) => [
+              key,
+              typeof value === "object" && value !== null
+                ? removeUndefined(value)
+                : value,
+            ])
+        );
+      };
+
+      const updateData = removeUndefined({
         title: formData.title.trim(),
         slug: generateSlug(formData.title),
         description: formData.description.trim(),
         content: formData.content.trim(),
-        featuredImage: formData.featuredImage.trim(),
-        startDate: new Date(`${formData.startDate?.toDateString()} ${formData.startTime}`),
-        endDate: formData.endDate && formData.endTime
-          ? new Date(`${formData.endDate.toDateString()} ${formData.endTime}`)
-          : new Date(`${formData.startDate?.toDateString()} ${formData.startTime}`),
+        featuredImage: uploadedImageUrl,
+        startDate: new Date(
+          `${formData.startDate?.toDateString()} ${formData.startTime}`
+        ),
+        endDate:
+          formData.endDate && formData.endTime
+            ? new Date(`${formData.endDate.toDateString()} ${formData.endTime}`)
+            : new Date(
+                `${formData.startDate?.toDateString()} ${formData.startTime}`
+              ),
         location: {
           name: formData.location.name.trim(),
           address: formData.location.address.trim(),
           city: formData.location.city.trim(),
           state: formData.location.state.trim(),
-          coordinates: formData.location.coordinates.lat && formData.location.coordinates.lng 
-            ? formData.location.coordinates 
-            : undefined,
         },
         organizer: {
           name: formData.organizer.name.trim() || "Connect Foundation",
@@ -259,21 +289,30 @@ export default function EditEventPage() {
         },
         category: formData.category,
         type: formData.type,
-        maxAttendees: formData.maxAttendees ? parseInt(formData.maxAttendees) : undefined,
+        maxAttendees: formData.maxAttendees
+          ? parseInt(formData.maxAttendees)
+          : null,
         registrationRequired: formData.registrationRequired,
-        registrationDeadline: formData.registrationDeadline && formData.registrationDeadlineTime
-          ? new Date(`${formData.registrationDeadline.toDateString()} ${formData.registrationDeadlineTime}`)
-          : undefined,
+        registrationDeadline:
+          formData.registrationDeadline && formData.registrationDeadlineTime
+            ? new Date(
+                `${formData.registrationDeadline.toDateString()} ${
+                  formData.registrationDeadlineTime
+                }`
+              )
+            : null,
         registrationUrl: formData.registrationUrl.trim(),
         cost: {
-          amount: formData.cost.free ? 0 : parseFloat(formData.cost.amount) || 0,
+          amount: formData.cost.free
+            ? 0
+            : parseFloat(formData.cost.amount) || 0,
           currency: formData.cost.currency,
           free: formData.cost.free,
         },
         updatedAt: new Date(),
         published: formData.published,
         featured: formData.featured,
-      };
+      });
 
       await updateEvent(eventId, updateData);
       toast.success("Event updated successfully!");
@@ -283,6 +322,7 @@ export default function EditEventPage() {
       toast.error("Failed to update event");
     } finally {
       setSaving(false);
+      setUploadProgress(0);
     }
   };
 
@@ -364,16 +404,8 @@ export default function EditEventPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => router.back()}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-              <Calendar className="h-8 w-8 text-main-red" />
               Edit Event
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
@@ -389,11 +421,7 @@ export default function EditEventPage() {
           >
             Cancel
           </Button>
-          <Button
-            onClick={() => handleSubmit({} as React.FormEvent)}
-            disabled={saving}
-            className="bg-main-red hover:bg-main-red/90"
-          >
+          <Button type="submit" form="edit-event-form" disabled={saving}>
             {saving ? (
               <>
                 <Spinner className="w-4 h-4 mr-2" />
@@ -409,16 +437,16 @@ export default function EditEventPage() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form id="edit-event-form" onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Basic Information */}
-            <Card>
-              <CardHeader className="py-6">
+            <Card className="py-4">
+              <CardHeader>
                 <CardTitle>Basic Information</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6 py-6">
+              <CardContent className="space-y-6">
                 <InputField
                   id="title"
                   label="Event Title"
@@ -433,7 +461,9 @@ export default function EditEventPage() {
                   label="Description"
                   required
                   value={formData.description}
-                  onChange={(e) => handleInputChange("description", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
                   placeholder="Brief description of the event"
                   rows={4}
                 />
@@ -447,29 +477,38 @@ export default function EditEventPage() {
                   rows={8}
                 />
 
-                <InputField
-                  id="featuredImage"
-                  label="Featured Image URL"
-                  value={formData.featuredImage}
-                  onChange={(e) => handleInputChange("featuredImage", e.target.value)}
-                  placeholder="https://example.com/image.jpg"
-                />
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Featured Image</label>
+                  <ImagePicker
+                    value={formData.featuredImage}
+                    onChange={(url) => {
+                      handleInputChange("featuredImage", url);
+                    }}
+                    progress={uploadProgress}
+                    onFileSelect={setSelectedFile}
+                  />
+                </div>
               </CardContent>
             </Card>
 
             {/* Event Details */}
-            <Card>
-              <CardHeader className="py-6">
+            <Card className="py-4">
+              <CardHeader>
                 <CardTitle>Event Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6 py-6">
+              <CardContent className="space-y-6">
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <NewDatePicker
                         label="Start Date"
                         date={formData.startDate}
-                        setDate={(date) => setFormData(prev => ({ ...prev, startDate: date as Date | undefined }))}
+                        setDate={(date) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            startDate: date as Date | undefined,
+                          }))
+                        }
                       />
                     </div>
                     <InputField
@@ -478,7 +517,9 @@ export default function EditEventPage() {
                       required
                       type="time"
                       value={formData.startTime}
-                      onChange={(e) => handleInputChange("startTime", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("startTime", e.target.value)
+                      }
                     />
                   </div>
 
@@ -487,7 +528,12 @@ export default function EditEventPage() {
                       <NewDatePicker
                         label="End Date"
                         date={formData.endDate}
-                        setDate={(date) => setFormData(prev => ({ ...prev, endDate: date as Date | undefined }))}
+                        setDate={(date) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            endDate: date as Date | undefined,
+                          }))
+                        }
                       />
                     </div>
                     <InputField
@@ -495,58 +541,58 @@ export default function EditEventPage() {
                       label="End Time"
                       type="time"
                       value={formData.endTime}
-                      onChange={(e) => handleInputChange("endTime", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("endTime", e.target.value)
+                      }
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="category">Category *</Label>
-                    <SelectField
-                      value={formData.category}
-                      onValueChange={(value) => handleInputChange("category", value)}
-                    >
-                      {CATEGORIES.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category.charAt(0).toUpperCase() + category.slice(1)}
-                        </SelectItem>
-                      ))}
-                    </SelectField>
-                  </div>
+                  <SelectField
+                    label={"Category"}
+                    value={formData.category}
+                    onValueChange={(value) =>
+                      handleInputChange("category", value)
+                    }
+                  >
+                    {CATEGORIES.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectField>
 
-                  <div>
-                    <Label htmlFor="type">Event Type *</Label>
-                    <SelectField
-                      value={formData.type}
-                      onValueChange={(value) => handleInputChange("type", value)}
-                    >
-                      {TYPES.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type.charAt(0).toUpperCase() + type.slice(1)}
-                        </SelectItem>
-                      ))}
-                    </SelectField>
-                  </div>
+                  <SelectField
+                    label={"EventType"}
+                    value={formData.type}
+                    onValueChange={(value) => handleInputChange("type", value)}
+                  >
+                    {TYPES.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectField>
                 </div>
 
-                <div>
-                  <Label htmlFor="maxAttendees">Maximum Attendees</Label>
-                  <Input
-                    id="maxAttendees"
-                    type="number"
-                    value={formData.maxAttendees}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("maxAttendees", e.target.value)}
-                    placeholder="Leave empty for unlimited"
-                    min="1"
-                  />
-                </div>
+                <InputField
+                  label={"Maximum Attendees"}
+                  id="maxAttendees"
+                  type="number"
+                  value={formData.maxAttendees}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleInputChange("maxAttendees", e.target.value)
+                  }
+                  placeholder="Leave empty for unlimited"
+                  min="1"
+                />
               </CardContent>
             </Card>
 
             {/* Location Information */}
             {formData.type === "physical" && (
-              <Card>
+              <Card className="py-4">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <MapPin className="h-5 w-5" />
@@ -554,47 +600,47 @@ export default function EditEventPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="locationName">Venue Name *</Label>
-                    <Input
-                      id="locationName"
-                      value={formData.location.name}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleLocationChange("name", e.target.value)}
-                      placeholder="Event venue name"
-                      required={formData.type === "physical"}
-                    />
-                  </div>
+                  <InputField
+                    label="Venue Name"
+                    id="locationName"
+                    value={formData.location.name}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleLocationChange("name", e.target.value)
+                    }
+                    placeholder="Event venue name"
+                    required={formData.type === "physical"}
+                  />
 
-                  <div>
-                    <Label htmlFor="locationAddress">Address</Label>
-                    <Input
-                      id="locationAddress"
-                      value={formData.location.address}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleLocationChange("address", e.target.value)}
-                      placeholder="Street address"
-                    />
-                  </div>
+                  <InputField
+                    label="Address"
+                    id="locationAddress"
+                    value={formData.location.address}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleLocationChange("address", e.target.value)
+                    }
+                    placeholder="Street address"
+                  />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="locationCity">City</Label>
-                      <Input
-                        id="locationCity"
-                        value={formData.location.city}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleLocationChange("city", e.target.value)}
-                        placeholder="City"
-                      />
-                    </div>
+                    <InputField
+                      label={"City"}
+                      id="locationCity"
+                      value={formData.location.city}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        handleLocationChange("city", e.target.value)
+                      }
+                      placeholder="City"
+                    />
 
-                    <div>
-                      <Label htmlFor="locationState">State/Province</Label>
-                      <Input
-                        id="locationState"
-                        value={formData.location.state}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleLocationChange("state", e.target.value)}
-                        placeholder="State or Province"
-                      />
-                    </div>
+                    <InputField
+                      label={"State/Province"}
+                      id="locationState"
+                      value={formData.location.state}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        handleLocationChange("state", e.target.value)
+                      }
+                      placeholder="State or Province"
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -604,7 +650,7 @@ export default function EditEventPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Organizer Information */}
-            <Card>
+            <Card className="py-4">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <User className="h-5 w-5" />
@@ -617,7 +663,9 @@ export default function EditEventPage() {
                   <Input
                     id="organizerName"
                     value={formData.organizer.name}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOrganizerChange("name", e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleOrganizerChange("name", e.target.value)
+                    }
                     placeholder="Organizer name"
                   />
                   <p className="text-sm text-gray-500 mt-1">
@@ -631,7 +679,9 @@ export default function EditEventPage() {
                     id="organizerEmail"
                     type="email"
                     value={formData.organizer.email}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOrganizerChange("email", e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleOrganizerChange("email", e.target.value)
+                    }
                     placeholder="contact@example.com"
                   />
                 </div>
@@ -642,7 +692,9 @@ export default function EditEventPage() {
                     id="organizerPhone"
                     type="tel"
                     value={formData.organizer.phone}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOrganizerChange("phone", e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleOrganizerChange("phone", e.target.value)
+                    }
                     placeholder="+1 (555) 123-4567"
                   />
                 </div>
@@ -650,7 +702,7 @@ export default function EditEventPage() {
             </Card>
 
             {/* Registration & Cost */}
-            <Card>
+            <Card className="py-4">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
@@ -660,7 +712,9 @@ export default function EditEventPage() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="registrationRequired">Registration Required</Label>
+                    <Label htmlFor="registrationRequired">
+                      Registration Required
+                    </Label>
                     <p className="text-sm text-gray-500">
                       Attendees must register to participate
                     </p>
@@ -668,7 +722,9 @@ export default function EditEventPage() {
                   <Switch
                     id="registrationRequired"
                     checked={formData.registrationRequired}
-                    onCheckedChange={(checked) => handleInputChange("registrationRequired", checked)}
+                    onCheckedChange={(checked) =>
+                      handleInputChange("registrationRequired", checked)
+                    }
                   />
                 </div>
 
@@ -679,7 +735,12 @@ export default function EditEventPage() {
                         <NewDatePicker
                           label="Registration Deadline Date"
                           date={formData.registrationDeadline}
-                          setDate={(date) => setFormData(prev => ({ ...prev, registrationDeadline: date as Date | undefined }))}
+                          setDate={(date) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              registrationDeadline: date as Date | undefined,
+                            }))
+                          }
                         />
                       </div>
                       <InputField
@@ -687,17 +748,24 @@ export default function EditEventPage() {
                         label="Registration Deadline Time"
                         type="time"
                         value={formData.registrationDeadlineTime}
-                        onChange={(e) => handleInputChange("registrationDeadlineTime", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "registrationDeadlineTime",
+                            e.target.value
+                          )
+                        }
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor="registrationUrl">Registration URL</Label>
-                      <Input
+                      <InputField
+                        label="Registration URL"
                         id="registrationUrl"
                         type="url"
                         value={formData.registrationUrl}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("registrationUrl", e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          handleInputChange("registrationUrl", e.target.value)
+                        }
                         placeholder="https://example.com/register"
                       />
                     </div>
@@ -707,52 +775,52 @@ export default function EditEventPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="freeEvent">Free Event</Label>
-                    <p className="text-sm text-gray-500">
-                      No cost to attend
-                    </p>
+                    <p className="text-sm text-gray-500">No cost to attend</p>
                   </div>
                   <Switch
                     id="freeEvent"
                     checked={formData.cost.free}
-                    onCheckedChange={(checked) => handleCostChange("free", checked)}
+                    onCheckedChange={(checked) =>
+                      handleCostChange("free", checked)
+                    }
                   />
                 </div>
 
                 {!formData.cost.free && (
                   <div className="grid grid-cols-1 gap-4">
-                    <div>
-                      <Label htmlFor="costAmount">Cost Amount</Label>
-                      <Input
-                        id="costAmount"
-                        type="number"
-                        value={formData.cost.amount}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleCostChange("amount", e.target.value)}
-                        placeholder="0.00"
-                        min="0"
-                        step="0.01"
-                      />
-                    </div>
+                    <InputField
+                      label="Cost Amount"
+                      id="costAmount"
+                      type="number"
+                      value={formData.cost.amount}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        handleCostChange("amount", e.target.value)
+                      }
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                    />
 
-                    <div>
-                      <Label htmlFor="costCurrency">Currency</Label>
-                      <SelectField
-                        value={formData.cost.currency}
-                        onValueChange={(value) => handleCostChange("currency", value)}
-                      >
-                        {CURRENCIES.map((currency) => (
-                          <SelectItem key={currency} value={currency}>
-                            {currency}
-                          </SelectItem>
-                        ))}
-                      </SelectField>
-                    </div>
+                    <SelectField
+                      label="Currency"
+                      value={formData.cost.currency}
+                      onValueChange={(value) =>
+                        handleCostChange("currency", value)
+                      }
+                    >
+                      {CURRENCIES.map((currency) => (
+                        <SelectItem key={currency} value={currency}>
+                          {currency}
+                        </SelectItem>
+                      ))}
+                    </SelectField>
                   </div>
                 )}
               </CardContent>
             </Card>
 
             {/* Publishing Options */}
-            <Card>
+            <Card className="py-4">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
@@ -770,7 +838,9 @@ export default function EditEventPage() {
                   <Switch
                     id="published"
                     checked={formData.published}
-                    onCheckedChange={(checked) => handleInputChange("published", checked)}
+                    onCheckedChange={(checked) =>
+                      handleInputChange("published", checked)
+                    }
                   />
                 </div>
 
@@ -784,14 +854,16 @@ export default function EditEventPage() {
                   <Switch
                     id="featured"
                     checked={formData.featured}
-                    onCheckedChange={(checked) => handleInputChange("featured", checked)}
+                    onCheckedChange={(checked) =>
+                      handleInputChange("featured", checked)
+                    }
                   />
                 </div>
               </CardContent>
             </Card>
 
             {/* Preview */}
-            <Card>
+            <Card className="py-4">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Eye className="h-5 w-5" />
@@ -817,7 +889,10 @@ export default function EditEventPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Cost: {formData.cost.free ? "Free" : `${formData.cost.amount} ${formData.cost.currency}`}
+                      Cost:{" "}
+                      {formData.cost.free
+                        ? "Free"
+                        : `${formData.cost.amount} ${formData.cost.currency}`}
                     </p>
                   </div>
                 </div>

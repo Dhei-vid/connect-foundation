@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { PersonAvatar } from "@/components/ui/person-avatar";
 import { toast } from "sonner";
-import { useAuthContext } from "../providers";
+import { useAuthContext } from "../../providers/providers";
 import { Spinner } from "@/components/ui/spinner";
 
 interface PortalNavbarProps {

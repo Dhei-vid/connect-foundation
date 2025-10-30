@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthContext } from "@/components/providers";
+import { useAuthContext } from "@/providers/providers";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -201,7 +201,7 @@ export default function OnboardingPage() {
         </div>
 
         {/* Step Navigation */}
-        <div className="flex items-center justify-center mb-8">
+        <div className="hidden lg:flex items-center justify-center mb-8">
           <div className="flex items-center space-x-4">
             {steps.map((step, index) => (
               <div key={step.id} className="flex items-center">

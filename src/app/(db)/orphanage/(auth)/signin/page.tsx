@@ -7,7 +7,7 @@ import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuthContext } from "@/components/providers";
+import { useAuthContext } from "@/providers/providers";
 import { extractErrorMessage, type UnknownError } from "@/common/helpers";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";

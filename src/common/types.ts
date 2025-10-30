@@ -263,10 +263,6 @@ export interface Event {
     address: string;
     city: string;
     state: string;
-    coordinates?: {
-      lat: number;
-      lng: number;
-    };
   };
   organizer: {
     name: string;
@@ -275,10 +271,10 @@ export interface Event {
   };
   category: "fundraising" | "volunteer" | "awareness" | "community" | "other";
   type: "online" | "physical" | "hybrid";
-  maxAttendees?: number;
+  maxAttendees?: number | null;
   currentAttendees: number;
   registrationRequired: boolean;
-  registrationDeadline?: Date;
+  registrationDeadline?: Date | null;
   registrationUrl?: string;
   cost: {
     amount: number;

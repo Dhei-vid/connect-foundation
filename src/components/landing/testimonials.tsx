@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Quote, Play } from "lucide-react";
@@ -11,9 +11,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { headerStyle } from "@/common/style";
 import { cn } from "@/lib/utils";
+import { extractInitials } from "@/common/helpers";
+
+// Testimonial
+import { getTestimonials } from "@/firebase/testimonials";
+import { TestimonialRecord } from "@/firebase/testimonials";
 
 type Testimonial = {
   name: string;
@@ -32,8 +37,8 @@ type Testimonial = {
 // Source data: includes one hero-style testimonial with image
 const testimonials: Testimonial[] = [
   {
-    name: "Sarah Johnson",
-    role: "Monthly Donor",
+    name: "Sarah Adewale",
+    role: "Donor",
     content:
       "Connect Foundation has completely changed how I think about giving. I can see exactly where my money goes and the real impact it makes. The transparency is incredible!",
     rating: 5,
@@ -95,14 +100,27 @@ const testimonials: Testimonial[] = [
 export function Testimonials() {
   const [videoOpen, setVideoOpen] = useState(false);
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | undefined>();
+  const [testimonial, setTestimonials] = useState<TestimonialRecord[]>([]);
+
+  // getting testimonials from firebase
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      const testimonials = await getTestimonials();
+      setTestimonials(testimonials);
+    };
+
+    fetchTestimonials();
+  }, []);
 
   const hero = useMemo(
-    () => testimonials.find((t) => t.imageUrl) ?? testimonials[0],
-    []
+    () =>
+      testimonial.filter((t) => t.published).find((t) => t.imageUrl) ??
+      testimonials[0],
+    [testimonial]
   );
   const gridTestimonials = useMemo(
-    () => testimonials.filter((t) => t !== hero).slice(0, 3),
-    [hero]
+    () => testimonial.filter((t) => t !== hero && t.published).slice(0, 3),
+    [testimonial, hero]
   );
 
   function openVideo(url?: string) {
@@ -166,7 +184,7 @@ export function Testimonials() {
             <div
               className="h-full min-h-[260px] w-full rounded-3xl overflow-hidden relative"
               style={{
-                backgroundImage: `url(${hero.imageUrl || ""})`,
+                backgroundImage: `url("https://images.pexels.com/photos/6647021/pexels-photo-6647021.jpeg")`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
@@ -196,10 +214,15 @@ export function Testimonials() {
         </div>
 
         {/* Bottom row: three quote cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div
+          className={cn(
+            gridTestimonials.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3",
+            "grid grid-cols-1 gap-6"
+          )}
+        >
           {gridTestimonials.map((t, index) => (
             <motion.div
-              key={t.name}
+              key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.05 }}
@@ -211,14 +234,19 @@ export function Testimonials() {
                   <p className="mt-3 text-muted-foreground italic leading-relaxed">
                     {t.content}
                   </p>
-                  <div className="mt-6 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                  <div className="mt-6 flex justify-between">
+                    <div className="flex items-start gap-3">
                       <Avatar>
                         {t.avatarImageUrl ? (
-                          <img src={t.avatarImageUrl} alt={t.name} className="w-full h-full object-cover" />
+                          <AvatarImage
+                            sizes="50px"
+                            src={t.avatarImageUrl}
+                            alt={t.name}
+                            className="w-full h-full object-cover"
+                          />
                         ) : (
                           <AvatarFallback className={`bg-main-blue text-white`}>
-                            {t.avatar}
+                            {extractInitials(t.name)}
                           </AvatarFallback>
                         )}
                       </Avatar>
@@ -228,7 +256,9 @@ export function Testimonials() {
                           {t.role}
                         </div>
                         {t.organization && (
-                          <div className="text-xs text-muted-foreground">{t.organization}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {t.organization}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -236,6 +266,7 @@ export function Testimonials() {
                       <Button
                         variant="outline"
                         size="sm"
+                        className="self-end"
                         onClick={() => openVideo(t.videoUrl)}
                       >
                         <Play className="w-4 h-4 mr-2" /> Watch video

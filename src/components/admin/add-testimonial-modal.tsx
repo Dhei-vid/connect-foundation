@@ -66,6 +66,7 @@ export function AddTestimonialModal({
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -295,75 +296,82 @@ export function AddTestimonialModal({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <InputField
-                label="Video URL (YouTube or MP4)"
-                {...register("videoUrl")}
-                placeholder="https://... (YouTube or MP4)"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Paste a YouTube link or an MP4 URL. You may also upload an MP4
-                file below.
-              </p>
-
-              {/* Video Preview */}
-              {(watch("videoUrl") || videoPreview) && (
-                <div className="mt-4">
-                  <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden">
-                    {videoPreview ? (
-                      // Local video preview
-                      <video
-                        src={videoPreview}
-                        controls
-                        className="w-full h-full object-cover"
-                      />
-                    ) : watch("videoUrl") &&
-                      isYouTubeUrl(watch("videoUrl")!) ? (
-                      // YouTube embed
-                      <iframe
-                        src={`https://www.youtube.com/embed/${getYouTubeVideoId(
-                          watch("videoUrl")!
-                        )}`}
-                        title="Video preview"
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    ) : watch("videoUrl") ? (
-                      // Direct video URL
-                      <video
-                        src={watch("videoUrl")}
-                        controls
-                        className="w-full h-full object-cover"
-                      />
-                    ) : null}
-                  </div>
-                  {(watch("videoUrl") || videoPreview) && (
-                    <button
-                      type="button"
-                      onClick={removeVideo}
-                      className="mt-2 text-xs text-center px-2 py-1 bg-red-50 hover:bg-red-100 rounded text-red-600"
-                    >
-                      Remove Video
-                    </button>
-                  )}
-                </div>
-              )}
-
-              <div className="mt-2">
-                <input
-                  type="file"
-                  accept="video/mp4,video/webm"
-                  onChange={handleVideoUpload}
-                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          {type === "video" && (
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <InputField
+                  label="Video URL (YouTube or MP4)"
+                  {...register("videoUrl")}
+                  placeholder="https://... (YouTube or MP4)"
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Paste a YouTube link or an MP4 URL. You may also upload an MP4
+                  file below.
+                </p>
+
+                {/* Video Preview */}
+                {(watch("videoUrl") || videoPreview) && (
+                  <div className="mt-4">
+                    <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden">
+                      {videoPreview ? (
+                        // Local video preview
+                        <video
+                          src={videoPreview}
+                          controls
+                          className="w-full h-full object-cover"
+                        />
+                      ) : watch("videoUrl") &&
+                        isYouTubeUrl(watch("videoUrl")!) ? (
+                        // YouTube embed
+                        <iframe
+                          src={`https://www.youtube.com/embed/${getYouTubeVideoId(
+                            watch("videoUrl")!
+                          )}`}
+                          title="Video preview"
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : watch("videoUrl") ? (
+                        // Direct video URL
+                        <video
+                          src={watch("videoUrl")}
+                          controls
+                          className="w-full h-full object-cover"
+                        />
+                      ) : null}
+                    </div>
+                    {(watch("videoUrl") || videoPreview) && (
+                      <button
+                        type="button"
+                        onClick={removeVideo}
+                        className="mt-2 text-xs text-center px-2 py-1 bg-red-50 hover:bg-red-100 rounded text-red-600"
+                      >
+                        Remove Video
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                <div className="mt-2">
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm"
+                    onChange={handleVideoUpload}
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="flex items-center gap-2">
-            <Switch id="published" {...register("published")} />
+            <Switch
+              id="published"
+              // {...register("published")}
+              checked={watch("published")}
+              onCheckedChange={() => setValue("published", !watch("published"))}
+            />
             <Label htmlFor="published">Published</Label>
           </div>
 
