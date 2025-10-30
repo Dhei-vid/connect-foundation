@@ -178,7 +178,6 @@ export default function ContactPage() {
 
   const handleReply = (inquiryId: string) => {
     // TODO: Implement reply logic
-    console.log("Reply to inquiry:", inquiryId, replyText);
     setReplyText("");
     setSelectedInquiry(null);
   };

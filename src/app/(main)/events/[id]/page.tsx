@@ -392,7 +392,8 @@ export default function EventDetailPage() {
                           disabled={
                             registered ||
                             (event.maxAttendees !== undefined &&
-                              event.currentAttendees >= event.maxAttendees)
+                              event.maxAttendees !== null &&
+                              event.currentAttendees >= event?.maxAttendees)
                           }
                           className="bg-main-red hover:bg-main-red/90"
                         >

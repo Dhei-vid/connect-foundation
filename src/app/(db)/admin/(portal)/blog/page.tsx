@@ -53,10 +53,7 @@ export default function AdminBlogPage() {
     try {
       setLoading(true);
       setError(null);
-      console.log("Loading blog posts from Firebase...");
-
       const postsData = await getAllBlogPosts();
-      console.log("Loaded blog posts:", postsData);
       setPosts(postsData);
     } catch (error) {
       console.error("Error loading blog posts:", error);
@@ -72,9 +69,7 @@ export default function AdminBlogPage() {
     currentStatus: boolean
   ) => {
     try {
-      console.log("Toggling published status for post:", postId);
       await updateBlogPost(postId, { published: !currentStatus });
-      console.log("Post status updated successfully");
       toast.success(
         `Post ${!currentStatus ? "published" : "unpublished"} successfully`
       );
@@ -90,9 +85,7 @@ export default function AdminBlogPage() {
     currentStatus: boolean
   ) => {
     try {
-      console.log("Toggling featured status for post:", postId);
       await updateBlogPost(postId, { featured: !currentStatus });
-      console.log("Post featured status updated successfully");
       toast.success(
         `Post ${!currentStatus ? "featured" : "unfeatured"} successfully`
       );
@@ -113,9 +106,7 @@ export default function AdminBlogPage() {
     }
 
     try {
-      console.log("Deleting blog post:", postId);
       await deleteBlogPost(postId);
-      console.log("Blog post deleted successfully");
       toast.success("Blog post deleted successfully");
       await loadBlogPosts(); // Reload the list
     } catch (error) {

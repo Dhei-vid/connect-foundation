@@ -1,4 +1,5 @@
 import { Gender } from "./enums";
+import { ImageFile } from "@/components/ui/multi-image-upload";
 
 export interface User {
   uid: string;
@@ -31,7 +32,12 @@ export interface Orphanage {
   logoURL?: string;
   coverImageURL?: string;
   images: string[]; // Multiple images of the orphanage, children, facilities
+  logoURLFile: ImageFile;
+  coverImageFile: ImageFile;
+  imageFiles: ImageFile[];
   childrenCount: number;
+  agerange: string;
+  specialneeds?: string;
   staffCount: number;
   foundedYear: number;
   verified: boolean;
@@ -49,6 +55,9 @@ export interface Orphanage {
   accountName?: string;
   createdAt: Date;
   updatedAt: Date;
+  // Additional checks
+  periodicMonitoring: boolean;
+  communityService?: boolean;
 }
 
 export interface Issue {

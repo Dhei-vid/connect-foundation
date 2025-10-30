@@ -4,12 +4,16 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MultiImageUpload } from "@/components/ui/multi-image-upload";
+import {
+  MultiImageUpload,
+  ImageFile,
+} from "@/components/ui/multi-image-upload";
 import { SingleImageUpload } from "@/components/ui/single-image-upload";
 import { Image as ImageIcon, Building2, Check, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import type { Orphanage } from "@/common/types";
+import { initialImageFile } from "@/common/data";
 
 interface OrphanageImageManagerProps {
   orphanage: Partial<Orphanage>;
@@ -33,6 +37,23 @@ export function OrphanageImageManager({
   );
   const [selectedLogoIndex, setSelectedLogoIndex] = useState<number>(-1);
   const [selectedCoverIndex, setSelectedCoverIndex] = useState<number>(-1);
+
+  const [imageFiles, setImageFiles] = useState<{
+    coverImageFile: ImageFile;
+    logoImageFile: ImageFile;
+    successImageFile: ImageFile[];
+  }>({
+    coverImageFile: initialImageFile,
+    logoImageFile: initialImageFile,
+    successImageFile: [],
+  });
+
+  // image files
+  // const [coverImageFile, setCoverImageFile] =
+  //   useState<ImageFile>(initialImageFile);
+  // const [logoImageFile, setLogoImageFile] =
+  //   useState<ImageFile>(initialImageFile);
+  // const [successImageFile, setSuccessImageFile] = useState<ImageFile[]>([]);
 
   // Initialize selected indices if logo/cover are from gallery
   useEffect(() => {
@@ -161,6 +182,13 @@ export function OrphanageImageManager({
                 <SingleImageUpload
                   value={logoSource === "upload" ? logoURL : undefined}
                   onChange={handleLogoUpload}
+                  imageFile={imageFiles.logoImageFile}
+                  setImageFile={(file) =>
+                    setImageFiles((prev) => ({
+                      ...prev,
+                      logoImageFile: file as ImageFile,
+                    }))
+                  }
                   aspectRatio="square"
                   placeholder="Upload logo"
                   maxSizeMB={5}
@@ -193,6 +221,13 @@ export function OrphanageImageManager({
 
             <SingleImageUpload
               value={coverSource === "upload" ? coverImageURL : undefined}
+              imageFile={imageFiles.coverImageFile}
+              setImageFile={(file) =>
+                setImageFiles((prev) => ({
+                  ...prev,
+                  coverImageFile: file as ImageFile,
+                }))
+              }
               onChange={handleCoverUpload}
               aspectRatio="video"
               placeholder="Upload cover"
@@ -224,14 +259,21 @@ export function OrphanageImageManager({
               Upload photos of your orphanage, facilities, and activities. You
               can also select images from here to use as logo or cover.
             </p>
+
             <MultiImageUpload
               value={images}
+              localImages={imageFiles.successImageFile}
+              setLocalImages={(files) =>
+                setImageFiles((prev) => ({
+                  ...prev,
+                  successImageFile: files as ImageFile[],
+                }))
+              }
               onChange={handleImagesChange}
               maxImages={20}
               maxSizeMB={5}
               label=""
               description="Upload up to 20 images to showcase your orphanage."
-              disabled={disabled}
             />
           </div>
         </CardContent>

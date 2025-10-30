@@ -1,14 +1,19 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { X, Upload, Loader2 } from "lucide-react";
+import React, { useState, useRef, Dispatch } from "react";
+import { X, Upload } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./button";
 import { cn } from "@/lib/utils";
 import { Spinner } from "./spinner";
+import { SetStateAction } from "jotai";
+import { ImageFile } from "./multi-image-upload";
+import { toast } from "sonner";
 
 interface SingleImageUploadProps {
   value?: string; // Current image URL
+  imageFile: ImageFile;
+  setImageFile: Dispatch<SetStateAction<ImageFile>>;
   onChange: (url: string | undefined) => void;
   maxSizeMB?: number;
   label?: string;
@@ -21,6 +26,8 @@ interface SingleImageUploadProps {
 
 export function SingleImageUpload({
   value,
+  // imageFile,
+  setImageFile,
   onChange,
   maxSizeMB = 5,
   label,
@@ -48,19 +55,26 @@ export function SingleImageUpload({
 
     // Validate file size
     if (file.size > maxSizeBytes) {
-      alert(`File is too large. Maximum size is ${maxSizeMB}MB`);
+      toast.error(`File is too large. Maximum size is ${maxSizeMB}MB`);
       return;
     }
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      alert("File is not an image");
+      toast.error("File is not an image");
       return;
     }
 
+    const id = Math.random().toString(36).substr(2, 9);
     // Create local preview
     const preview = URL.createObjectURL(file);
     setLocalPreview(preview);
+
+    setImageFile({
+      id,
+      preview,
+      file,
+    });
 
     // For now, just store the preview URL
     // When Firebase Storage is implemented, this will upload and return the URL

@@ -52,8 +52,7 @@ function AppProviders({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string): Promise<boolean> => {
     try {
-      const responses = await signInWithEmail(email, password);
-      console.log(responses);
+      await signInWithEmail(email, password);
       return true;
     } catch (error) {
       console.error("Sign in error:", error);

@@ -36,7 +36,10 @@ import StoriesCard from "@/components/stories/stories-card";
 import { formatCurrency } from "@/common/helpers";
 
 interface SuccessStoryWithOrphanage extends SuccessStory {
-  orphanage?: Orphanage | null;
+  orphanage?: Omit<
+    Orphanage,
+    "logoURLFile" | "coverImageFile" | "imageFiles"
+  > | null;
 }
 
 export default function SuccessStoriesPage() {

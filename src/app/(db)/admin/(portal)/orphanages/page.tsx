@@ -47,11 +47,9 @@ export default function OrphanagesPage() {
     try {
       setLoading(true);
       setError(null);
-      console.log("Loading orphanages from Firebase...");
 
       const { getOrphanages } = await import("@/firebase/orphanages");
       const orphanagesData = await getOrphanages();
-      console.log("Loaded orphanages:", orphanagesData);
       setOrphanages(orphanagesData);
     } catch (error) {
       console.error("Error loading orphanages:", error);
@@ -64,10 +62,8 @@ export default function OrphanagesPage() {
 
   const handleVerify = async (orphanageId: string) => {
     try {
-      console.log("Verifying orphanage:", orphanageId);
       const { updateOrphanage } = await import("@/firebase/orphanages");
       await updateOrphanage(orphanageId, { verified: true });
-      console.log("Orphanage verified successfully");
       toast.success("Orphanage verified successfully");
       await loadOrphanages(); // Reload the list
     } catch (error) {
@@ -78,10 +74,9 @@ export default function OrphanagesPage() {
 
   const handleReject = async (orphanageId: string) => {
     try {
-      console.log("Rejecting orphanage:", orphanageId);
       const { updateOrphanage } = await import("@/firebase/orphanages");
       await updateOrphanage(orphanageId, { verified: false });
-      console.log("Orphanage rejected successfully");
+
       toast.success("Orphanage rejected successfully");
       await loadOrphanages(); // Reload the list
     } catch (error) {
@@ -307,15 +302,15 @@ export default function OrphanagesPage() {
               <div className="relative h-48 bg-gray-100 dark:bg-gray-800">
                 <Image
                   src={
-                    orphanage.coverImageURL || 
-                    orphanage.logoURL || 
+                    orphanage.coverImageURL ||
+                    orphanage.logoURL ||
                     "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&auto=format&fit=crop&q=80"
                   }
                   alt={orphanage.name}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                
+
                 {/* Status Badge Overlay */}
                 <div className="absolute top-3 right-3">
                   <Badge
@@ -358,7 +353,9 @@ export default function OrphanagesPage() {
                   </h3>
                   <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                     <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-                    <span className="line-clamp-1">{orphanage.city}, {orphanage.state}</span>
+                    <span className="line-clamp-1">
+                      {orphanage.city}, {orphanage.state}
+                    </span>
                   </div>
                 </div>
 
@@ -367,12 +364,14 @@ export default function OrphanagesPage() {
                   <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 min-h-[2.5rem]">
                     {orphanage.description || "No description provided"}
                   </div>
-                  
+
                   <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
                     <Mail className="w-3 h-3 mr-1.5 flex-shrink-0" />
-                    <span className="line-clamp-1">{orphanage.contactEmail}</span>
+                    <span className="line-clamp-1">
+                      {orphanage.contactEmail}
+                    </span>
                   </div>
-                  
+
                   {orphanage.contactPhone && (
                     <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
                       <Phone className="w-3 h-3 mr-1.5 flex-shrink-0" />
@@ -393,7 +392,7 @@ export default function OrphanagesPage() {
                       Verify Orphanage
                     </Button>
                   )}
-                  
+
                   <div className="flex gap-2">
                     <Button
                       size="sm"
@@ -406,7 +405,7 @@ export default function OrphanagesPage() {
                       <Eye className="w-4 h-4 mr-2" />
                       View Details
                     </Button>
-                    
+
                     {!orphanage.verified && (
                       <Button
                         size="sm"

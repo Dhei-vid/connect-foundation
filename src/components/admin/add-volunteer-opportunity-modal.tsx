@@ -56,19 +56,11 @@ export function AddVolunteerOpportunityModal({
 
     try {
       setLoading(true);
-      console.log("Starting volunteer opportunity creation...");
-
-      console.log("Creating volunteer opportunity with data:", {
-        ...formData,
-        isActive: true,
-      });
 
       await createVolunteerOpportunity({
         ...formData,
         isActive: true,
       });
-
-      console.log("Volunteer opportunity created successfully!");
 
       toast("Success", {
         description: "Volunteer opportunity created successfully!",

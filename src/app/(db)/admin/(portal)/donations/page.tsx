@@ -178,8 +178,6 @@ export default function DonationsPage() {
       // Reload stats to reflect changes
       const updatedStats = await getDonationStats();
       setStats(updatedStats);
-
-      console.log("Donation status updated successfully");
     } catch (err) {
       console.error("Error updating donation status:", err);
       setError("Failed to update donation status. Please try again.");
@@ -188,7 +186,7 @@ export default function DonationsPage() {
 
   const handleViewDonation = async (donation: Donation) => {
     setSelectedDonation(donation);
-    
+
     // If the donation has a target issue, fetch the issue details
     if (donation.targetIssueId) {
       try {
@@ -455,7 +453,11 @@ export default function DonationsPage() {
               <SelectField
                 label=""
                 value={filterStatus}
-                onValueChange={(value) => setFilterStatus(value as "all" | "completed" | "pending" | "failed")}
+                onValueChange={(value) =>
+                  setFilterStatus(
+                    value as "all" | "completed" | "pending" | "failed"
+                  )
+                }
               >
                 {[
                   {
@@ -484,7 +486,11 @@ export default function DonationsPage() {
               <SelectField
                 label=""
                 value={filterTimeframe}
-                onValueChange={(value) => setFilterTimeframe(value as "all" | "today" | "week" | "month" | "year")}
+                onValueChange={(value) =>
+                  setFilterTimeframe(
+                    value as "all" | "today" | "week" | "month" | "year"
+                  )
+                }
               >
                 {[
                   {
@@ -664,7 +670,7 @@ export default function DonationsPage() {
               View detailed information about this donation
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedDonation && (
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
@@ -739,15 +745,21 @@ export default function DonationsPage() {
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span>Orphanage Name:</span>
-                        <span className="font-medium">{selectedIssue.orphanageName}</span>
+                        <span className="font-medium">
+                          {selectedIssue.orphanageName}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span>Issue Title:</span>
-                        <span className="font-medium">{selectedIssue.title}</span>
+                        <span className="font-medium">
+                          {selectedIssue.title}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span>Category:</span>
-                        <span className="font-medium capitalize">{selectedIssue.category}</span>
+                        <span className="font-medium capitalize">
+                          {selectedIssue.category}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span>Priority:</span>
@@ -767,11 +779,15 @@ export default function DonationsPage() {
                       </div>
                       <div className="flex justify-between">
                         <span>Estimated Cost:</span>
-                        <span className="font-medium">₦{selectedIssue.estimatedCost.toLocaleString()}</span>
+                        <span className="font-medium">
+                          ₦{selectedIssue.estimatedCost.toLocaleString()}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span>Amount Raised:</span>
-                        <span className="font-medium">₦{selectedIssue.raisedAmount.toLocaleString()}</span>
+                        <span className="font-medium">
+                          ₦{selectedIssue.raisedAmount.toLocaleString()}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -795,14 +811,16 @@ export default function DonationsPage() {
                 </div>
               )}
 
-              {selectedDonation.targetIssueId && !selectedIssue && !loadingIssue && (
-                <div>
-                  <h3 className="font-semibold mb-2">Target Issue</h3>
-                  <p className="text-blue-600">
-                    Issue #{selectedDonation.targetIssueId}
-                  </p>
-                </div>
-              )}
+              {selectedDonation.targetIssueId &&
+                !selectedIssue &&
+                !loadingIssue && (
+                  <div>
+                    <h3 className="font-semibold mb-2">Target Issue</h3>
+                    <p className="text-blue-600">
+                      Issue #{selectedDonation.targetIssueId}
+                    </p>
+                  </div>
+                )}
 
               <div className="flex gap-2 pt-4">
                 {selectedDonation.status === "pending" && (

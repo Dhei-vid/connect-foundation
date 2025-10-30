@@ -1,4 +1,13 @@
-import { doc, updateDoc, getDoc, collection, getDocs, query, orderBy, deleteDoc } from "firebase/firestore";
+import {
+  doc,
+  updateDoc,
+  getDoc,
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  deleteDoc,
+} from "firebase/firestore";
 import { db } from "@/config/firebase";
 import type { Orphanage } from "@/common/types";
 
@@ -63,14 +72,17 @@ export async function getOrphanageProfile(
 export async function getOrphanages(): Promise<Orphanage[]> {
   try {
     const orphanagesRef = collection(db, "orphanages");
-    
+
     // Try with orderBy first, fallback to simple query if index doesn't exist
     let querySnapshot;
     try {
       const q = query(orphanagesRef, orderBy("createdAt", "desc"));
       querySnapshot = await getDocs(q);
     } catch (orderByError) {
-      console.warn("OrderBy index not found, fetching without ordering:", orderByError);
+      console.warn(
+        "OrderBy index not found, fetching without ordering:",
+        orderByError
+      );
       querySnapshot = await getDocs(orphanagesRef);
     }
 
@@ -115,13 +127,13 @@ export async function updateOrphanage(
 export async function deleteOrphanage(orphanageId: string): Promise<void> {
   try {
     const orphanageRef = doc(db, "orphanages", orphanageId);
-    
+
     // Check if orphanage exists before deleting
     const orphanageDoc = await getDoc(orphanageRef);
     if (!orphanageDoc.exists()) {
       throw new Error("Orphanage not found");
     }
-    
+
     await deleteDoc(orphanageRef);
   } catch (error) {
     console.error("Error deleting orphanage:", error);

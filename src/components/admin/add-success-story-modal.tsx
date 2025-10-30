@@ -1,13 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Upload, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { SelectField } from "@/components/ui/form-field";
 import { SelectItem } from "@/components/ui/select";
-import { MultiImageUpload } from "@/components/ui/multi-image-upload";
+import {
+  MultiImageUpload,
+  ImageFile,
+} from "@/components/ui/multi-image-upload";
 import {
   Dialog,
   DialogContent,
@@ -48,6 +51,7 @@ export function AddSuccessStoryModal({
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [localImages, setLocalImages] = useState<ImageFile[]>([]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -343,10 +347,11 @@ export function AddSuccessStoryModal({
               Upload images showing the successful completion of the project.
               These will be displayed in the success story gallery.
             </p>
-
             <MultiImageUpload
               value={formData.images}
               onChange={(urls) => handleInputChange("images", urls)}
+              localImages={localImages}
+              setLocalImages={setLocalImages}
               maxImages={10}
               maxSizeMB={5}
               label=""

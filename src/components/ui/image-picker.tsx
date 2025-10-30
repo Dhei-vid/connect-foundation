@@ -12,7 +12,7 @@ interface ImagePickerProps {
   value: string;
   onChange: (url: string) => void;
   onFileSelect?: (file: File | null) => void; // 👈 new prop to pass selected file up
-  progress: number;
+  progress?: number;
   placeholder?: string;
   showPreview?: boolean;
   className?: string;
@@ -23,7 +23,6 @@ export function ImagePicker({
   value,
   onChange,
   progress,
-
   onFileSelect,
   placeholder = "Enter image URL or upload a file",
   showPreview = true,
@@ -171,7 +170,7 @@ export function ImagePicker({
         </div>
       )}
 
-      {progress > 0 && (
+      {progress && progress > 0 && (
         <div className="space-y-3">
           <div className="flex flex-row justify-between">
             <p className="text-sm text-main-blue">Uploading Image:</p>

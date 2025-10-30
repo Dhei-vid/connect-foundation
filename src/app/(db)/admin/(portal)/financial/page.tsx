@@ -139,7 +139,9 @@ export default function FinancialPage() {
   const [filterType, setFilterType] = useState<"all" | "income" | "expense">(
     "all"
   );
-  const [selectedRecord, setSelectedRecord] = useState<FinancialRecord | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<FinancialRecord | null>(
+    null
+  );
   const [showAddModal, setShowAddModal] = useState(false);
   const [recordType, setRecordType] = useState<"income" | "expense">("income");
   const [recordCategory, setRecordCategory] = useState("");
@@ -232,13 +234,16 @@ export default function FinancialPage() {
       // Check if expense exceeds available funds
       if (recordType === "expense") {
         const availableFunds = totalIncome - totalExpenses;
-        
+
         if (amount > availableFunds) {
           toast.error(
-            `Insufficient funds! Available: ${formatCurrency(availableFunds)}. Requested: ${formatCurrency(amount)}`,
+            `Insufficient funds! Available: ${formatCurrency(
+              availableFunds
+            )}. Requested: ${formatCurrency(amount)}`,
             {
               duration: 5000,
-              description: "The expense amount exceeds the available balance from donations. Please reduce the amount or wait for more donations.",
+              description:
+                "The expense amount exceeds the available balance from donations. Please reduce the amount or wait for more donations.",
             }
           );
           return;
@@ -248,7 +253,9 @@ export default function FinancialPage() {
         const percentageOfFunds = (amount / availableFunds) * 100;
         if (percentageOfFunds > 50 && availableFunds > 0) {
           toast.warning(
-            `This expense will use ${percentageOfFunds.toFixed(1)}% of available funds`,
+            `This expense will use ${percentageOfFunds.toFixed(
+              1
+            )}% of available funds`,
             {
               duration: 4000,
             }
@@ -269,7 +276,6 @@ export default function FinancialPage() {
 
       if (useMockData) {
         // For mock data, just log
-        console.log("Mock: Add financial record", newRecord);
         toast.success("Financial record added (mock mode)");
       } else {
         // Save to Firebase
@@ -297,7 +303,6 @@ export default function FinancialPage() {
   const handleEditRecord = async (recordId: string) => {
     try {
       // TODO: Implement edit form
-      console.log("Edit record:", recordId);
       toast.info("Edit functionality coming soon");
     } catch (error) {
       console.error("Error editing record:", error);
@@ -308,7 +313,6 @@ export default function FinancialPage() {
   const handleDeleteRecord = async (recordId: string) => {
     try {
       if (useMockData) {
-        console.log("Mock: Delete record:", recordId);
         toast.success("Record deleted (mock mode)");
       } else {
         await deleteFinancialRecord(recordId);
@@ -774,7 +778,9 @@ export default function FinancialPage() {
             <div className="flex gap-2">
               <SelectField
                 value={filterType}
-                onValueChange={(value) => setFilterType(value as "all" | "income" | "expense")}
+                onValueChange={(value) =>
+                  setFilterType(value as "all" | "income" | "expense")
+                }
               >
                 <SelectItem value="all">All Records</SelectItem>
                 <SelectItem value="income">Income Only</SelectItem>
@@ -829,7 +835,8 @@ export default function FinancialPage() {
                             : "text-red-600"
                         }`}
                       >
-                        {record.type === "income" ? "+" : "-"}{formatCurrency(record.amount).replace(/^₦/, "")}
+                        {record.type === "income" ? "+" : "-"}
+                        {formatCurrency(record.amount).replace(/^₦/, "")}
                       </span>
                     </td>
                     <td className="py-3 px-4">

@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Users, Calendar, Building } from "lucide-react";
 import type { Orphanage } from "@/common/types";
+import { Separator } from "../ui/separator";
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
 
 interface StatisticsStepProps {
   data: Partial<Orphanage>;
@@ -31,6 +34,10 @@ export default function StatisticsStep({
     childrenCount: data.childrenCount || 0,
     staffCount: data.staffCount || 0,
     foundedYear: data.foundedYear || new Date().getFullYear(),
+    agerange: data.agerange || "",
+    specialneeds: data.specialneeds || "",
+    periodicMonitoring: data.periodicMonitoring || false,
+    communityService: data.communityService || false,
   });
 
   // Update form data when data prop changes
@@ -39,6 +46,10 @@ export default function StatisticsStep({
       childrenCount: data.childrenCount || 0,
       staffCount: data.staffCount || 0,
       foundedYear: data.foundedYear || new Date().getFullYear(),
+      agerange: data.agerange || "",
+      specialneeds: data.specialneeds || "",
+      periodicMonitoring: data.periodicMonitoring || false,
+      communityService: data.communityService || false,
     });
   }, [data]);
 
@@ -46,26 +57,45 @@ export default function StatisticsStep({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const numValue = name === "foundedYear" ? parseInt(value) || 0 : parseInt(value) || 0;
-    setFormData(prev => ({ ...prev, [name]: numValue }));
-    
+
+    // Determine if the field should be treated as a number
+    const isNumericField = ["foundedYear"].includes(name);
+    const parsedValue = isNumericField ? parseInt(value) || 0 : value;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: parsedValue,
+    }));
+
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (formData.childrenCount < 0) {
-      newErrors.childrenCount = "Number of children cannot be negative";
+    if (formData.childrenCount < 0 || formData.childrenCount === 0) {
+      newErrors.childrenCount = "Number of children cannot be zero or less";
     }
-    if (formData.staffCount < 0) {
-      newErrors.staffCount = "Number of staff cannot be negative";
+    if (formData.staffCount < 0 || formData.staffCount === 0) {
+      newErrors.staffCount = "Number of staff cannot be zero or less";
     }
-    if (formData.foundedYear < 1800 || formData.foundedYear > new Date().getFullYear()) {
+    if (
+      formData.foundedYear < 1800 ||
+      formData.foundedYear > new Date().getFullYear()
+    ) {
       newErrors.foundedYear = "Please enter a valid founding year";
+    }
+
+    if (!formData?.periodicMonitoring) {
+      newErrors.periodicMonitoring =
+        "Please tick yes on periodic monitoring & reporting";
+    }
+
+    if (!formData?.agerange) {
+      newErrors.agerange = "Please enter the age range of children";
     }
 
     setErrors(newErrors);
@@ -104,13 +134,15 @@ export default function StatisticsStep({
               onChange={handleInputChange}
               placeholder="0"
               min="0"
-              className={`pl-10 ${errors.childrenCount ? "border-red-500" : ""}`}
+              className={`pl-10 ${
+                errors.childrenCount ? "border-red-500" : ""
+              }`}
             />
           </div>
           {errors.childrenCount && (
-            <p className="text-red-500 text-sm mt-1">{errors.childrenCount}</p>
+            <p className="text-red-500 text-xs mt-1">{errors.childrenCount}</p>
           )}
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             Current number of children in your care
           </p>
         </div>
@@ -132,9 +164,9 @@ export default function StatisticsStep({
             />
           </div>
           {errors.staffCount && (
-            <p className="text-red-500 text-sm mt-1">{errors.staffCount}</p>
+            <p className="text-red-500 text-xs mt-1">{errors.staffCount}</p>
           )}
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             Total number of staff members
           </p>
         </div>
@@ -157,12 +189,113 @@ export default function StatisticsStep({
             />
           </div>
           {errors.foundedYear && (
-            <p className="text-red-500 text-sm mt-1">{errors.foundedYear}</p>
+            <p className="text-red-500 text-xs mt-1">{errors.foundedYear}</p>
           )}
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             Year the orphanage was established
           </p>
         </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+            Age range of Children
+          </label>
+          <div className="relative">
+            <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              type="text"
+              name="agerange"
+              value={formData.agerange}
+              onChange={handleInputChange}
+              placeholder="5 - 10 years"
+              className={`pl-10 ${errors.agerange ? "border-red-500" : ""}`}
+            />
+          </div>
+          {errors.agerange && (
+            <p className="text-red-500 text-xs mt-1">{errors.agerange}</p>
+          )}
+          <p className="text-xs text-gray-500 mt-1">
+            Age range of children in your care
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+            Children with Special Needs?
+          </label>
+          <div className="relative">
+            <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              type="text"
+              name="specialneeds"
+              value={formData.specialneeds}
+              onChange={handleInputChange}
+              placeholder="5 children with special needs"
+              className={`pl-10 ${errors.specialneeds ? "border-red-500" : ""}`}
+            />
+          </div>
+          {errors.specialneeds && (
+            <p className="text-red-500 text-xs mt-1">{errors.specialneeds}</p>
+          )}
+          <p className="text-xs text-gray-500 mt-1">
+            Explain the situation of the children with special needs
+          </p>
+        </div>
+      </div>
+
+      {/* Additonal agreement */}
+      <div className="space-y-6">
+        <Separator />
+
+        <div>
+          <p>Routine Checks</p>
+        </div>
+
+        <div className="grid md:grid-cols-2">
+          <div className="flex items-center gap-3">
+            <Checkbox
+              id="periodicMonitoring"
+              checked={data.periodicMonitoring}
+              onCheckedChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  periodicMonitoring: value as boolean,
+                }))
+              }
+            />
+            <Label className="text-sm font-light" htmlFor="terms">
+              Open to Periodic Monitoring and Reporting
+            </Label>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Checkbox
+              id="communityService"
+              checked={data.communityService}
+              onCheckedChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  communityService: value as boolean,
+                }))
+              }
+            />
+            <Label className="text-sm font-light" htmlFor="terms">
+              Willing to participate in community service or outreach events
+            </Label>
+          </div>
+        </div>
+
+        <div>
+          {errors.periodicMonitoring && (
+            <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+              <p className="text-xs text-red-800 dark:text-red-200 space-y-1">
+                {errors.periodicMonitoring}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <Separator />
       </div>
 
       <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
@@ -181,9 +314,7 @@ export default function StatisticsStep({
         <Button variant="outline" onClick={onPrev}>
           Previous
         </Button>
-        <Button onClick={handleNext}>
-          Continue
-        </Button>
+        <Button onClick={handleNext}>Continue</Button>
       </div>
     </div>
   );

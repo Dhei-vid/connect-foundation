@@ -255,8 +255,6 @@ export async function getDonationStats(filters?: {
   try {
     const donations = await getDonations(filters);
 
-    console.log("DONATIONS ", donations);
-
     const completedDonations = donations.filter(
       (d) => d.status === "completed"
     );
@@ -394,4 +392,3 @@ export async function getTopDonors(limitCount: number = 10): Promise<
     throw error;
   }
 }
-

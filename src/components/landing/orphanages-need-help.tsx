@@ -62,7 +62,8 @@ const mockOrphanageIssues = [
   },
 ];
 
-interface OrphanageWithIssue extends Orphanage {
+interface OrphanageWithIssue
+  extends Omit<Orphanage, "logoURLFile" | "coverImageFile" | "imageFiles"> {
   currentIssue: {
     orphanageId: string;
     title: string;
@@ -99,12 +100,12 @@ export function OrphanagesNeedHelpSection() {
 
       // Combine orphanages with their issues
       const orphanagesWithIssues: OrphanageWithIssue[] = [];
-      
+
       for (const orphanage of mockOrphanages) {
         const issue = mockOrphanageIssues.find(
           (i) => i.orphanageId === orphanage.id
         );
-        
+
         if (issue) {
           orphanagesWithIssues.push({
             ...orphanage,

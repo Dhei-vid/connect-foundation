@@ -1,5 +1,6 @@
 import { Globe, Zap, Megaphone } from "lucide-react";
 import type { FAQItem } from "@/components/general/faq";
+import { ImageFile } from "@/components/ui/multi-image-upload";
 
 export const impactInfo = [
   {
@@ -134,3 +135,12 @@ export const volunteerTestimonials = [
     duration: "8 months",
   },
 ];
+
+export const initialImageFile: ImageFile = {
+  id: "",
+  file: new File([], ""), // creates an empty File object
+  preview: "",
+  uploading: false,
+  uploaded: false,
+  url: "",
+};

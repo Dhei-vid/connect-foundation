@@ -106,17 +106,14 @@ export default function Page() {
     }
 
     const amount = selectedAmount || parseFloat(customAmount) || 0;
-    console.log("Starting payment process with amount:", amount);
     setIsProcessing(true);
 
     try {
       // Convert amount to kobo (Paystack expects amount in kobo)
       const amountInKobo = Math.round(amount * 100);
-      console.log("Amount conversion:", { naira: amount, kobo: amountInKobo });
 
       // Generate unique reference
       const reference = await generateReference();
-      console.log("Generated reference:", reference);
 
       // Create pending donation record
       const donationData = {
@@ -132,7 +129,6 @@ export default function Page() {
         transactionReference: reference,
       };
 
-      console.log("Creating donation record:", donationData);
       const donationId = await createDonation(donationData);
 
       // Initialize payment with Paystack
@@ -160,7 +156,6 @@ export default function Page() {
       }
 
       const paystackResponse = await initializeTransaction(paystackParams);
-      console.log("Paystack response:", paystackResponse);
 
       if (paystackResponse.status && paystackResponse.data) {
         // Show success message

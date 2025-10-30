@@ -113,7 +113,15 @@ export function onAuthStateChange(
 
 export async function createOrphanageProfile(
   userId: string,
-  orphanageData: Omit<Orphanage, "id" | "createdAt" | "updatedAt">
+  orphanageData: Omit<
+    Orphanage,
+    | "id"
+    | "createdAt"
+    | "updatedAt"
+    | "logoURLFile"
+    | "coverImageFile"
+    | "imageFiles"
+  >
 ): Promise<void> {
   try {
     // Filter out undefined values to avoid Firestore errors

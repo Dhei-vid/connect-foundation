@@ -25,7 +25,11 @@ import type { Event } from "@/common/types";
 import { SelectField } from "@/components/ui/form-field";
 import { SelectItem } from "@/components/ui/select";
 import { getAllEvents, deleteEvent, updateEvent } from "@/firebase/events";
-import { extractErrorMessage, UnknownError, formatFirebaseDate } from "@/common/helpers";
+import {
+  extractErrorMessage,
+  UnknownError,
+  formatFirebaseDate,
+} from "@/common/helpers";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 
 export default function AdminEventsPage() {
@@ -95,9 +99,7 @@ export default function AdminEventsPage() {
     currentStatus: boolean
   ) => {
     try {
-      console.log("Toggling featured status for event:", eventId);
       await updateEvent(eventId, { featured: !currentStatus });
-      console.log("Event featured status updated successfully");
       toast.success(
         `Event ${!currentStatus ? "featured" : "unfeatured"} successfully`
       );
@@ -146,7 +148,8 @@ export default function AdminEventsPage() {
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  const formatDate = (date: Date) => formatFirebaseDate(date, "MMM dd, yyyy 'at' h:mm a");
+  const formatDate = (date: Date) =>
+    formatFirebaseDate(date, "MMM dd, yyyy 'at' h:mm a");
 
   const getStatusColor = (status: string) => {
     switch (status) {

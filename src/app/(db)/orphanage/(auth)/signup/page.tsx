@@ -77,7 +77,15 @@ export default function OrphanageSignUpPage() {
       );
 
       // Create basic orphanage profile for onboarding
-      const orphanageData: Omit<Orphanage, "id" | "createdAt" | "updatedAt"> = {
+      const orphanageData: Omit<
+        Orphanage,
+        | "id"
+        | "createdAt"
+        | "updatedAt"
+        | "logoURLFile"
+        | "coverImageFile"
+        | "imageFiles"
+      > = {
         name: formData.name,
         location: "", // Will be filled in onboarding
         address: "", // Will be filled in onboarding
@@ -95,6 +103,10 @@ export default function OrphanageSignUpPage() {
         contactPersonEmail: formData.contactPersonEmail,
         contactPersonPhone: formData.contactPersonPhone,
         contactPersonPosition: formData.contactPersonPosition,
+        periodicMonitoring: false,
+        communityService: false,
+        agerange: "",
+        specialneeds: "",
         images: [], // Default value for images
       };
 

@@ -71,9 +71,7 @@ export default function AdminDashboardPage() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      console.log("Loading dashboard data...");
       const dashboardStats = await getDashboardStats();
-      console.log("Dashboard stats loaded:", dashboardStats);
       setStats(dashboardStats);
     } catch (error) {
       console.error("Error loading dashboard data:", error);
@@ -444,9 +442,7 @@ function RecentDonationsList() {
 
   const loadRecentDonations = async () => {
     try {
-      console.log("Loading recent donations...");
       const recentDonations = await getRecentDonations(5);
-      console.log("Recent donations loaded:", recentDonations);
       setDonations(recentDonations);
     } catch (error) {
       console.error("Error loading recent donations:", error);
@@ -530,9 +526,7 @@ function PendingVolunteersList() {
 
   const loadPendingVolunteers = async () => {
     try {
-      console.log("Loading pending volunteers...");
       const pendingVolunteers = await getPendingVolunteers();
-      console.log("Pending volunteers loaded:", pendingVolunteers);
       setVolunteers(pendingVolunteers.slice(0, 5)); // Show only first 5
     } catch (error) {
       console.error("Error loading pending volunteers:", error);
@@ -616,9 +610,7 @@ function NewInquiriesList() {
 
   const loadNewInquiries = async () => {
     try {
-      console.log("Loading new inquiries...");
       const newInquiries = await getNewContactInquiries();
-      console.log("New inquiries loaded:", newInquiries);
       setInquiries(newInquiries.slice(0, 5)); // Show only first 5
     } catch (error) {
       console.error("Error loading new inquiries:", error);

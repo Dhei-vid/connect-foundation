@@ -41,8 +41,6 @@ const VolunteerRegistrationForm = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("start");
-
     if (selectedOpportunities.length === 0) {
       return;
     }

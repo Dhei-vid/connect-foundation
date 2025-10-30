@@ -63,8 +63,6 @@ export async function getDashboardStats(): Promise<{
   };
 }> {
   try {
-    console.log("Getting dashboard stats...");
-
     // Get current date ranges
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -155,7 +153,6 @@ export async function getDashboardStats(): Promise<{
       inquiries: inquiryStats,
     };
 
-    console.log("Dashboard stats result:", result);
     return result;
   } catch (error) {
     console.error("Error getting dashboard stats:", error);

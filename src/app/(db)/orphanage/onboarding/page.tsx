@@ -24,6 +24,8 @@ import {
   getOrphanageProfile,
   updateOrphanageProfile,
 } from "@/firebase/orphanages";
+import { updateUserOnboardingStatus } from "@/firebase/auth";
+import { uploadImage, uploadMultipleImages } from "@/firebase/storage";
 
 // Import step components
 import ContactPersonStep from "@/components/onboarding/contact-person-step";
@@ -84,7 +86,6 @@ export default function OnboardingPage() {
 
       try {
         setIsLoadingData(true);
-        const { getOrphanageProfile } = await import("@/firebase/orphanages");
         const existingData = await getOrphanageProfile(user.uid);
 
         if (existingData) {
@@ -119,18 +120,62 @@ export default function OnboardingPage() {
     }
   };
 
+  // Submitting orphanage onboarding data
   const completeOnboarding = async () => {
     setIsLoading(true);
     try {
       // Update orphanage profile with complete data
       const orphanages = await getOrphanageProfile(user!.uid);
 
-      if (orphanages) {
+      // uploading onboarding images
+      const images = formData.imageFiles?.map((img) => img.file) ?? [];
+      const logo = formData.logoURLFile;
+      const cover = formData.coverImageFile;
+
+      if (!cover?.file) {
+        toast.error("Please upload cover image");
+        return;
       }
-      await updateOrphanageProfile(user!.uid, formData as Orphanage);
+
+      if (images.length === 0) {
+        toast.error("Please upload at least one image");
+        return;
+      }
+
+      toast.info("Uploading images...");
+      const imagesURL = images.length
+        ? await uploadMultipleImages(
+            images,
+            `onboarding/${formData.name}/images-${Date.now()}`
+          )
+        : [];
+      const logoImageURL = logo?.file
+        ? await uploadImage(
+            logo.file,
+            `onboarding/${formData.name}/logo-${Date.now()}`
+          )
+        : undefined;
+      const coverURL = cover?.file
+        ? await uploadImage(
+            cover.file,
+            `onboarding/${formData.name}/cover-${Date.now()}`
+          )
+        : undefined;
+      toast.success("Image Uploaded Successfully");
+
+      const onBoardingData = {
+        ...formData,
+        images: imagesURL,
+        logoURL: logoImageURL,
+        coverImageURL: coverURL,
+      };
+
+      toast.info("Uploading orphanage data...");
+      await updateOrphanageProfile(user!.uid, onBoardingData as Orphanage);
+
+      toast.success("Orphanage data created successfully");
 
       // Update user onboarding status
-      const { updateUserOnboardingStatus } = await import("@/firebase/auth");
       await updateUserOnboardingStatus(user!.uid, true);
 
       toast.success("Profile completed successfully!");

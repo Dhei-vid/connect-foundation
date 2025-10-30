@@ -2,12 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MultiImageUpload } from "@/components/ui/multi-image-upload";
+import {
+  ImageFile,
+  MultiImageUpload,
+} from "@/components/ui/multi-image-upload";
 import { SingleImageUpload } from "@/components/ui/single-image-upload";
 import Image from "next/image";
 import { Building2, Image as ImageIcon, Check, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Orphanage } from "@/common/types";
+import { Button } from "../ui/button";
+import { initialImageFile } from "@/common/data";
 
 interface ImagesStepProps {
   data: Partial<Orphanage>;
@@ -18,18 +23,29 @@ interface ImagesStepProps {
   isLastStep: boolean;
 }
 
-export default function ImagesStep({ data, onUpdate }: ImagesStepProps) {
+export default function ImagesStep({
+  data,
+  onUpdate,
+  onNext,
+  onPrev,
+}: ImagesStepProps) {
   const [logoURL, setLogoURL] = useState<string | undefined>(data.logoURL);
   const [coverImageURL, setCoverImageURL] = useState<string | undefined>(
     data.coverImageURL
   );
   const [images, setImages] = useState<string[]>(data.images || []);
+  const [localImages, setLocalImages] = useState<ImageFile[]>([]);
+  const [coverImageFile, setCoverImageFile] =
+    useState<ImageFile>(initialImageFile);
+  const [logoFile, setLogoFile] = useState<ImageFile>(initialImageFile);
+
   const [logoSource, setLogoSource] = useState<"upload" | "gallery">("upload");
   const [coverSource, setCoverSource] = useState<"upload" | "gallery">(
     "upload"
   );
   const [selectedLogoIndex, setSelectedLogoIndex] = useState<number>(-1);
   const [selectedCoverIndex, setSelectedCoverIndex] = useState<number>(-1);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Initialize selected indices if logo/cover are from gallery
   useEffect(() => {
@@ -123,6 +139,30 @@ export default function ImagesStep({ data, onUpdate }: ImagesStepProps) {
     setSelectedCoverIndex(-1); // Clear gallery selection
   };
 
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!coverImageURL) {
+      newErrors.name = "Please add a cover image";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    if (validateForm()) {
+      onUpdate({
+        ...data,
+        images: [...localImages.map((item) => item.preview)],
+        imageFiles: localImages,
+        coverImageFile: coverImageFile,
+        logoURLFile: logoFile,
+      });
+      onNext();
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -135,27 +175,10 @@ export default function ImagesStep({ data, onUpdate }: ImagesStepProps) {
         </p>
       </div>
 
-      {/* Firebase Storage Notice */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <ImageIcon className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-          <div>
-            <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-              Image Upload Information
-            </p>
-            <p className="text-sm text-blue-800 dark:text-blue-200 mt-1">
-              Firebase Storage integration is pending. For now, you can paste
-              image URLs or select local images that will be stored when
-              Firebase Storage is connected.
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Logo and Cover Upload - Side by Side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Logo Upload */}
-        <Card className="py-2">
+        <Card className="py-4">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <Building2 className="h-4 w-4" />
@@ -168,10 +191,12 @@ export default function ImagesStep({ data, onUpdate }: ImagesStepProps) {
             </p>
 
             <div className="flex justify-center">
-              <div className="w-40 h-40 rounded-full overflow-hidden">
+              <div className="w-40 h-40 overflow-hidden">
                 <SingleImageUpload
                   value={logoSource === "upload" ? logoURL : undefined}
                   onChange={handleLogoUpload}
+                  imageFile={logoFile}
+                  setImageFile={setLogoFile}
                   aspectRatio="square"
                   placeholder="Upload logo"
                   maxSizeMB={5}
@@ -180,7 +205,7 @@ export default function ImagesStep({ data, onUpdate }: ImagesStepProps) {
             </div>
 
             {logoSource === "upload" && logoURL && (
-              <div className="flex items-center justify-center gap-2 text-sm text-main-red dark:text-main-red">
+              <div className="flex items-center justify-center gap-2 text-sm text-green-700 dark:text-green-300">
                 <Check className="h-4 w-4" />
                 Logo uploaded
               </div>
@@ -189,7 +214,7 @@ export default function ImagesStep({ data, onUpdate }: ImagesStepProps) {
         </Card>
 
         {/* Cover Image Upload */}
-        <Card className="py-2">
+        <Card className="py-4">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <ImageIcon className="h-4 w-4" />
@@ -204,6 +229,8 @@ export default function ImagesStep({ data, onUpdate }: ImagesStepProps) {
             <SingleImageUpload
               value={coverSource === "upload" ? coverImageURL : undefined}
               onChange={handleCoverUpload}
+              imageFile={coverImageFile}
+              setImageFile={setCoverImageFile}
               aspectRatio="video"
               placeholder="Upload cover"
               maxSizeMB={5}
@@ -235,6 +262,8 @@ export default function ImagesStep({ data, onUpdate }: ImagesStepProps) {
 
           <MultiImageUpload
             value={images}
+            setLocalImages={setLocalImages}
+            localImages={localImages}
             onChange={handleImagesChange}
             maxImages={20}
             maxSizeMB={5}
@@ -302,6 +331,8 @@ export default function ImagesStep({ data, onUpdate }: ImagesStepProps) {
                     src={images[selectedLogoIndex]}
                     alt="Selected Logo"
                     className="w-full h-full object-cover"
+                    width={100}
+                    height={100}
                   />
                 </div>
                 <div>
@@ -430,14 +461,11 @@ export default function ImagesStep({ data, onUpdate }: ImagesStepProps) {
         </ul>
       </div>
 
-      {/* Skip Notice */}
-      <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-        <p className="text-sm text-yellow-800 dark:text-yellow-200">
-          <strong>Note:</strong> You can skip this step and add images later
-          from your settings. However, profiles with images receive{" "}
-          {images.length > 0 ? "40%" : "significantly"} more engagement from
-          donors.
-        </p>
+      <div className="flex justify-between pt-6">
+        <Button variant="outline" onClick={onPrev}>
+          Previous
+        </Button>
+        <Button onClick={handleNext}>Continue</Button>
       </div>
     </div>
   );

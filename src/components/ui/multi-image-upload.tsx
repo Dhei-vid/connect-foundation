@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, Dispatch, SetStateAction } from "react";
 import Image from "next/image";
 import { X, Upload, Image as ImageIcon } from "lucide-react";
 import { Button } from "./button";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export interface ImageFile {
   id: string;
@@ -16,7 +17,9 @@ export interface ImageFile {
 }
 
 interface MultiImageUploadProps {
-  value: string[]; // Array of image URLs
+  value: string[];
+  localImages: ImageFile[];
+  setLocalImages: Dispatch<SetStateAction<ImageFile[]>>;
   onChange: (urls: string[]) => void;
   maxImages?: number;
   maxSizeMB?: number;
@@ -27,7 +30,9 @@ interface MultiImageUploadProps {
 }
 
 export function MultiImageUpload({
-  value = [],
+  value,
+  localImages,
+  setLocalImages,
   onChange,
   maxImages = 10,
   maxSizeMB = 5,
@@ -36,7 +41,6 @@ export function MultiImageUpload({
   className,
   disabled = false,
 }: MultiImageUploadProps) {
-  const [localImages, setLocalImages] = useState<ImageFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -52,13 +56,15 @@ export function MultiImageUpload({
     filesToAdd.forEach((file) => {
       // Validate file size
       if (file.size > maxSizeBytes) {
-        alert(`File ${file.name} is too large. Maximum size is ${maxSizeMB}MB`);
+        toast.error(
+          `File ${file.name} is too large. Maximum size is ${maxSizeMB}MB`
+        );
         return;
       }
 
       // Validate file type
       if (!file.type.startsWith("image/")) {
-        alert(`File ${file.name} is not an image`);
+        toast.error(`File ${file.name} is not an image`);
         return;
       }
 
@@ -260,8 +266,7 @@ export function MultiImageUpload({
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
           <p className="text-sm text-blue-800 dark:text-blue-200">
             <strong>Note:</strong> {localImages.length} image(s) selected but
-            not uploaded yet. These will be stored locally until you implement
-            Firebase Storage upload.
+            not uploaded yet. These will be uploaded when you save.
           </p>
         </div>
       )}

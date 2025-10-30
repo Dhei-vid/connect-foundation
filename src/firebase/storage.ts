@@ -122,3 +122,62 @@ export function validateImageFile(file: File): {
 
   return { valid: true };
 }
+
+/**
+ * Upload multiple images to Firebase Storage
+ * @param files Array of File objects (from input[type=file])
+ * @param folder Storage folder name
+ * @returns Promise<string[]> - Array of download URLs
+ */
+export async function uploadMultipleImages(
+  files: File[],
+  basePath: string,
+  onProgress?: (progress: number) => void
+): Promise<string[]> {
+  try {
+    if (!files || files.length === 0) return [];
+
+    const uploadPromises = files.map((file, index) => {
+      const uniquePath = `${basePath}/${Date.now()}-${index}-${file.name}`;
+      const imageRef = ref(storage, uniquePath);
+
+      if (onProgress) {
+        return new Promise<string>((resolve, reject) => {
+          const uploadTask = uploadBytesResumable(imageRef, file);
+
+          uploadTask.on(
+            "state_changed",
+            (snapshot: UploadTaskSnapshot) => {
+              // Calculate overall progress across all files
+              const fileProgress =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              const totalProgress =
+                fileProgress / files.length + (index / files.length) * 100;
+              onProgress(Math.min(totalProgress, 100));
+            },
+            (error) => {
+              console.error("Error uploading image:", error);
+              reject(error);
+            },
+            async () => {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve(downloadURL);
+            }
+          );
+        });
+      } else {
+        // Upload without progress tracking
+        return uploadBytes(imageRef, file).then(async (snapshot) => {
+          return await getDownloadURL(snapshot.ref);
+        });
+      }
+    });
+
+    // Wait for all uploads to complete
+    const urls = await Promise.all(uploadPromises);
+    return urls;
+  } catch (error) {
+    console.error("Error uploading multiple images:", error);
+    throw new Error("Failed to upload multiple images");
+  }
+}

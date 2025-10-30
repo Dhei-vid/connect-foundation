@@ -42,7 +42,7 @@ export default function Page() {
       }
 
       try {
-        const inquiryId = await createContactInquiry({
+        await createContactInquiry({
           firstname: formData.firstname,
           lastname: formData.lastname,
           email: formData.email,
@@ -50,7 +50,6 @@ export default function Page() {
           message: formData.message,
         });
 
-        console.log("Contact inquiry created with ID:", inquiryId);
         toast.success("Message sent successfully! We'll get back to you soon.");
 
         // Reset form
