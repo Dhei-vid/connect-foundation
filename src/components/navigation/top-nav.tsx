@@ -149,10 +149,14 @@ export function TopNav({
           >
             {navItems.map((item) => {
               // Check if any dropdown item is active
-              const isDropdownItemActive = item.hasDropdown && 
-                dropdownConfig[item.label as keyof typeof dropdownConfig]?.items.some(
-                  (subItem) => pathname === subItem.href || 
-                              (subItem.href !== "/" && pathname.startsWith(subItem.href))
+              const isDropdownItemActive =
+                item.hasDropdown &&
+                dropdownConfig[
+                  item.label as keyof typeof dropdownConfig
+                ]?.items.some(
+                  (subItem) =>
+                    pathname === subItem.href ||
+                    (subItem.href !== "/" && pathname.startsWith(subItem.href))
                 );
               const isActive = pathname === item.href || isDropdownItemActive;
 
@@ -181,7 +185,7 @@ export function TopNav({
                         />
                       </div>
                     </button>
-                    ) : (
+                  ) : (
                     <Link href={item.href}>
                       <div
                         className={cn(
@@ -233,28 +237,27 @@ export function TopNav({
                         }
                       </p>
                     </div>
-                    <div className="w-full">
+                    <div className="w-full space-y-1">
                       {dropdownConfig[
                         activeDropdown as keyof typeof dropdownConfig
                       ].items.map((item) => {
-                        const isActive = pathname === item.href || 
-                                        (item.href !== "/" && pathname.startsWith(item.href));
+                        const isActive =
+                          pathname === item.href ||
+                          (item.href !== "/" && pathname.startsWith(item.href));
                         return (
                           <div
                             key={item.label}
                             className={cn(
                               "cursor-pointer p-2 w-full transition-colors duration-200 rounded-sm",
-                              isActive 
-                                ? "bg-main-blue" 
-                                : "hover:bg-main-blue"
+                              isActive ? "bg-main-blue" : "hover:bg-main-blue"
                             )}
                           >
                             <Link
                               href={item.href}
                               className={cn(
-                                "w-full block",
-                                isActive 
-                                  ? "text-white font-semibold" 
+                                "w-full block text-sm",
+                                isActive
+                                  ? "text-white font-semibold"
                                   : "text-white/90 hover:text-white"
                               )}
                               onClick={() => {
@@ -391,8 +394,10 @@ export function TopNav({
                       {dropdownConfig[
                         item.label as keyof typeof dropdownConfig
                       ]?.items.map((subItem, index) => {
-                        const isActive = pathname === subItem.href || 
-                                        (subItem.href !== "/" && pathname.startsWith(subItem.href));
+                        const isActive =
+                          pathname === subItem.href ||
+                          (subItem.href !== "/" &&
+                            pathname.startsWith(subItem.href));
                         return (
                           <Link
                             key={index}
