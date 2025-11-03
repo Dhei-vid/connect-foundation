@@ -18,7 +18,6 @@ import {
   DollarSign,
   Calendar,
   MapPin,
-  Loader2,
   AlertCircle,
   CheckCircle2,
 } from "lucide-react";
@@ -175,7 +174,7 @@ function DonateDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-width">
         <DialogHeader>
           <DialogTitle className="text-2xl">
             Support {orphanage?.name}
@@ -427,12 +426,12 @@ function IssueHelpCard({ issue, orphanage, onDonate }: IssueCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="flex flex-col space-y-4 h-full w-full">
         <p className="text-gray-600 dark:text-gray-400 line-clamp-3">
           {issue.description}
         </p>
 
-        <div className="flex items-center gap-1 text-sm">
+        <div className="mt-auto flex items-center gap-1 text-sm">
           <Badge variant="outline">{issue.category}</Badge>
           {issue.deadline && (
             <div className="flex items-center gap-1 text-gray-500 ml-2">
@@ -443,7 +442,7 @@ function IssueHelpCard({ issue, orphanage, onDonate }: IssueCardProps) {
         </div>
 
         {/* Financial Info */}
-        <div className="space-y-3 pt-4 border-t">
+        <div className="mt-auto space-y-3 pt-4 border-t">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-gray-500">Goal</p>
@@ -663,14 +662,16 @@ export default function HelpPage() {
         {/* Issues Grid */}
         {!loading && filteredIssues.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredIssues.map((issue) => (
-              <IssueHelpCard
-                key={issue.id}
-                issue={issue}
-                orphanage={orphanages.get(issue.orphanageId) || null}
-                onDonate={handleDonate}
-              />
-            ))}
+            {filteredIssues
+              .filter((issue) => issue.estimatedCost >= issue.raisedAmount)
+              .map((issue) => (
+                <IssueHelpCard
+                  key={issue.id}
+                  issue={issue}
+                  orphanage={orphanages.get(issue.orphanageId) || null}
+                  onDonate={handleDonate}
+                />
+              ))}
           </div>
         )}
 

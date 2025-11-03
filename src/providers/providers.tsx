@@ -18,6 +18,7 @@ interface AuthContextType {
   userRole: string | null;
   isAdmin: boolean;
   isOrphanage: boolean;
+  isOnboardingComplete: boolean | null;
   signIn: (email: string, password: string) => Promise<boolean>;
   signUp: (
     email: string,
@@ -49,6 +50,7 @@ function AppProviders({ children }: { children: React.ReactNode }) {
   const userRole = user?.role || null;
   const isAdmin = userRole === "ADMIN";
   const isOrphanage = userRole === "ORPHANAGE";
+  const isOnboardingComplete = user?.onboardingCompleted || null;
 
   const signIn = async (email: string, password: string): Promise<boolean> => {
     try {
@@ -125,6 +127,7 @@ function AppProviders({ children }: { children: React.ReactNode }) {
     signUp,
     signOut,
     requireAuth,
+    isOnboardingComplete,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/providers/providers";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, ArrowRight } from "lucide-react";
@@ -51,7 +51,7 @@ export default function Page() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           <Button
             onClick={() =>
-              role === "ADMIN" || pathName === "/admin"
+              role === "ADMIN"
                 ? router.push("/admin/signin")
                 : router.push("/orphanage/signin")
             }
@@ -65,7 +65,7 @@ export default function Page() {
           {isAuthenticated && (
             <Button
               onClick={() =>
-                role === "ADMIN"
+                role === "ADMIN" || pathName === "/orphanage"
                   ? router.push("admin/dashboard")
                   : router.push("orphanage/dashboard")
               }

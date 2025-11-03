@@ -19,11 +19,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  uploadImage,
-  generateImagePath,
-  validateImageFile,
-} from "@/firebase/storage";
-import {
   createSuccessStory,
   updateSuccessStory,
 } from "@/firebase/success-stories";
@@ -33,6 +28,8 @@ import { toast } from "sonner";
 import type { SuccessStory, Orphanage, Issue } from "@/common/types";
 import { Spinner } from "@/components/ui/spinner";
 import { NewDatePicker } from "../ui/datepicker";
+
+import { uploadMultipleImages } from "@/firebase/storage";
 
 interface AddSuccessStoryModalProps {
   isOpen: boolean;
@@ -67,36 +64,41 @@ export function AddSuccessStoryModal({
   });
 
   useEffect(() => {
-    if (isOpen) {
-      loadData();
-      if (editingStory) {
-        setFormData({
-          orphanageId: editingStory.orphanageId,
-          issueId: editingStory.issueId,
-          title: editingStory.title,
-          description: editingStory.description,
-          impact: editingStory.impact,
-          beneficiaries: editingStory.beneficiaries,
-          cost: editingStory.cost,
-          completedAt: editingStory.completedAt,
-          images: editingStory.images || [],
-        });
-      } else {
-        // Reset form for new story
-        setFormData({
-          orphanageId: "",
-          issueId: "",
-          title: "",
-          description: "",
-          impact: "",
-          beneficiaries: 0,
-          cost: 0,
-          completedAt: new Date(),
-          images: [],
-        });
-      }
+    if (!isOpen) return; // only run when open
+
+    loadData();
+
+    if (editingStory) {
+      setFormData({
+        orphanageId: editingStory.orphanageId,
+        issueId: editingStory.issueId,
+        title: editingStory.title,
+        description: editingStory.description,
+        impact: editingStory.impact,
+        beneficiaries: editingStory.beneficiaries,
+        cost: editingStory.cost,
+        completedAt: editingStory.completedAt,
+        images: editingStory.images || [],
+      });
+    } else {
+      // initialize only if not editing and it's a fresh open
+      setFormData((prev) =>
+        prev.orphanageId
+          ? prev
+          : {
+              orphanageId: "",
+              issueId: "",
+              title: "",
+              description: "",
+              impact: "",
+              beneficiaries: 0,
+              cost: 0,
+              completedAt: new Date(),
+              images: [],
+            }
+      );
     }
-  }, [isOpen, editingStory]);
+  }, [isOpen]);
 
   const loadData = async () => {
     try {
@@ -122,39 +124,40 @@ export function AddSuccessStoryModal({
     }));
   };
 
-  const handleImageUpload = async (files: File[]) => {
-    if (files.length === 0) return;
+  // Handling Image Upload
+  const handleImageUpload = async () => {
+    if (localImages.length === 0) {
+      toast.error("Please upload at least one image");
+      return [];
+    }
 
+    const images = localImages.map((img) => img.file);
     setUploadingImages(true);
-    const uploadedUrls: string[] = [];
 
     try {
-      for (const file of files) {
-        // Validate file
-        const validation = validateImageFile(file);
-        if (!validation.valid) {
-          toast.error(validation.error || "Invalid file");
-          continue;
-        }
+      toast.info("Uploading images...");
+      const imagesURL = await uploadMultipleImages(
+        images,
+        `success-story/${formData.orphanageId}/images-${Date.now()}`
+      );
 
-        // Generate unique path
-        const path = generateImagePath("success-stories", file.name);
-
-        // Upload to Firebase Storage
-        const url = await uploadImage(file, path);
-        uploadedUrls.push(url);
+      if (!imagesURL || imagesURL.length === 0) {
+        toast.error("Image upload failed");
+        return [];
       }
 
-      if (uploadedUrls.length > 0) {
-        setFormData((prev) => ({
-          ...prev,
-          images: [...prev.images, ...uploadedUrls],
-        }));
-        toast.success(`${uploadedUrls.length} image(s) uploaded successfully`);
-      }
+      // Save to state
+      setFormData((prev) => ({
+        ...prev,
+        images: imagesURL,
+      }));
+
+      toast.success(`${imagesURL.length} image(s) uploaded successfully`);
+      return imagesURL;
     } catch (error) {
       console.error("Error uploading images:", error);
       toast.error("Failed to upload some images");
+      return [];
     } finally {
       setUploadingImages(false);
     }
@@ -176,6 +179,9 @@ export function AddSuccessStoryModal({
       );
       const selectedIssue = issues.find((i) => i.id === formData.issueId);
 
+      // Calling the image upload function to firebase
+      const imageUploadResult = await handleImageUpload();
+
       const successStoryData = {
         orphanageId: formData.orphanageId,
         orphanageName: selectedOrphanage?.name || "Unknown Orphanage",
@@ -184,7 +190,7 @@ export function AddSuccessStoryModal({
         title: formData.title,
         description: formData.description,
         impact: formData.impact,
-        images: formData.images,
+        images: imageUploadResult,
         beneficiaries: formData.beneficiaries,
         cost: formData.cost,
         completedAt: formData.completedAt,
@@ -194,7 +200,10 @@ export function AddSuccessStoryModal({
         await updateSuccessStory(editingStory.id, successStoryData);
         toast.success("Success story updated successfully");
       } else {
-        await createSuccessStory(successStoryData);
+        if (imageUploadResult) {
+          await createSuccessStory(successStoryData);
+        }
+
         toast.success("Success story created successfully");
       }
 
@@ -328,7 +337,6 @@ export function AddSuccessStoryModal({
               <Input
                 type="number"
                 min="0"
-                step="0.01"
                 value={formData.cost}
                 onChange={(e) =>
                   handleInputChange("cost", parseFloat(e.target.value) || 0)

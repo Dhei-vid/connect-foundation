@@ -12,7 +12,6 @@ import {
   Users,
   HandCoins,
   Image as ImageIcon,
-  XCircle,
   Filter,
   CheckCircle,
   Calendar,
@@ -31,287 +30,14 @@ import {
   getSuccessStories,
   getSuccessStoryStats,
   deleteSuccessStory,
-  // createSuccessStory,
-  // updateSuccessStory,
 } from "@/firebase/success-stories";
 import { getOrphanages } from "@/firebase/orphanages";
 import { getIssues } from "@/firebase/issues";
 import { toast } from "sonner";
-import { formatFirebaseDate } from "@/lib/date-utils";
 import type { SuccessStory, Orphanage, Issue } from "@/common/types";
 import { formatCurrency } from "@/common/helpers";
 
-// Mock data for success stories
-const getMockSuccessStories = (): SuccessStory[] => {
-  const now = new Date();
-  return [
-    {
-      id: "1",
-      orphanageId: "orphan-1",
-      orphanageName: "Hope Children's Home",
-      issueId: "issue-1",
-      issueTitle: "New Dormitory Construction",
-      title: "New Dormitory Brings Hope to 50 Children",
-      description:
-        "Thanks to the generous support of our donors, we successfully completed the construction of a new dormitory building. This facility now provides safe, comfortable accommodation for 50 children who previously lived in overcrowded conditions.",
-      impact:
-        "The new dormitory features modern amenities, individual storage spaces, and proper ventilation. Children report better sleep quality and improved health outcomes. The facility has also enabled us to accept 15 additional children from difficult situations.",
-      images: [
-        "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&h=600",
-      ],
-      beneficiaries: 50,
-      cost: 125000,
-      completedAt: new Date(now.getFullYear(), now.getMonth() - 2, 15),
-      createdAt: new Date(now.getFullYear(), now.getMonth() - 2, 20),
-      updatedAt: new Date(now.getFullYear(), now.getMonth() - 2, 20),
-    },
-    {
-      id: "2",
-      orphanageId: "orphan-2",
-      orphanageName: "Sunshine Orphanage",
-      issueId: "issue-2",
-      issueTitle: "School Supplies and Uniforms",
-      title: "Every Child Ready for School",
-      description:
-        "With community support, we provided complete school supplies and uniforms to all 35 children. This initiative ensures no child misses school due to lack of materials or proper attire.",
-      impact:
-        "School attendance improved by 98%, and teachers report better student engagement. Children express increased confidence and pride in their appearance. Academic performance has shown a 25% improvement across all grades.",
-      images: [
-        "https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=800&h=600",
-      ],
-      beneficiaries: 35,
-      cost: 8500,
-      completedAt: new Date(now.getFullYear(), now.getMonth() - 1, 5),
-      createdAt: new Date(now.getFullYear(), now.getMonth() - 1, 10),
-      updatedAt: new Date(now.getFullYear(), now.getMonth() - 1, 10),
-    },
-    {
-      id: "3",
-      orphanageId: "orphan-1",
-      orphanageName: "Hope Children's Home",
-      issueId: "issue-3",
-      issueTitle: "Medical Equipment and Healthcare",
-      title: "Medical Clinic Saves Lives",
-      description:
-        "The establishment of an on-site medical clinic with modern equipment has transformed healthcare access for our children. We can now provide immediate medical attention and regular health checkups.",
-      impact:
-        "Emergency response time reduced from hours to minutes. Regular health screenings detected and treated conditions early. Hospital visits decreased by 60% as preventive care improved. Three children's lives were saved through early intervention.",
-      images: [
-        "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&h=600",
-      ],
-      beneficiaries: 65,
-      cost: 45000,
-      completedAt: new Date(now.getFullYear(), now.getMonth() - 3, 20),
-      createdAt: new Date(now.getFullYear(), now.getMonth() - 3, 25),
-      updatedAt: new Date(now.getFullYear(), now.getMonth() - 3, 25),
-    },
-    {
-      id: "4",
-      orphanageId: "orphan-3",
-      orphanageName: "St. Mary's Children Center",
-      issueId: "issue-4",
-      issueTitle: "Computer Lab and Internet Access",
-      title: "Digital Learning Empowers Future Leaders",
-      description:
-        "A fully equipped computer lab with 20 workstations and high-speed internet has opened new learning opportunities. Children now have access to online education resources and digital literacy training.",
-      impact:
-        "All children gained basic computer skills. Five teenagers secured internships through online applications. The facility is used for homework, research, and skill development. Children report increased confidence in technology.",
-      images: [
-        "https://images.unsplash.com/photo-1516534775068-ba3e7458af70?w=800&h=600",
-      ],
-      beneficiaries: 42,
-      cost: 32000,
-      completedAt: new Date(now.getFullYear(), now.getMonth() - 1, 12),
-      createdAt: new Date(now.getFullYear(), now.getMonth() - 1, 15),
-      updatedAt: new Date(now.getFullYear(), now.getMonth() - 1, 15),
-    },
-    {
-      id: "5",
-      orphanageId: "orphan-2",
-      orphanageName: "Sunshine Orphanage",
-      issueId: "issue-5",
-      issueTitle: "Kitchen Renovation and Equipment",
-      title: "Nutritious Meals for Growing Bodies",
-      description:
-        "Complete kitchen renovation with modern cooking equipment enables us to prepare nutritious, varied meals. The new facility meets health standards and can serve all children efficiently.",
-      impact:
-        "Meal quality improved significantly with balanced nutrition. Food waste reduced by 40% through better storage. Children show improved health markers including weight gain and energy levels. Kitchen staff report safer, more efficient working conditions.",
-      images: [
-        "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&h=600",
-      ],
-      beneficiaries: 35,
-      cost: 28000,
-      completedAt: new Date(now.getFullYear(), now.getMonth() - 2, 8),
-      createdAt: new Date(now.getFullYear(), now.getMonth() - 2, 12),
-      updatedAt: new Date(now.getFullYear(), now.getMonth() - 2, 12),
-    },
-    {
-      id: "6",
-      orphanageId: "orphan-4",
-      orphanageName: "Little Angels Home",
-      issueId: "issue-6",
-      issueTitle: "Playground and Recreation Area",
-      title: "Safe Play Space Brings Joy and Development",
-      description:
-        "A safe, modern playground with age-appropriate equipment provides children with space for physical activity and social interaction. The facility includes sports equipment and outdoor learning areas.",
-      impact:
-        "Children's physical fitness improved measurably. Social skills development accelerated through group play. Behavioral issues decreased as children have healthy outlets for energy. The space is used daily by all children.",
-      images: [
-        "https://images.unsplash.com/photo-1544979590-37e9b47eb705?w=800&h=600",
-      ],
-      beneficiaries: 48,
-      cost: 18000,
-      completedAt: new Date(now.getFullYear(), now.getMonth(), 3),
-      createdAt: new Date(now.getFullYear(), now.getMonth(), 7),
-      updatedAt: new Date(now.getFullYear(), now.getMonth(), 7),
-    },
-  ];
-};
-
-const getMockOrphanages = (): Orphanage[] => {
-  const now = new Date();
-  return [
-    {
-      id: "orphan-1",
-      name: "Hope Children's Home",
-      location: "Lagos, Nigeria",
-      address: "123 Hope Street, Ikeja",
-      state: "Lagos",
-      city: "Ikeja",
-      description:
-        "A loving home providing care, education, and opportunities for orphaned and vulnerable children since 2010.",
-      contactEmail: "contact@hopechildrenshome.org",
-      contactPhone: "+234 123 456 7890",
-      website: "https://hopechildrenshome.org",
-      logoURL:
-        "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=400&h=400&fit=crop",
-      coverImageURL:
-        "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200&h=400&fit=crop",
-      images: [
-        "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&h=600",
-        "https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=800&h=600",
-        "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&h=600",
-        "https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=800&h=600",
-      ],
-      childrenCount: 65,
-      staffCount: 12,
-      foundedYear: 2010,
-      verified: true,
-      contactPersonFirstName: "Adebayo",
-      contactPersonLastName: "Okafor",
-      contactPersonEmail: "adebayo@hopechildrenshome.org",
-      contactPersonPhone: "+234 123 456 7890",
-      contactPersonPosition: "Director",
-      registrationNumber: "RC123456",
-      licenseNumber: "LIC789012",
-      createdAt: now,
-      updatedAt: now,
-    } as Orphanage,
-    {
-      id: "orphan-2",
-      name: "Sunshine Orphanage",
-      location: "Abuja, Nigeria",
-      address: "456 Sunshine Avenue, Wuse",
-      state: "FCT",
-      city: "Abuja",
-      description:
-        "Dedicated to providing quality education and healthcare to underprivileged children since 2012.",
-      contactEmail: "info@sunshineorphanage.org",
-      contactPhone: "+234 234 567 8901",
-      website: "https://sunshineorphanage.org",
-      logoURL:
-        "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400&h=400&fit=crop",
-      coverImageURL:
-        "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200&h=400&fit=crop",
-      images: [
-        "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&h=600",
-        "https://images.unsplash.com/photo-1516534775068-ba3e7458af70?w=800&h=600",
-        "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600",
-      ],
-      childrenCount: 35,
-      staffCount: 8,
-      foundedYear: 2012,
-      verified: true,
-      contactPersonFirstName: "Chioma",
-      contactPersonLastName: "Nwankwo",
-      contactPersonEmail: "chioma@sunshineorphanage.org",
-      contactPersonPhone: "+234 234 567 8901",
-      contactPersonPosition: "Administrator",
-      registrationNumber: "RC234567",
-      licenseNumber: "LIC890123",
-      createdAt: now,
-      updatedAt: now,
-    } as Orphanage,
-    {
-      id: "orphan-3",
-      name: "St. Mary's Children Center",
-      location: "Port Harcourt, Nigeria",
-      address: "789 St. Mary Road, GRA",
-      state: "Rivers",
-      city: "Port Harcourt",
-      description:
-        "A faith-based organization committed to nurturing children's spiritual, academic, and social development since 2008.",
-      contactEmail: "contact@stmaryschildren.org",
-      contactPhone: "+234 345 678 9012",
-      logoURL:
-        "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400&h=400&fit=crop",
-      coverImageURL:
-        "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=1200&h=400&fit=crop",
-      images: [
-        "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&h=600",
-        "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&h=600",
-        "https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=800&h=600",
-      ],
-      childrenCount: 42,
-      staffCount: 10,
-      foundedYear: 2008,
-      verified: true,
-      contactPersonFirstName: "Emmanuel",
-      contactPersonLastName: "Okoro",
-      contactPersonEmail: "emmanuel@stmaryschildren.org",
-      contactPersonPhone: "+234 345 678 9012",
-      contactPersonPosition: "Director",
-      registrationNumber: "RC345678",
-      licenseNumber: "LIC901234",
-      createdAt: now,
-      updatedAt: now,
-    } as Orphanage,
-    {
-      id: "orphan-4",
-      name: "Little Angels Home",
-      location: "Kano, Nigeria",
-      address: "321 Angel Street, Nassarawa",
-      state: "Kano",
-      city: "Kano",
-      description:
-        "Creating a safe, nurturing environment where every child can thrive and reach their full potential since 2015.",
-      contactEmail: "hello@littleangelshome.org",
-      contactPhone: "+234 456 789 0123",
-      logoURL:
-        "https://images.unsplash.com/photo-1544979590-37e9b47eb705?w=400&h=400&fit=crop",
-      coverImageURL:
-        "https://images.unsplash.com/photo-1544979590-37e9b47eb705?w=1200&h=400&fit=crop",
-      images: [
-        "https://images.unsplash.com/photo-1544979590-37e9b47eb705?w=800&h=600",
-        "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&h=600",
-        "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600",
-      ],
-      childrenCount: 48,
-      staffCount: 9,
-      foundedYear: 2015,
-      verified: true,
-      contactPersonFirstName: "Fatima",
-      contactPersonLastName: "Abubakar",
-      contactPersonEmail: "fatima@littleangelshome.org",
-      contactPersonPhone: "+234 456 789 0123",
-      contactPersonPosition: "Coordinator",
-      registrationNumber: "RC456789",
-      licenseNumber: "LIC012345",
-      createdAt: now,
-      updatedAt: now,
-    } as Orphanage,
-  ];
-};
+import ViewSuccessStoryModal from "@/components/admin/success-story/view-modal";
 
 export default function SuccessStoriesPage() {
   const [successStories, setSuccessStories] = useState<SuccessStory[]>([]);
@@ -328,56 +54,31 @@ export default function SuccessStoriesPage() {
   const [filterOrphanage, setFilterOrphanage] = useState("all");
   const [selectedStory, setSelectedStory] = useState<SuccessStory | null>(null);
   const [viewMode, setViewMode] = useState<"all" | "by-orphanage">("all");
-  const [useMockData, setUseMockData] = useState(true); // Toggle for mock data
+
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showAViewModal, setShowViewModal] = useState(false);
   const [editingStory, setEditingStory] = useState<SuccessStory | null>(null);
 
   useEffect(() => {
     loadData();
-  }, [useMockData]);
+  }, []);
 
   const loadData = async () => {
     try {
       setLoading(true);
 
-      if (useMockData) {
-        // Use mock data
-        const mockStories = getMockSuccessStories();
-        const mockOrphanages = getMockOrphanages();
-
-        setSuccessStories(mockStories);
-        setOrphanages(mockOrphanages);
-        setIssues([]);
-
-        // Calculate stats from mock data
-        const byOrphanage = mockStories.reduce((acc, story) => {
-          acc[story.orphanageId] = (acc[story.orphanageId] || 0) + 1;
-          return acc;
-        }, {} as { [orphanageId: string]: number });
-
-        setStats({
-          total: mockStories.length,
-          totalBeneficiaries: mockStories.reduce(
-            (sum, s) => sum + s.beneficiaries,
-            0
-          ),
-          totalCost: mockStories.reduce((sum, s) => sum + s.cost, 0),
-          byOrphanage,
-        });
-      } else {
-        // Use real Firebase data
-        const [storiesData, orphanagesData, issuesData, statsData] =
-          await Promise.all([
-            getSuccessStories(),
-            getOrphanages(),
-            getIssues(),
-            getSuccessStoryStats(),
-          ]);
-        setSuccessStories(storiesData);
-        setOrphanages(orphanagesData);
-        setIssues(issuesData);
-        setStats(statsData);
-      }
+      // Use real Firebase data
+      const [storiesData, orphanagesData, issuesData, statsData] =
+        await Promise.all([
+          getSuccessStories(),
+          getOrphanages(),
+          getIssues(),
+          getSuccessStoryStats(),
+        ]);
+      setSuccessStories(storiesData);
+      setOrphanages(orphanagesData);
+      setIssues(issuesData);
+      setStats(statsData);
     } catch (error) {
       console.error("Error loading data:", error);
       toast.error("Failed to load success stories");
@@ -414,11 +115,6 @@ export default function SuccessStoriesPage() {
   const getOrphanageName = (orphanageId: string) => {
     const orphanage = orphanages.find((o) => o.id === orphanageId);
     return orphanage?.name || "Unknown Orphanage";
-  };
-
-  const getIssueTitle = (issueId: string) => {
-    const issue = issues.find((i) => i.id === issueId);
-    return issue?.title || "Unknown Issue";
   };
 
   if (loading) {
@@ -508,13 +204,6 @@ export default function SuccessStoriesPage() {
           <Button onClick={() => setShowAddModal(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Add Success Story
-          </Button>
-          <Button
-            onClick={() => setUseMockData(!useMockData)}
-            variant={useMockData ? "default" : "outline"}
-            size="sm"
-          >
-            {useMockData ? "Using Mock Data" : "Using Live Data"}
           </Button>
           <Button
             onClick={() =>
@@ -627,7 +316,7 @@ export default function SuccessStoriesPage() {
                 className="hover:shadow-lg transition-all duration-300 overflow-hidden group"
               >
                 {/* Image Section */}
-                <div className="relative h-48 bg-gray-100 dark:bg-gray-800">
+                <div className="relative h-48 bg-gray-100 dark:bg-gray-800 overflow-hidden">
                   <Image
                     src={mainImage}
                     alt={story.title}
@@ -713,7 +402,10 @@ export default function SuccessStoriesPage() {
                       size="sm"
                       variant="outline"
                       className="flex-1"
-                      onClick={() => setSelectedStory(story)}
+                      onClick={() => {
+                        setShowViewModal(true);
+                        setSelectedStory(story);
+                      }}
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       View
@@ -806,7 +498,10 @@ export default function SuccessStoriesPage() {
                             size="sm"
                             variant="outline"
                             className="flex-1 text-xs"
-                            onClick={() => setSelectedStory(story)}
+                            onClick={() => {
+                              setShowViewModal(true);
+                              setSelectedStory(story);
+                            }}
                           >
                             <Eye className="w-3 h-3 mr-1" />
                             View
@@ -833,165 +528,27 @@ export default function SuccessStoriesPage() {
         </div>
       )}
 
-      {/* Success Story Details Modal */}
-      {selectedStory && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    {selectedStory.title}
-                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                      Completed
-                    </Badge>
-                  </CardTitle>
-                  <div className="flex items-center text-sm text-gray-500 mt-2">
-                    <Building2 className="w-4 h-4 mr-1" />
-                    {selectedStory.orphanageName}
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedStory(null)}
-                >
-                  <XCircle className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h3 className="font-semibold mb-2">Description</h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {selectedStory.description}
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-2">Impact</h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {selectedStory.impact}
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-2">Related Issue</h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {getIssueTitle(selectedStory.issueId)}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold mb-2">Statistics</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Beneficiaries:</span>
-                      <span className="font-medium">
-                        {selectedStory.beneficiaries}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Total Cost:</span>
-                      <span className="font-medium">
-                        ${selectedStory.cost.toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Completed:</span>
-                      <span className="font-medium">
-                        {formatFirebaseDate(selectedStory.completedAt)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold mb-2">Timeline</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Created:</span>
-                      <span className="font-medium">
-                        {formatFirebaseDate(selectedStory.createdAt)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Last Updated:</span>
-                      <span className="font-medium">
-                        {formatFirebaseDate(selectedStory.updatedAt)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {selectedStory.images && selectedStory.images.length > 0 && (
-                <div>
-                  <h3 className="font-semibold mb-2 flex items-center gap-2">
-                    <ImageIcon className="w-5 h-5" />
-                    Images ({selectedStory.images.length})
-                  </h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {selectedStory.images.map((image, index) => (
-                      <div
-                        key={index}
-                        className="relative aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden group cursor-pointer"
-                      >
-                        <Image
-                          src={image}
-                          alt={`${selectedStory.title} - Image ${index + 1}`}
-                          fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-                        <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                          {index + 1}/{selectedStory.images.length}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="flex gap-2 pt-4">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => {
-                    setEditingStory(selectedStory);
-                    setShowAddModal(true);
-                  }}
-                >
-                  <Edit className="w-4 h-4 mr-2" />
-                  Edit Story
-                </Button>
-                <ConfirmationDialog
-                  title="Delete Success Story"
-                  description={`Are you sure you want to delete "${selectedStory.title}"? This action cannot be undone.`}
-                  onConfirm={() => {
-                    handleDeleteStory(selectedStory.id);
-                    setSelectedStory(null);
-                  }}
-                  variant="destructive"
-                >
-                  <Button variant="destructive" className="flex-1">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete Story
-                  </Button>
-                </ConfirmationDialog>
-                <Button
-                  variant="outline"
-                  onClick={() => setSelectedStory(null)}
-                  className="flex-1"
-                >
-                  Close
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      {/* View Success story Modal */}
+      <ViewSuccessStoryModal
+        isOpen={showAViewModal}
+        sucessData={selectedStory}
+        issues={issues}
+        onClose={() => {
+          setShowViewModal(false);
+          setSelectedStory(null);
+        }}
+        onEdit={() => {
+          const currentSelected = selectedStory;
+          setSelectedStory(null);
+          setShowViewModal(false);
+          setEditingStory(currentSelected);
+          setShowAddModal(true);
+        }}
+        onDelete={(id: string) => {
+          handleDeleteStory(id);
+          setSelectedStory(null);
+        }}
+      />
 
       {/* Add/Edit Success Story Modal */}
       <AddSuccessStoryModal
