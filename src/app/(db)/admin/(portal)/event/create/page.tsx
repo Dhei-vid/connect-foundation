@@ -84,6 +84,8 @@ export default function CreateEventPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
+  console.log("Upload Progress ", uploadProgress);
+
   const handleInputChange = (
     field: string,
     value: string | boolean | number | string[] | Date | undefined

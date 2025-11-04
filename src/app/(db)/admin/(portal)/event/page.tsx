@@ -443,7 +443,7 @@ export default function AdminEventsPage() {
                           alt={event.title}
                           width={192}
                           height={200}
-                          className="w-full h-full object-cover object-center rounded-lg"
+                          className="w-full h-42 object-cover object-center rounded-lg"
                         />
                       ) : (
                         <div className="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">

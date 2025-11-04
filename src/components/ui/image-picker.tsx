@@ -174,7 +174,7 @@ export function ImagePicker({
         <div className="space-y-3">
           <div className="flex flex-row justify-between">
             <p className="text-sm text-main-blue">Uploading Image:</p>
-            <p className="text-sm text-main-blue">{progress.toPrecision(0)}%</p>
+            <p className="text-sm text-main-blue">{Math.round(progress)}%</p>
           </div>
           <Progress value={progress} />
         </div>
