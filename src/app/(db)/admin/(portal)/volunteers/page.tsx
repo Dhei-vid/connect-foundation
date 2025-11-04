@@ -664,7 +664,6 @@ export default function VolunteersPage() {
                     <th className="text-left py-3 px-4">Volunteer</th>
                     <th className="text-left py-3 px-4">Contact</th>
                     <th className="text-left py-3 px-4">Experience</th>
-                    <th className="text-left py-3 px-4">Skills</th>
                     <th className="text-left py-3 px-4">Status</th>
                     <th className="text-left py-3 px-4">Background Check</th>
                     <th className="text-left py-3 px-4">Actions</th>
@@ -710,24 +709,7 @@ export default function VolunteersPage() {
                           {volunteer.experience}
                         </Badge>
                       </td>
-                      <td className="py-3 px-4">
-                        <div className="flex flex-wrap gap-1">
-                          {/* {volunteer.skills.slice(0, 2).map((skill, index) => (
-                            <Badge
-                              key={index}
-                              variant="outline"
-                              className="text-xs"
-                            >
-                              {skill}
-                            </Badge>
-                          ))}
-                          {volunteer.skills.length > 2 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{volunteer.skills.length - 2}
-                            </Badge>
-                          )} */}
-                        </div>
-                      </td>
+
                       <td className="py-3 px-4">
                         <Badge className={getStatusColor(volunteer.status)}>
                           {volunteer.status}
