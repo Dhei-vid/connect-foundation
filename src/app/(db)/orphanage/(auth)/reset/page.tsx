@@ -30,9 +30,7 @@ export default function OrphanageSignInPage() {
       setStatus("Reset email sent. Please check your inbox");
     } catch (error) {
       const errorMessage = extractErrorMessage(error as UnknownError);
-      setError(
-        "An error occurred while resetting password. Please try again later."
-      );
+      setError(`An error occurred while resetting password. ${errorMessage}`);
       toast.error("Error resetting password", {
         description: errorMessage,
       });
@@ -58,9 +56,9 @@ export default function OrphanageSignInPage() {
               <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
               <button
                 onClick={() => setError("")}
-                className="hover:bg-white/50 rounded-md cursor-pointer p-1 transition-all ease-in-out duration-200"
+                className="hover:bg-white/50 rounded-md cursor-pointer p-1 w-6 h-6 flex items-center justify-center transition-all ease-in-out duration-200"
               >
-                <X />
+                <X size={20} />
               </button>
             </div>
           )}
@@ -72,7 +70,7 @@ export default function OrphanageSignInPage() {
               </p>
               <button
                 onClick={() => setStatus("")}
-                className="hover:bg-white/50 rounded-md cursor-pointer p-1 transition-all ease-in-out duration-200"
+                className="hover:bg-white/50 rounded-md cursor-pointer p-1 w-6 h-6 flex items-center justify-center transition-all ease-in-out duration-200"
               >
                 <X size={15} />
               </button>

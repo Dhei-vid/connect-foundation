@@ -228,7 +228,11 @@ export const resetPassword = async (email: string) => {
     const emailExists = await checkUserByEmail(email);
     console.log("Email exists ", emailExists);
 
-    if (emailExists) await sendPasswordResetEmail(auth, email);
+    if (emailExists) {
+      await sendPasswordResetEmail(auth, email);
+    } else {
+      throw new Error("Email does not exist");
+    }
   } catch (error) {
     throw error;
   }
