@@ -2,24 +2,22 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Mail, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuthContext } from "@/providers/providers";
 import { extractErrorMessage, type UnknownError } from "@/common/helpers";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
+import { resetPassword } from "@/firebase/auth";
 
 export default function OrphanageSignInPage() {
-  const router = useRouter();
   const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [status, setStatus] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const { signIn, user } = useAuthContext();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,22 +25,15 @@ export default function OrphanageSignInPage() {
     setIsLoading(true);
 
     try {
-      const success = await signIn(email, password);
-      if (success) {
-        toast.success("Signed in successfully");
-
-        if (user && !user.onboardingCompleted) {
-          router.push("/orphanage/onboarding");
-        } else {
-          router.push("/orphanage/dashboard");
-        }
-      } else {
-        setError("Invalid email or password");
-      }
+      await resetPassword(email);
+      toast.success("Reset email sent");
+      setStatus("Reset email sent. Please check your inbox");
     } catch (error) {
       const errorMessage = extractErrorMessage(error as UnknownError);
-      setError("An error occurred during sign in");
-      toast.error("Error signing in", {
+      setError(
+        "An error occurred while resetting password. Please try again later."
+      );
+      toast.error("Error resetting password", {
         description: errorMessage,
       });
     } finally {
@@ -55,16 +46,36 @@ export default function OrphanageSignInPage() {
       <Card className="w-full shadow-lg border-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm">
         <CardHeader className="text-center pb-6">
           <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-            Orphanage Sign In
+            Reset Password
           </CardTitle>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Access your orphanage portal
+            Rset your password to access your orphanage portal
           </p>
         </CardHeader>
         <CardContent className="px-6 pb-6">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div className="flex flex-row justify-between mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
               <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              <button
+                onClick={() => setError("")}
+                className="hover:bg-white/50 rounded-md cursor-pointer p-1 transition-all ease-in-out duration-200"
+              >
+                <X />
+              </button>
+            </div>
+          )}
+
+          {status && (
+            <div className="flex flex-row justify-between mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+              <p className="text-sm text-green-600 dark:text-green-400">
+                {status}
+              </p>
+              <button
+                onClick={() => setStatus("")}
+                className="hover:bg-white/50 rounded-md cursor-pointer p-1 transition-all ease-in-out duration-200"
+              >
+                <X size={15} />
+              </button>
             </div>
           )}
 
@@ -86,45 +97,6 @@ export default function OrphanageSignInPage() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="pl-10 pr-10 h-11 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-main-red focus:border-transparent"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="text-right">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                <Link
-                  href="/orphanage/reset"
-                  className="text-main-red font-semibold hover:underline"
-                >
-                  Forgotten password?
-                </Link>
-              </p>
-            </div>
-
             <Button
               type="submit"
               className="w-full h-11 bg-main-red hover:bg-main-red/90 text-white font-medium transition-colors"
@@ -133,22 +105,22 @@ export default function OrphanageSignInPage() {
               {isLoading ? (
                 <div className="flex items-center gap-2">
                   <Spinner className="w-4 h-4" />
-                  Signing in...
+                  Resetting...
                 </div>
               ) : (
-                "Sign In"
+                "Reset Passwording"
               )}
             </Button>
           </form>
 
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don&apos;t have an account?{" "}
+              Have an account?{" "}
               <Link
-                href="/orphanage/signup"
+                href="/orphanage/signin"
                 className="text-main-red font-semibold hover:underline"
               >
-                Sign up here
+                Log in here
               </Link>
             </p>
           </div>

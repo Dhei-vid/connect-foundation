@@ -1,15 +1,33 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut,
   onAuthStateChanged,
   updateProfile,
   User as FirebaseUser,
 } from "firebase/auth";
-import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { auth, db } from "@/config/firebase";
 import type { User, Orphanage } from "@/common/types";
 
+/**
+ * Sign Up User with Email
+ * @param email
+ * @param password
+ * @param displayName
+ * @param role
+ * @returns
+ */
 export async function signUpWithEmail(
   email: string,
   password: string,
@@ -48,6 +66,12 @@ export async function signUpWithEmail(
   }
 }
 
+/**
+ * Sign In User
+ * @param email
+ * @param password
+ * @returns
+ */
 export async function signInWithEmail(
   email: string,
   password: string
@@ -80,6 +104,9 @@ export async function signInWithEmail(
   }
 }
 
+/**
+ * Sign Out user
+ */
 export async function signOutUser(): Promise<void> {
   try {
     await signOut(auth);
@@ -89,6 +116,11 @@ export async function signOutUser(): Promise<void> {
   }
 }
 
+/**
+ * Check Auth Change Status
+ * @param callback
+ * @returns
+ */
 export function onAuthStateChange(
   callback: (user: User | null) => void
 ): () => void {
@@ -111,6 +143,11 @@ export function onAuthStateChange(
   });
 }
 
+/**
+ * Create orphanage Profile
+ * @param userId
+ * @param orphanageData
+ */
 export async function createOrphanageProfile(
   userId: string,
   orphanageData: Omit<
@@ -143,6 +180,10 @@ export async function createOrphanageProfile(
   }
 }
 
+/**
+ * Check current user
+ * @returns
+ */
 export async function getCurrentUser(): Promise<User | null> {
   const user = auth.currentUser;
   if (!user) return null;
@@ -159,6 +200,11 @@ export async function getCurrentUser(): Promise<User | null> {
   return null;
 }
 
+/**
+ * Update User onboarding Status
+ * @param userId
+ * @param onboardingCompleted
+ */
 export async function updateUserOnboardingStatus(
   userId: string,
   onboardingCompleted: boolean
@@ -171,4 +217,32 @@ export async function updateUserOnboardingStatus(
     console.error("Error updating onboarding status:", error);
     throw error;
   }
+}
+
+/**
+ * Reset Password
+ * @param email: String
+ */
+export const resetPassword = async (email: string) => {
+  try {
+    const emailExists = await checkUserByEmail(email);
+    console.log("Email exists ", emailExists);
+
+    if (emailExists) await sendPasswordResetEmail(auth, email);
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Check is email exists
+ * @param email
+ * @returns
+ */
+export async function checkUserByEmail(email: string) {
+  const usersRef = collection(db, "users");
+
+  const q = query(usersRef, where("email", "==", email));
+  const snapshot = await getDocs(q);
+  return !snapshot.empty;
 }
