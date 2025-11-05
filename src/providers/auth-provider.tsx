@@ -1,20 +1,23 @@
 "use client";
 
-import { ReactNode, useState } from "react";
-import { usePathname } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { ReactNode, useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuthContext } from "./providers";
 import { WrongPage } from "@/components/error/wrong-screen";
+import { toast } from "sonner";
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, isAdmin, isOrphanage } = useAuthContext();
+  const { isAuthenticated, isAdmin, isOrphanage, isOnboardingComplete } =
+    useAuthContext();
 
   const [isLoading, setIsLoading] = useState(false);
 
+  // Match the entire word
   const containsSubstring = (target: string, text: string): boolean => {
-    return text.toLowerCase().includes(target.toLowerCase());
+    const pattern = new RegExp(`\\b${target}\\b`, "i"); // 'i' for case-insensitive
+    return pattern.test(text);
   };
 
   const handleRedirect = (url: string) => {

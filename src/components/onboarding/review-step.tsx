@@ -15,6 +15,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import type { Orphanage } from "@/common/types";
+import { Spinner } from "../ui/spinner";
 
 interface ReviewStepProps {
   data: Partial<Orphanage>;
@@ -425,7 +426,11 @@ export default function ReviewStep({
           className="flex items-center gap-2"
         >
           {isLoading ? "Completing..." : "Complete Profile"}
-          <CheckCircle className="w-4 h-4" />
+          {isLoading ? (
+            <Spinner className="w-4 h-4 mr-2" />
+          ) : (
+            <CheckCircle className="w-4 h-4" />
+          )}
         </Button>
       </div>
     </div>

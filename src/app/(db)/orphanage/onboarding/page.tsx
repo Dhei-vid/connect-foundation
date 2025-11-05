@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/providers/providers";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -12,8 +11,6 @@ import {
   FileText,
   CreditCard,
   CheckCircle,
-  ArrowRight,
-  ArrowLeft,
   Image as ImageIcon,
 } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
@@ -125,7 +122,7 @@ export default function OnboardingPage() {
     setIsLoading(true);
     try {
       // Update orphanage profile with complete data
-      const orphanages = await getOrphanageProfile(user!.uid);
+      await getOrphanageProfile(user!.uid);
 
       // uploading onboarding images
       const images = formData.imageFiles?.map((img) => img.file) ?? [];
@@ -163,8 +160,10 @@ export default function OnboardingPage() {
         : undefined;
       toast.success("Image Uploaded Successfully");
 
+      const { imageFiles, logoURLFile, coverImageFile, ...rest } = formData;
+
       const onBoardingData = {
-        ...formData,
+        ...rest,
         images: imagesURL,
         logoURL: logoImageURL,
         coverImageURL: coverURL,
@@ -298,7 +297,7 @@ export default function OnboardingPage() {
         </Card>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between">
+        {/* <div className="flex justify-between">
           <Button
             variant="outline"
             onClick={prevStep}
@@ -324,7 +323,7 @@ export default function OnboardingPage() {
               <CheckCircle className="w-4 h-4" />
             </Button>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -120,7 +120,7 @@ export default function OrphanageSignUpPage() {
       router.push("/orphanage/onboarding");
     } catch (error) {
       const errorMessage = extractErrorMessage(error as UnknownError);
-      setError("An error occurred during sign up");
+      setError(`An error occurred during sign up. ${errorMessage}`);
       toast.error("Error creating account", {
         description: errorMessage,
       });

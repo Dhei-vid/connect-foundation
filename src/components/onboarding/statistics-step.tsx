@@ -91,7 +91,7 @@ export default function StatisticsStep({
 
     if (!formData?.periodicMonitoring) {
       newErrors.periodicMonitoring =
-        "Please tick yes on periodic monitoring & reporting";
+        'Please tick yes on "Open Periodic Monitoring & Reporting". This means over time we would request for reports on the assistance rendered and how it is benefitting the orphanage.';
     }
 
     if (!formData?.agerange) {
@@ -255,7 +255,7 @@ export default function StatisticsStep({
           <div className="flex items-center gap-3">
             <Checkbox
               id="periodicMonitoring"
-              checked={data.periodicMonitoring}
+              checked={formData.periodicMonitoring}
               onCheckedChange={(value) =>
                 setFormData((prev) => ({
                   ...prev,
@@ -263,7 +263,7 @@ export default function StatisticsStep({
                 }))
               }
             />
-            <Label className="text-sm font-light" htmlFor="terms">
+            <Label className="text-sm font-light" htmlFor="periodicMonitoring">
               Open to Periodic Monitoring and Reporting
             </Label>
           </div>
@@ -271,7 +271,7 @@ export default function StatisticsStep({
           <div className="flex items-center gap-3">
             <Checkbox
               id="communityService"
-              checked={data.communityService}
+              checked={formData.communityService}
               onCheckedChange={(value) =>
                 setFormData((prev) => ({
                   ...prev,

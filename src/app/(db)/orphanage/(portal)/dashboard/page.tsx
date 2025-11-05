@@ -425,7 +425,6 @@ export default function OrphanageDashboard() {
               <li>Receive donations from generous supporters</li>
               <li>Share success stories and impact reports</li>
               <li>Connect with volunteers and other organizations</li>
-              <li>Track your financial records and transparency</li>
             </ul>
             <p className="text-sm text-gray-500 dark:text-gray-500 mt-4">
               We&apos;ll notify you once your account is verified and ready to

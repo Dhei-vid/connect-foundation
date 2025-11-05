@@ -27,7 +27,9 @@ export default function OrphanageSignInPage() {
     try {
       await resetPassword(email);
       toast.success("Reset email sent");
-      setStatus("Reset email sent. Please check your inbox");
+      setStatus(
+        "Reset email sent. Please check your inbox. Check you spam folder as well"
+      );
     } catch (error) {
       const errorMessage = extractErrorMessage(error as UnknownError);
       setError(`An error occurred while resetting password. ${errorMessage}`);

@@ -226,7 +226,6 @@ export async function updateUserOnboardingStatus(
 export const resetPassword = async (email: string) => {
   try {
     const emailExists = await checkUserByEmail(email);
-    console.log("Email exists ", emailExists);
 
     if (emailExists) {
       await sendPasswordResetEmail(auth, email);

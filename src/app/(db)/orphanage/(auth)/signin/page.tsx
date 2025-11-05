@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
@@ -19,7 +19,24 @@ export default function OrphanageSignInPage() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const { signIn, user } = useAuthContext();
+  const { signIn, user, isAuthenticated, isOrphanage, isOnboardingComplete } =
+    useAuthContext();
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    if (isAuthenticated) {
+      if (isOrphanage && isOnboardingComplete) {
+        router.push("/orphanage/dashboard");
+        toast("Redirecting to Dashboard");
+      }
+
+      if (isOrphanage && !isOnboardingComplete) {
+        router.push("/orphanage/onboarding");
+        toast("Redirecting to Onboarding screen");
+      }
+    }
+  }, [isAuthenticated, isOrphanage, isOnboardingComplete]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
