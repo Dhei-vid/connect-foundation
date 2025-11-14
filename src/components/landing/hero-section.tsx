@@ -17,7 +17,7 @@ export function HeroSection() {
           transition={{ duration: 0.8 }}
           className="mb-8"
         >
-          <h1 className="text-5xl md:text-7xl 2xl:text-9xl font-bold mb-6">
+          <h1 className="text-5xl md:text-7xl 2xl:text-8xl font-bold mb-6">
             <span className="text-grey">Connect</span>
             <br />
             <span className="text-grey">Orphanage Foundation</span>

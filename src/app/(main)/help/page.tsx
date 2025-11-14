@@ -25,7 +25,7 @@ import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import Image from "next/image";
 import type { Issue, Orphanage } from "@/common/types";
-import { getIssues, updateIssue } from "@/firebase/issues";
+import { getIssues } from "@/firebase/issues";
 import { getOrphanages } from "@/firebase/orphanages";
 import { createDonation } from "@/firebase/donations";
 import {
@@ -564,30 +564,30 @@ export default function HelpPage() {
         <section
           className={cn(
             heroLayoutStyle,
-            "flex flex-col items-center justify-center text-center"
+            "flex flex-col items-center text-center pt-10 lg:pt-20"
           )}
         >
           <div className="max-w-4xl mx-auto text-center text-white">
             <h1 className={cn(heroHeaderStyle, "font-bold mb-6")}>
               Help Make a <span className="text-main-red">Difference</span>
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-white/90">
+            <p className="text-base md:text-lg 2xl:text-xl mb-8 text-white/90">
               Support orphanages by donating directly to their most urgent
               needs. Every contribution brings hope and transforms lives.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <Heart className="w-8 h-8 mx-auto mb-2" />
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                <Heart className="w-8 h-8 mx-auto mb-2 text-main-red" />
                 <h3 className="font-semibold">Direct Impact</h3>
                 <p className="text-sm text-white/80">100% goes to the cause</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <CheckCircle2 className="w-8 h-8 mx-auto mb-2" />
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                <CheckCircle2 className="w-8 h-8 mx-auto mb-2 text-main-red" />
                 <h3 className="font-semibold">Verified Needs</h3>
                 <p className="text-sm text-white/80">All issues are verified</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <DollarSign className="w-8 h-8 mx-auto mb-2" />
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                <DollarSign className="w-8 h-8 mx-auto mb-2 text-main-red" />
                 <h3 className="font-semibold">Transparent</h3>
                 <p className="text-sm text-white/80">Track your contribution</p>
               </div>

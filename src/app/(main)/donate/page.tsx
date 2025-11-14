@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +11,6 @@ import {
   CheckCircle,
   Clock,
   ArrowDown,
-  Loader2,
 } from "lucide-react";
 import { TopNav } from "@/components/navigation/top-nav";
 import ImpactCard from "@/components/general/impact-card";
@@ -39,7 +38,6 @@ export default function Page() {
   });
   const [isRecurring, setIsRecurring] = useState<boolean>(false);
   const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
-  const [isPending, startTransition] = useTransition();
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
@@ -197,43 +195,43 @@ export default function Page() {
       <div className="px-4 2xl:px-10">
         <div
           className={
-            "overflow-hidden relative bg-cover bg-no-repeat bg-center h-[40rem] lg:h-[34rem] 2xl:h-[55rem] 3xl:h-[60rem] p-6 2xl:p-8 3xl:p-12 rounded-[3rem] bg-[url('https://images.pexels.com/photos/5789276/pexels-photo-5789276.jpeg')]"
+            "overflow-hidden relative bg-cover bg-no-repeat bg-center h-[calc(100svh-100px)] p-6 2xl:p-8 3xl:p-12 rounded-[3rem] bg-[url('https://images.pexels.com/photos/5789276/pexels-photo-5789276.jpeg')]"
           }
         >
           {/* Gradient behind content */}
           <div className="absolute inset-0 bg-gradient-to-br from-gray-900/70 via-slate-800/50 to-gray-700/90 z-0 rounded-b-[3rem]"></div>
 
           {/* Content */}
-          <div className="w-full flex mb-auto relative z-10 h-[32rem] lg:h-[30rem] 2xl:h-[50rem] 3xl:h-[60rem]">
+          <div className="w-full flex mb-auto relative z-10 h-[calc(100svh-140px)]">
             <div className="grid grid-cols-3 items-end w-full">
               <div className="col-span-2 flex flex-row items-end">
                 <div>
-                  <p className="tracking-wide text-white font-bold text-2xl lg:text-9xl 2xl:text-[15rem]">
+                  <p className="tracking-wide text-white font-bold text-7xl lg:text-9xl 2xl:text-9xl">
                     Donate
                   </p>
                 </div>
-                <div className="mb-3">
-                  <p className="font-bold text-main-red lg:text-3xl 2xl:text-6xl">
+                <div>
+                  <p className="font-bold text-main-red text-xl lg:text-3xl 2xl:text-4xl">
                     Help
                   </p>
-                  <p className="font-bold text-main-red lg:text-3xl 2xl:text-6xl">
+                  <p className="font-bold text-main-red text-xl lg:text-3xl 2xl:text-4xl">
                     Others
                   </p>
                 </div>
               </div>
-              <div className={"justify-self-end col-span-1"}>
+              <div className={"hidden lg:block justify-self-end col-span-1"}>
                 <button
                   className={
                     "ease-in-out transition-all duration-200 group cursor-pointer text-white rounded-full p-3 px-5 bg-main-red hover:bg-main-red/90 flex flex-row items-center gap-1 2xl:gap-3"
                   }
                 >
-                  <p className={"font-semibold 2xl:text-3xl"}>Start Donating</p>
+                  <p className={"font-semibold 2xl:text-2xl"}>Start Donating</p>
                   <div
                     className={
                       "group-hover:bg-white/10 bg-white/7 p-2 rounded-full"
                     }
                   >
-                    <ArrowDown className="2xl:w-12 2xl:h-12" />
+                    <ArrowDown className="2xl:w-8 2xl:h-8" />
                   </div>
                 </button>
               </div>

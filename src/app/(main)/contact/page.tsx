@@ -3,10 +3,12 @@
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Clock, Send, Loader2 } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { heroLayoutStyle } from "@/common/style";
 import { Spinner } from "@/components/ui/spinner";
+import FAQ from "@/components/general/faq";
+import { faqData } from "@/common/data";
 
 import { TopNav } from "@/components/navigation/top-nav";
 import HeroLayout from "@/components/general/hero-layout";
@@ -88,14 +90,14 @@ export default function Page() {
         <section
           className={cn(
             heroLayoutStyle,
-            "flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8"
+            "flex flex-col items-center px-4 sm:px-6 lg:px-8 pt-15 2xl:pt-35"
           )}
         >
           <div className="max-w-7xl mx-auto text-center">
-            <h1 className="text-6xl md:text-7xl font-bold text-grey dark:text-white mb-6">
+            <h1 className="text-6xl md:text-7xl font-bold text-white dark:text-white mb-6">
               Get in Touch
             </h1>
-            <p className="text-xl lg:text-2xl text-grey dark:text-gray-300 max-w-3xl mx-auto">
+            <p className="text-base md:text-lg 2xl:text-xl text-white dark:text-gray-300 max-w-3xl mx-auto">
               Have questions about our work? Want to learn how you can help?
               We&apos;d love to hear from you and answer any questions you might
               have.
@@ -295,68 +297,14 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Office Image Section */}
-      {/* <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-            Our Office
-          </h2>
-          <div className="relative">
-            <div className="w-full h-96 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-2xl flex items-center justify-center">
-              <div className="text-center text-gray-500 dark:text-gray-400">
-                <MapPin className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p className="text-lg">
-                  Image: Connect Foundation Office Building
-                </p>
-                <p className="text-sm">Placeholder for office building photo</p>
-                <p className="text-sm">
-                  Modern office space where our team works
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section> */}
-
       {/* FAQ Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
+          <h2 className="text-4xl font-bold text-center text-gray-900 dark:text-white mb-16">
             Frequently Asked Questions
           </h2>
-          <div className="space-y-6">
-            {[
-              {
-                question: "How can I donate to a specific orphanage?",
-                answer:
-                  "You can browse our orphanage profiles and select specific issues or needs to donate to. Each donation is tracked and you'll receive updates on how your contribution is being used.",
-              },
-              {
-                question:
-                  "What percentage of my donation goes directly to the children?",
-                answer:
-                  "We maintain a 90%+ efficiency rate, meaning at least 90% of your donation goes directly to the orphanage and children. Administrative costs are kept minimal and transparent.",
-              },
-              {
-                question: "How do you verify orphanages on your platform?",
-                answer:
-                  "We have a rigorous verification process that includes site visits, documentation review, and ongoing monitoring to ensure all orphanages meet our standards of care and transparency.",
-              },
-              {
-                question:
-                  "Can I volunteer at an orphanage through your platform?",
-                answer:
-                  "Yes! Many of our partner orphanages welcome volunteers. Contact us to learn about current volunteer opportunities and requirements.",
-              },
-            ].map((faq, index) => (
-              <Card key={index} className="p-6 bg-white dark:bg-gray-900">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                  {faq.question}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300">{faq.answer}</p>
-              </Card>
-            ))}
-          </div>
+
+          <FAQ items={faqData} className="space-y-4" allowMultiple={false} />
         </div>
       </section>
     </div>

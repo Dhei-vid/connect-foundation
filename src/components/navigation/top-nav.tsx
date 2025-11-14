@@ -129,7 +129,7 @@ export function TopNav({
   }, [isMobileMenuOpen]);
 
   return (
-    <nav className="mx-auto p-3 sm:p-4 md:p-5 w-full 2xl:w-[70%] 3xl:w-[50%]">
+    <nav className="mx-auto p-3 sm:p-4 md:p-5 w-full 2xl:w-[80%] 3xl:w-[50%]">
       {/* Desktop Navigation - Hidden on mobile and tablet */}
       <div className="hidden md:grid grid-cols-4 items-center justify-center">
         <Image

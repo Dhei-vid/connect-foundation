@@ -10,7 +10,6 @@ import AccordionComp from "@/components/general/accordion-component";
 import StoriesCard from "@/components/stories/stories-card";
 import { TopNav } from "@/components/navigation/top-nav";
 import HeroLayout from "@/components/general/hero-layout";
-import { heroLayoutStyle } from "@/common/style";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { getMockSuccessStories } from "@/common/mock-data";
@@ -25,8 +24,7 @@ export default function Page() {
         <TopNav />
         <section
           className={cn(
-            heroLayoutStyle,
-            "flex flex-col items-center justify-center max-w-6xl mx-auto"
+            "flex flex-col items-center justify-center max-w-6xl mx-auto pt-15 2xl:pt-35"
           )}
         >
           <div className="max-w-7xl space-y-5 mx-auto text-center">
@@ -34,7 +32,7 @@ export default function Page() {
               <h1 className="text-5xl md:text-7xl lg:text-8xl 2xl:text-[10rem] font-bold text-white/90">
                 Our <span className="text-main-red/90">Impact</span>
               </h1>
-              <p className="text-xl lg:text-2xl 2xl:text-3xl text-white max-w-3xl mx-auto mb-8">
+              <p className="text-base md:text-lg 2xl:text-xl text-white max-w-3xl mx-auto mb-8">
                 See the real difference your support makes in children&apos;s
                 lives. From education to healthcare, every donation creates
                 lasting positive change.
@@ -42,7 +40,7 @@ export default function Page() {
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
-                className="bg-main-red hover:bg-main-red/90 text-lg px-8 py-3"
+                className="bg-main-red hover:bg-main-red/90 px-8 py-3"
                 onClick={() => router.push("/donate")}
                 size="lg"
               >
@@ -53,7 +51,7 @@ export default function Page() {
               <Button
                 variant="outline"
                 size="lg"
-                className="text-lg px-8 py-3 hover:bg-transparent hover:text-white"
+                className="px-8 py-3 hover:bg-transparent hover:text-white"
               >
                 View Success Stories
               </Button>

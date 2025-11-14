@@ -58,32 +58,29 @@ export default function Page() {
 
   return (
     <div className="min-h-screen">
-      <HeroLayout bgImage="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg">
+      <HeroLayout bgImage="https://images.pexels.com/photos/31095001/pexels-photo-31095001.jpeg">
         <TopNav />
         <section
           className={cn(
             heroLayoutStyle,
-            "flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8"
+            "flex flex-col items-center px-4 sm:px-6 lg:px-8 pt-15 2xl:pt-35"
           )}
         >
           <div className="max-w-7xl mx-auto text-center">
             <h1 className="text-6xl md:text-7xl font-bold text-white mb-6">
               Become a <span className="text-main-red">Volunteer</span>
             </h1>
-            <p className="text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto mb-8">
+            <p className="text-base md:text-lg 2xl:text-xl text-white/90 max-w-3xl mx-auto mb-8">
               Join our community of dedicated volunteers making a real
               difference in children&apos;s lives. Your time, skills, and
               compassion can change the world, one child at a time.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                className="text-lg px-8 py-3 bg-main-red text-white"
-              >
+              <Button size="lg" className="px-8 py-3 bg-main-red text-white">
                 <Users className="w-5 h-5 mr-2" />
                 Start Volunteering
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-3">
+              <Button variant="outline" size="lg" className="px-8 py-3">
                 Learn More
               </Button>
             </div>

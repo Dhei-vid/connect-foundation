@@ -5,7 +5,8 @@ export const heroHeaderStyle = "text-5xl md:text-7xl 2xl:text-9xl pb-3";
 
 export const paddingStyle = "px-5 py-20 lg:px-8 2xl:px-54";
 
-export const heroLayoutStyle = "h-[30rem] md:h-[25rem] 2xl:h-[40rem]";
+export const heroLayoutStyle =
+  "min-h-[120svh] lg:min-h-0 lg:h-[calc(100svh-40px)]";
 
 export const categoryColors = {
   medical: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
